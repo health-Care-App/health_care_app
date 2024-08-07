@@ -1,1 +1,6 @@
-# health_care_app
+### フロント
+flutter
+### バック
+go
+### DB
+postgresql
