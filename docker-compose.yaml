@@ -1,0 +1,58 @@
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+services:
+  flutter:
+    container_name: flutter
+    build:
+      context: ./frontend
+      args:
+        # Dockerfile内でARGしている変数に.envに定義した値を代入。
+        - ubuntu_version=${UBUNTU_VERSION}
+        - timezone=${TIMEZONE}
+        - web_server_port=${WEB_SERVER_PORT}
+        - app_code_path_container=${APP_CODE_PATH_CONTAINER}
+    tty: true
+    env_file: .env
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+    logging: *default-logging
+    # web-serverとして動作させるためにportを指定。
+    ports:
+      - "$WEB_SERVER_PORT:$WEB_SERVER_PORT"
+    depends_on:
+      - go
+
+  go:
+    container_name: go
+    build: ./backend
+    volumes:
+      - ./backend/:/app/
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    depends_on:
+      - db  
+  
+  db:
+    container_name: db
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+
+  
+volumes:
+  postgres_data:
