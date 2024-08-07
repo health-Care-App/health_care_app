@@ -1,29 +1,16 @@
-x-logging:
-  &default-logging
-  options:
-    max-size: '12m'
-    max-file: '5'
-  driver: json-file
-
 services:
   flutter:
     container_name: flutter
-    build:
-      context: ./frontend
-      args:
-        # Dockerfile内でARGしている変数に.envに定義した値を代入。
-        - ubuntu_version=${UBUNTU_VERSION}
-        - timezone=${TIMEZONE}
-        - web_server_port=${WEB_SERVER_PORT}
-        - app_code_path_container=${APP_CODE_PATH_CONTAINER}
+    build: ./frontend
+    working_dir: /app
+    command: bash -c "flutter clean && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8888" 
     tty: true
     env_file: .env
     volumes:
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
-    logging: *default-logging
+      - ./frontend/app:/app
     # web-serverとして動作させるためにportを指定。
     ports:
-      - "$WEB_SERVER_PORT:$WEB_SERVER_PORT"
+      - "8888:8888"
     depends_on:
       - go
 
