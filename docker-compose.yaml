@@ -1,14 +1,12 @@
 services:
   flutter:
     container_name: flutter
-    build: ./frontend
-    working_dir: /app
+    build: ./frontend/
     command: bash -c "flutter clean && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8888" 
     tty: true
     env_file: .env
     volumes:
       - ./frontend/app:/app
-    # web-serverとして動作させるためにportを指定。
     ports:
       - "8888:8888"
     depends_on:
@@ -16,7 +14,7 @@ services:
 
   go:
     container_name: go
-    build: ./backend
+    build: ./backend/
     volumes:
       - ./backend/:/app/
     ports:
@@ -39,7 +37,14 @@ services:
       - 5432:5432
     env_file:
       - .env
-
+  
+  firebase:
+    container_name: firebase
+    build: ./firebase/
+    command: /bin/bash -c "/bin/bash"
+    volumes:
+      - ./firebase/:/app
+    tty: true
   
 volumes:
   postgres_data:
