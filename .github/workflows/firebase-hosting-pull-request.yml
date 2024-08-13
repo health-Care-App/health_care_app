@@ -26,6 +26,10 @@ jobs:
       # ビルド
       - working-directory: ./frontend/app
         run: flutter build web
+      
+      #ビルド確認
+      - name: ビルド確認
+        run: ls ./frontend/app/build/web
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
