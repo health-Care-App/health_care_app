@@ -7,8 +7,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: フォルダ移動
-        run: cd frontend
+      - name: move to frontend/app
+        run: cd frontend/app
 
       # Flutter のインストール clone がはやい
       - name: Install Flutter
