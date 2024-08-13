@@ -25,12 +25,15 @@ jobs:
 
       # パッケージのダウンロード
       - name: Download Flutter packages
+        working-directory: ./frontend/app
         run: flutter pub get
       
       # ビルド
-      - run: flutter build web
+      - working-directory: ./frontend/app
+        run: flutter build web
       
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - working-directory: ./firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           projectId: health-care-app-3e333
