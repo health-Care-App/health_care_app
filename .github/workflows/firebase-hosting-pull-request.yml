@@ -21,8 +21,8 @@ jobs:
         working-directory: ./frontend/app
         run: flutter pub get
 
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        working-directory: ./firebase
+      - working-directory: ./frontend/app
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           projectId: health-care-app-3e333
