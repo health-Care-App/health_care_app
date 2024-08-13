@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "source": "../frontend/app/build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

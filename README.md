@@ -1,6 +1,6 @@
-### フロント
+# フロント
 flutter
-### バック
+# バック
 go
-### DB
+# DB
 postgresql
