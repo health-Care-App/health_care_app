@@ -29,6 +29,9 @@ jobs:
       
       - name: Enable flutter web
         run: flutter config --enable-web
+      
+      - run: ls
+      - run: ls ./frontend
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
