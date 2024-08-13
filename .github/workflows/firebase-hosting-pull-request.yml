@@ -34,3 +34,5 @@ jobs:
           projectId: health-care-app-3e333
           entryPoint: ./firebase
           expires: 30d
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks

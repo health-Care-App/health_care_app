@@ -38,3 +38,5 @@ jobs:
           projectId: health-care-app-3e333
           channelId: live
           entryPoint: ./firebase
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
