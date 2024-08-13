@@ -8,14 +8,12 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend/app
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: move to frontend/app
-        run: cd frontend/app
-      
-      - name: check dir
-        run: ls
 
       # Flutter のインストール clone がはやい
       - name: Install Flutter
