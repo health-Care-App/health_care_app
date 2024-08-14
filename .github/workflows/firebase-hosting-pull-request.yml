@@ -29,16 +29,13 @@ jobs:
       
       - name: Enable flutter web
         run: flutter config --enable-web
-      
-      - run: ls
-      - run: ls ./frontend
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           projectId: health-care-app-3e333
-          entryPoint: ./firebase
+          entryPoint: ./frontend/app
           expires: 30d
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
