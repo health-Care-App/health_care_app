@@ -37,6 +37,6 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           projectId: health-care-app-3e333
           channelId: live
-          entryPoint: ./firebase
+          entryPoint: ./frontend/app
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
