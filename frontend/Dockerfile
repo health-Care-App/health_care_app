@@ -21,7 +21,11 @@ RUN apt-get update && apt-get install -y \
         cmake \
         ninja-build \
         pkg-config \
-        libgtk-3-dev
+        libgtk-3-dev \
+        nodejs \
+        npm
+
+WORKDIR /app
 
 #Flutter
 RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
@@ -50,10 +54,17 @@ ENV PATH "$PATH:/usr/local/Android/sdk/platform-tools"
 RUN git clone https://github.com/flutter/flutter.git
 ENV PATH "$PATH:/usr/local/flutter/bin"
 
+WORKDIR /app
+
 # Flutter Web
 RUN flutter config --enable-web
 
 #android stdioのパッケージライセンス認証
 RUN flutter doctor --android-licenses
 
-WORKDIR /app
+#node
+RUN npm install n -g 
+RUN n 20
+
+#firebase
+RUN npm install -g firebase-tools

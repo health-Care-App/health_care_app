@@ -38,13 +38,5 @@ services:
     env_file:
       - .env
   
-  firebase:
-    container_name: firebase
-    build: ./firebase/
-    command: /bin/bash -c "/bin/bash"
-    volumes:
-      - ./firebase/:/app
-    tty: true
-  
 volumes:
   postgres_data:
