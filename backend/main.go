@@ -3,8 +3,6 @@ package main
 import (
     "github.com/gin-gonic/gin"
     "net/http"
-    "gorm.io/driver/postgres"
-    "gorm.io/gorm"
     "fmt"
 )
 
