@@ -17,6 +17,7 @@ services:
     build: ./backend/
     volumes:
       - ./backend/:/app/
+      - tmp-data:/app/tmp
     ports:
       - 8080:8080
     env_file:
@@ -28,7 +29,7 @@ services:
     container_name: db
     image: postgres:16
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres-data:/var/lib/postgresql/data/
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -39,4 +40,5 @@ services:
       - .env
   
 volumes:
-  postgres_data:
+  postgres-data:
+  tmp-data:

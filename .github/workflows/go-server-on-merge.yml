@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - id: "auth"
         uses: "google-github-actions/auth@v0"
@@ -29,14 +29,13 @@ jobs:
       - name: Setup Google Cloud
         uses: google-github-actions/setup-gcloud@v1
         with:
-          service_account_key: ${{ secrets.GCLOUD_AUTH }}
-          project_id: ${{ secrets.PROJECT_ID }}
+          project_id: $PROJECT_ID
 
       - name: Configure Docker
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build
-        run: docker build --platform linux/amd64 -f Dockerfile -t us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG ./backend
+        run: docker build -f Dockerfile -t us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG ./backend
 
       - name: Push
         run: docker push us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG

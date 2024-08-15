@@ -1,7 +1,13 @@
 FROM golang:1.22.3
 WORKDIR /app/
+
+RUN go install github.com/air-verse/air@latest
+
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY ./ /app/
 
-RUN go get -u github.com/air-verse/air@latest && \
-    go build -o /go/bin/air github.com/air-verse/air
+EXPOSE 8080
+
 CMD ["air", "-c", ".air.toml"]
