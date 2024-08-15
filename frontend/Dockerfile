@@ -63,8 +63,8 @@ RUN flutter config --enable-web
 RUN flutter doctor --android-licenses
 
 #node
-RUN npm install n -g 
-RUN n 20
+RUN npm install n -g \
+    n 20
 
 #firebase
 RUN npm install -g firebase-tools
