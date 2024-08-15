@@ -34,9 +34,6 @@ jobs:
 
       - name: Configure Docker
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
-      
-      - name: ls
-        run: ls ./backend
 
       - name: Build
         run: docker build -f Dockerfile -t us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG ./backend
