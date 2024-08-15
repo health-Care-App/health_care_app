@@ -28,8 +28,6 @@ jobs:
 
       - name: Setup Google Cloud
         uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: $PROJECT_ID
 
       - name: Configure Docker
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
