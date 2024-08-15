@@ -39,7 +39,7 @@ jobs:
         run: docker push us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG
 
       - name: ls
-        run: ls ./backend/tmp
+        run: ls
 
       - name: Deploy
         run: gcloud run deploy $SERVICE_NAME --image us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG --platform managed --region $REGION --allow-unauthenticated
