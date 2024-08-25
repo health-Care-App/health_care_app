@@ -2,7 +2,7 @@ services:
   flutter:
     container_name: flutter
     build: ./frontend/
-    command: bash -c "flutter clean && flutter build web && /bin/bash" 
+    command: bash -c "flutter clean && flutter build web && firebase emulators:start" 
     tty: true
     env_file: .env
     volumes:
