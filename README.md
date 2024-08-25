@@ -9,7 +9,7 @@ Go, Gin
 開発サーバ: http://localhost:8080  
 ## 開発環境
 Docker, Firebase, Cloud Run, Github Actions  
-## 環境構築手順
+# 環境構築手順
 1. リポジトリのクローン
 `git clone git@github.com:health-Care-App/health_care_app.git`
   
