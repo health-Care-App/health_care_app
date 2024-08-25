@@ -1,7 +1,5 @@
 FROM ubuntu:20.04
 
-LABEL manintainer hogehoge
-
 ENV TZ=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -41,7 +39,7 @@ RUN apt-get update && \
 WORKDIR /usr/local
 RUN mkdir -p Android/sdk
 ENV ANDROID_SDK_ROOT /usr/local/Android/sdk
-RUN mkdir -p .android && touch .android/repositories.cfg
+RUN mkdir -p .android && touch .android/repositories.cfg 
 RUN wget -O sdk-tools.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
 RUN unzip sdk-tools.zip && rm sdk-tools.zip
 RUN mv tools Android/sdk/tools
@@ -58,13 +56,23 @@ WORKDIR /app
 
 # Flutter Web
 RUN flutter config --enable-web
-
 #android stdioのパッケージライセンス認証
 RUN flutter doctor --android-licenses
 
 #node
 RUN npm install n -g \
-    n 20
+    && n 20
 
 #firebase
 RUN npm install -g firebase-tools
+
+#flutterFire CLIインストール
+RUN dart pub global activate flutterfire_cli
+ENV PATH "$PATH:/root/.pub-cache/bin" 
+
+#firebase emulator suiteのためのjava jdkダウンロード
+RUN mkdir /usr/java \
+    && cd /usr/java \
+    && wget https://download.oracle.com/java/22/latest/jdk-22_linux-x64_bin.tar.gz \
+    && tar zxvf jdk-22_linux-x64_bin.tar.gz && rm jdk-22_linux-x64_bin.tar.gz
+ENV PATH "/usr/java/jdk-22.0.2/bin:$PATH"

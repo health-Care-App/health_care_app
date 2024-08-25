@@ -2,13 +2,16 @@ services:
   flutter:
     container_name: flutter
     build: ./frontend/
-    command: bash -c "flutter clean && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8888" 
+    command: bash -c "flutter clean && flutter build web && /bin/bash" 
     tty: true
     env_file: .env
     volumes:
       - ./frontend/app:/app
     ports:
-      - "8888:8888"
+      - 4000:4000
+      - 5000:5000
+      - 9099:9099
+      - 8000:8000
     depends_on:
       - go
 
@@ -22,23 +25,7 @@ services:
       - 8080:8080
     env_file:
       - .env
-    depends_on:
-      - db  
-  
-  db:
-    container_name: db
-    image: postgres:16
-    volumes:
-      - postgres-data:/var/lib/postgresql/data/
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - 5432:5432
-    env_file:
-      - .env
+
   
 volumes:
-  postgres-data:
   tmp-data:
