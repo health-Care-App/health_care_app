@@ -36,7 +36,7 @@ Go, Gin
 `docker compose up -d`
 
 4. http://localhost:4000 にアクセスして正常に動作しているか確認  
-# Flutterをホットリロードで開発したい場合
+## Flutterをホットリロードで開発したい場合
 1. flutterコンテナの中に入る  
 `docker compose exec flutter bash`
 
