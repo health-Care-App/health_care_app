@@ -3,10 +3,10 @@ WORKDIR /app/
 
 RUN go install github.com/air-verse/air@latest
 
-COPY go.mod go.sum ./
+COPY ./app/go.mod ./app/go.sum ./
 RUN go mod download
 
-COPY ./ /app/
+COPY ./app/ /app/
 
 EXPOSE 8080
 

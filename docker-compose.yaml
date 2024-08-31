@@ -20,7 +20,7 @@ services:
     container_name: go
     build: ./backend/
     volumes:
-      - ./backend/:/app/
+      - ./backend/app:/app/
       - tmp-data:/app/tmp
     ports:
       - 8080:8080
