@@ -1,10 +1,17 @@
 # 技術スタック
 ## フロントエンド
 Dart, flutter  
+  
 本番サーバ: https://health-care-app-3e333.web.app  
-開発サーバ: http://localhost:4000  
+  
+FirebaseのAuthentication、FireStore、Hosting機能を模したEmulator開発サーバ: http://localhost:4000  
+※コードを書き直した後、その変化が即反映されないので、Flutterのコーディングするときの利用は非推奨  
+  
+Flutterを直接起動した開発サーバ（[ここ](https://github.com/health-Care-App/health_care_app/edit/main/README.md#flutter%E3%82%92%E3%83%9B%E3%83%83%E3%83%88%E3%83%AA%E3%83%AD%E3%83%BC%E3%83%89%E3%81%A7%E9%96%8B%E7%99%BA%E3%81%97%E3%81%9F%E3%81%84%E5%A0%B4%E5%90%88)で起動する必要あり）: http://localhost:8888  
+※コードの書き直しが即反映されるホットリロードが有効なため、Flutterのコーディングをするときはこちらを推奨
 ## バックエンド
 Go, Gin  
+  
 本番サーバ: https://go-server-ielplqf5oa-uc.a.run.app  
 開発サーバ: http://localhost:8080  
 ## 開発環境
