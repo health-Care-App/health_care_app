@@ -2,7 +2,7 @@ services:
   flutter:
     container_name: flutter
     build: ./frontend/
-    command: bash -c "flutter clean && flutter build web && firebase emulators:start" 
+    command: bash -c "flutter clean && flutter build web && firebase emulators:start && flutter clean && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8888" 
     tty: true
     env_file: .env
     volumes:
@@ -12,6 +12,7 @@ services:
       - 5000:5000
       - 9099:9099
       - 8000:8000
+      - 8888:8888
     depends_on:
       - go
 
