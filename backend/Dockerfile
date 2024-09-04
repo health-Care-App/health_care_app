@@ -9,5 +9,3 @@ RUN go mod download
 COPY ./app/ /app/
 
 EXPOSE 8080
-
-CMD ["air", "-c", ".air.toml"]

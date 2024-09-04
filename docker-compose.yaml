@@ -3,30 +3,35 @@ services:
     container_name: flutter
     build: ./frontend/
     command: bash -c "flutter clean && flutter build web && firebase emulators:start && flutter clean && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8888" 
-    tty: true
     env_file: .env
     volumes:
       - ./frontend/app:/app
     ports:
       - 4000:4000
-      - 5000:5000
       - 9099:9099
       - 8000:8000
       - 8888:8888
-    depends_on:
-      - go
+    tty: true
+    stdin_open: true
 
   go:
     container_name: go
     build: ./backend/
+    command: bash -c "air -c .air.toml"
     volumes:
       - ./backend/app:/app/
       - tmp-data:/app/tmp
+    environment:
+      FIRESTORE_EMULATOR_HOST: "flutter:8000"
+      FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
     ports:
       - 8080:8080
     env_file:
       - .env
+    tty: true
+    stdin_open: true
+    depends_on:
+      - flutter
 
-  
 volumes:
   tmp-data:

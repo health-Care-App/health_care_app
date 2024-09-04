@@ -18,23 +18,41 @@ const (
 	postSleepTimePath = sleepTimePath
 	messagePath       = "/message"
 	getMessagePath    = messagePath + "/:userId"
+
+	layout = "2006-01-02"
 )
+
+type healthPostRequestBody struct {
+	UserId string `json:"userId" binding:"required"`
+	Health int    `json:"health" binding:"required"`
+}
 
 // 健康状態を取得する関数
 func gethealthHandler(c *gin.Context) {
-	layout := "2006-01-02"
 	userId := c.Param("userId")
 	oldDateAt := c.DefaultQuery("oldDateAt", time.Now().Format(layout))
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	database.GetHealthData(userId, ParsedOldDateAt)
+	response := database.GetHealthData(userId, ParsedOldDateAt)
+	c.JSON(200, response)
 }
 
 // 健康状態を保存する関数
 func postHealthHandler(c *gin.Context) {
-
+	body := healthPostRequestBody{}
+	if err := c.ShouldBind(&body); err != nil {
+		log.Fatalln(err)
+	}
+	createDateAt, err := time.Parse(layout, time.Now().Format(layout))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	database.PostHelthData(body.UserId, body.Health, createDateAt)
+	c.JSON(200, gin.H{
+		"message": "ok",
+	})
 }
 
 // 睡眠時間を取得する関数
@@ -56,7 +74,7 @@ func Initializer() {
 	r := gin.Default()
 	r.GET(getHealthPath, gethealthHandler)
 	r.POST(postHealthPath, postHealthHandler)
-	r.GET(postSleepTimePath, getSleepTimeHandler)
+	r.GET(getSleepTimePath, getSleepTimeHandler)
 	r.POST(postSleepTimePath, postSleepTimeHandler)
 	r.GET(getMessagePath, getMessageHandler)
 	r.Run()
