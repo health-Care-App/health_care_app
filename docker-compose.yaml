@@ -18,7 +18,6 @@ services:
   go:
     container_name: go
     build: ./backend/
-    command: bash -c "air -c .air.toml"
     volumes:
       - ./backend/app:/app/
       - tmp-data:/app/tmp
