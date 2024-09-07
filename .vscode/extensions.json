@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "golang.go",
+        "ms-vscode-remote.remote-wsl",
+        "ms-vscode.remote-repositories",
+        "github.remotehub",
+        "twxs.cmake",
+        "dart-code.dart-code",
+        "ms-azuretools.vscode-docker",
+        "dart-code.flutter",
+        "github.vscode-github-actions",
+    ]
+}

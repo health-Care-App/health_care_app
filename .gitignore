@@ -1,1 +1,2 @@
-/backend/tmp
+/backend/app/tmp
+/backend/app/serviceAccountKey.json
