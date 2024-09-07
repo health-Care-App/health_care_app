@@ -1,7 +1,7 @@
 package database
 
 import (
-	"app/firebaseInit"
+	"app/firebaseinit"
 	"log"
 	"time"
 
@@ -49,7 +49,7 @@ type (
 
 // データベースから健康状態のデータを取得する関数
 func GetHealthData(userId string, oldDateAt time.Time) HealthGetResponse {
-	client, ctx := firebaseInit.FirestoreInitializer()
+	client, ctx := firebaseinit.FirestoreInitializer()
 	query := client.Collection("health").Doc(userId).Collection("healths")
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
 	var healths []Healths
@@ -74,7 +74,7 @@ func GetHealthData(userId string, oldDateAt time.Time) HealthGetResponse {
 
 // データベースに健康状態のデータを保存する関数
 func PostHelthData(userId string, health int, createDateAt time.Time) PostResponse {
-	client, ctx := firebaseInit.FirestoreInitializer()
+	client, ctx := firebaseinit.FirestoreInitializer()
 	_, _, err := client.Collection("health").Doc(userId).Collection("healths").Add(
 		ctx, dict{
 			"health": health,
@@ -90,7 +90,7 @@ func PostHelthData(userId string, health int, createDateAt time.Time) PostRespon
 
 // データベースから睡眠時間のデータを保存する関数
 func GetSleepTimeData(userId string, oldDateAt time.Time) SleepTimeGetResponse {
-	client, ctx := firebaseInit.FirestoreInitializer()
+	client, ctx := firebaseinit.FirestoreInitializer()
 	query := client.Collection("sleepTime").Doc(userId).Collection("sleepTimes")
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
 	var sleepTimes []SleepTimes
@@ -115,7 +115,7 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) SleepTimeGetResponse {
 
 // データベースに睡眠時間のデータを保存する関数
 func PostSleepTimeData(userId string, sleepTime int, createDateAt time.Time) PostResponse {
-	client, ctx := firebaseInit.FirestoreInitializer()
+	client, ctx := firebaseinit.FirestoreInitializer()
 	_, _, err := client.Collection("sleepTime").Doc(userId).Collection("sleepTimes").Add(
 		ctx, dict{
 			"sleepTime": sleepTime,
@@ -131,7 +131,7 @@ func PostSleepTimeData(userId string, sleepTime int, createDateAt time.Time) Pos
 
 // データベースからメッセージデータを取得する関数
 func GetMessageData(userId string, oldDateAt time.Time) MessageGetResponse {
-	client, ctx := firebaseInit.FirestoreInitializer()
+	client, ctx := firebaseinit.FirestoreInitializer()
 	query := client.Collection("message").Doc(userId).Collection("messages")
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
 	var messages []Messages

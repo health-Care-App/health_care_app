@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"app/database"
+	"app/middleware"
 	"log"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 
 const (
 	//endPoint定義
+	rootPath          = "/"
 	healthPath        = "/health"
 	postHealthPath    = healthPath
 	getHealthPath     = healthPath + "/:userId"
@@ -20,6 +22,8 @@ const (
 	getMessagePath    = messagePath + "/:userId"
 
 	layout = "2006-01-02"
+
+	port = ":8080"
 )
 
 type (
@@ -36,7 +40,11 @@ type (
 
 // 健康状態を取得する関数
 func gethealthHandler(c *gin.Context) {
-	userId := c.Param("userId")
+	value, exists := c.Get("userId")
+	if !exists {
+		log.Fatalln("User is not exist")
+	}
+	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
 	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
@@ -51,6 +59,12 @@ func gethealthHandler(c *gin.Context) {
 
 // 健康状態を保存する関数
 func postHealthHandler(c *gin.Context) {
+	value, exists := c.Get("userId")
+	if !exists {
+		log.Fatalln("User is not exist")
+	}
+	userId := value.(string)
+
 	body := healthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
 		log.Fatalln(err)
@@ -59,13 +73,17 @@ func postHealthHandler(c *gin.Context) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	response := database.PostHelthData(body.UserId, body.Health, createDateAt)
+	response := database.PostHelthData(userId, body.Health, createDateAt)
 	c.JSON(200, response)
 }
 
 // 睡眠時間を取得する関数
 func getSleepTimeHandler(c *gin.Context) {
-	userId := c.Param("userId")
+	value, exists := c.Get("userId")
+	if !exists {
+		log.Fatalln("user is not exist.")
+	}
+	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
 	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
@@ -80,6 +98,12 @@ func getSleepTimeHandler(c *gin.Context) {
 
 // 睡眠時間を保存する関数
 func postSleepTimeHandler(c *gin.Context) {
+	value, exists := c.Get("userId")
+	if !exists {
+		log.Fatalln("User is not exist")
+	}
+	userId := value.(string)
+
 	body := sleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
 		log.Fatalln(err)
@@ -88,13 +112,17 @@ func postSleepTimeHandler(c *gin.Context) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	response := database.PostSleepTimeData(body.UserId, body.SleepTime, createDateAt)
+	response := database.PostSleepTimeData(userId, body.SleepTime, createDateAt)
 	c.JSON(200, response)
 }
 
 // メッセージを取得する関数
 func getMessageHandler(c *gin.Context) {
-	userId := c.Param("userId")
+	value, exists := c.Get("userId")
+	if !exists {
+		log.Fatalln("user is not exist.")
+	}
+	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
 	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
@@ -109,10 +137,15 @@ func getMessageHandler(c *gin.Context) {
 
 func Initializer() {
 	r := gin.Default()
-	r.GET(getHealthPath, gethealthHandler)
-	r.POST(postHealthPath, postHealthHandler)
-	r.GET(getSleepTimePath, getSleepTimeHandler)
-	r.POST(postSleepTimePath, postSleepTimeHandler)
-	r.GET(getMessagePath, getMessageHandler)
-	r.Run()
+	authorized := r.Group(rootPath)
+
+	authorized.Use(middleware.Authorized())
+	{
+		authorized.GET(getHealthPath, gethealthHandler)
+		authorized.POST(postHealthPath, postHealthHandler)
+		authorized.GET(getSleepTimePath, getSleepTimeHandler)
+		authorized.POST(postSleepTimePath, postSleepTimeHandler)
+		authorized.GET(getMessagePath, getMessageHandler)
+	}
+	r.Run(port)
 }

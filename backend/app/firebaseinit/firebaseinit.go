@@ -1,4 +1,4 @@
-package firebaseInit
+package firebaseinit
 
 import (
 	"context"
@@ -41,11 +41,11 @@ func FirestoreInitializer() (*firestore.Client, context.Context) {
 	return client, ctx
 }
 
-func AuthInitializer() *auth.Client {
+func AuthInitializer() (*auth.Client, context.Context) {
 	app, ctx := adminSDKInitializer()
 	client, err := app.Auth(ctx)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return client
+	return client, ctx
 }
