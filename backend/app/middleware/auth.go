@@ -11,8 +11,8 @@ func Authorized() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		client, ctx := firebaseinit.AuthInitializer()
 
-		auth_header := c.GetHeader("Authorization")
-		idToken := strings.Replace(auth_header, "Bearer ", "", 1)
+		authHeader := c.GetHeader("Authorization")
+		idToken := strings.Replace(authHeader, "Bearer ", "", 1)
 
 		token, err := client.VerifyIDToken(ctx, idToken)
 		if err != nil {

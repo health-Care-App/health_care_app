@@ -11,15 +11,10 @@ import (
 
 const (
 	//endPoint定義
-	rootPath          = "/"
-	healthPath        = "/health"
-	postHealthPath    = healthPath
-	getHealthPath     = healthPath + "/:userId"
-	sleepTimePath     = "/sleepTime"
-	getSleepTimePath  = sleepTimePath + "/:userId"
-	postSleepTimePath = sleepTimePath
-	messagePath       = "/message"
-	getMessagePath    = messagePath + "/:userId"
+	rootPath      = "/"
+	healthPath    = "/health"
+	sleepTimePath = "/sleepTime"
+	messagePath   = "/message"
 
 	layout = "2006-01-02"
 
@@ -141,11 +136,11 @@ func Initializer() {
 
 	authorized.Use(middleware.Authorized())
 	{
-		authorized.GET(getHealthPath, gethealthHandler)
-		authorized.POST(postHealthPath, postHealthHandler)
-		authorized.GET(getSleepTimePath, getSleepTimeHandler)
-		authorized.POST(postSleepTimePath, postSleepTimeHandler)
-		authorized.GET(getMessagePath, getMessageHandler)
+		authorized.GET(healthPath, gethealthHandler)
+		authorized.POST(healthPath, postHealthHandler)
+		authorized.GET(sleepTimePath, getSleepTimeHandler)
+		authorized.POST(sleepTimePath, postSleepTimeHandler)
+		authorized.GET(messagePath, getMessageHandler)
 	}
 	r.Run(port)
 }
