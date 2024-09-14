@@ -21,6 +21,7 @@ services:
     volumes:
       - ./backend/app:/app/
       - tmp-data:/app/tmp
+      - voicevox-core-volume:/app/voicevox_core
     environment:
       FIRESTORE_EMULATOR_HOST: "flutter:8000"
       FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
@@ -35,3 +36,4 @@ services:
 
 volumes:
   tmp-data:
+  voicevox-core-volume:

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"app/database"
-	"app/middleware"
 	"log"
 	"time"
 
@@ -10,32 +9,8 @@ import (
 )
 
 const (
-	//endPoint定義
-	rootPath          = "/"
-	healthPath        = "/health"
-	postHealthPath    = healthPath
-	getHealthPath     = healthPath + "/:userId"
-	sleepTimePath     = "/sleepTime"
-	getSleepTimePath  = sleepTimePath + "/:userId"
-	postSleepTimePath = sleepTimePath
-	messagePath       = "/message"
-	getMessagePath    = messagePath + "/:userId"
-
 	layout = "2006-01-02"
-
-	port = ":8080"
-)
-
-type (
-	healthPostRequestBody struct {
-		UserId string `json:"userId" binding:"required"`
-		Health int    `json:"health" binding:"required"`
-	}
-
-	sleepTimePostRequestBody struct {
-		UserId    string `json:"userId" binding:"required"`
-		SleepTime int    `json:"sleepTime" binding:"required"`
-	}
+	port   = ":8080"
 )
 
 // 健康状態を取得する関数
@@ -65,7 +40,7 @@ func postHealthHandler(c *gin.Context) {
 	}
 	userId := value.(string)
 
-	body := healthPostRequestBody{}
+	body := HealthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
 		log.Fatalln(err)
 	}
@@ -104,7 +79,7 @@ func postSleepTimeHandler(c *gin.Context) {
 	}
 	userId := value.(string)
 
-	body := sleepTimePostRequestBody{}
+	body := SleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
 		log.Fatalln(err)
 	}
@@ -133,19 +108,4 @@ func getMessageHandler(c *gin.Context) {
 	}
 	response := database.GetMessageData(userId, ParsedOldDateAt)
 	c.JSON(200, response)
-}
-
-func Initializer() {
-	r := gin.Default()
-	authorized := r.Group(rootPath)
-
-	authorized.Use(middleware.Authorized())
-	{
-		authorized.GET(getHealthPath, gethealthHandler)
-		authorized.POST(postHealthPath, postHealthHandler)
-		authorized.GET(getSleepTimePath, getSleepTimeHandler)
-		authorized.POST(postSleepTimePath, postSleepTimeHandler)
-		authorized.GET(getMessagePath, getMessageHandler)
-	}
-	r.Run(port)
 }
