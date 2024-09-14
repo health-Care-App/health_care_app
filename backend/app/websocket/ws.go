@@ -18,16 +18,22 @@ func Wshandler(c *gin.Context) {
 	audioBytes := make(chan []byte, 10)
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
+		log.Println(err)
 		return
 	}
 	defer conn.Close()
 
 	_, message, err := conn.ReadMessage()
 	if err != nil {
-		log.Printf("ReadMessage Error. ERROR: %+v\n", err)
+		log.Println(err)
+		return
 	}
 
-	gpt.CreateChatStream(string(message), audioBytes)
+	err = gpt.CreateChatStream(string(message), audioBytes)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	for {
 		bytes, ok := <-audioBytes

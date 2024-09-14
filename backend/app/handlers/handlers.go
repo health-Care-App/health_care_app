@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"app/database"
-	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +16,7 @@ const (
 func gethealthHandler(c *gin.Context) {
 	value, exists := c.Get("userId")
 	if !exists {
-		log.Fatalln("User is not exist")
+		userErrorResponse(c)
 	}
 	userId := value.(string)
 
@@ -26,9 +25,14 @@ func gethealthHandler(c *gin.Context) {
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
-		log.Fatalln(err)
+		errorResponse(c, err)
 	}
-	response := database.GetHealthData(userId, ParsedOldDateAt)
+
+	response, err := database.GetHealthData(userId, ParsedOldDateAt)
+	if err != nil {
+		errorResponse(c, err)
+	}
+
 	c.JSON(200, response)
 }
 
@@ -36,19 +40,24 @@ func gethealthHandler(c *gin.Context) {
 func postHealthHandler(c *gin.Context) {
 	value, exists := c.Get("userId")
 	if !exists {
-		log.Fatalln("User is not exist")
+		userErrorResponse(c)
 	}
 	userId := value.(string)
 
 	body := HealthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		log.Fatalln(err)
+		errorResponse(c, err)
 	}
 	createDateAt, err := time.Parse(layout, time.Now().Format(layout))
 	if err != nil {
-		log.Fatalln(err)
+		errorResponse(c, err)
 	}
-	response := database.PostHelthData(userId, body.Health, createDateAt)
+
+	response, err := database.PostHelthData(userId, body.Health, createDateAt)
+	if err != nil {
+		errorResponse(c, err)
+	}
+
 	c.JSON(200, response)
 }
 
@@ -56,7 +65,7 @@ func postHealthHandler(c *gin.Context) {
 func getSleepTimeHandler(c *gin.Context) {
 	value, exists := c.Get("userId")
 	if !exists {
-		log.Fatalln("user is not exist.")
+		userErrorResponse(c)
 	}
 	userId := value.(string)
 
@@ -65,9 +74,13 @@ func getSleepTimeHandler(c *gin.Context) {
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
-		log.Fatalln(err)
+		errorResponse(c, err)
 	}
-	response := database.GetSleepTimeData(userId, ParsedOldDateAt)
+
+	response, err := database.GetSleepTimeData(userId, ParsedOldDateAt)
+	if err != nil {
+		errorResponse(c, err)
+	}
 	c.JSON(200, response)
 }
 
@@ -75,19 +88,24 @@ func getSleepTimeHandler(c *gin.Context) {
 func postSleepTimeHandler(c *gin.Context) {
 	value, exists := c.Get("userId")
 	if !exists {
-		log.Fatalln("User is not exist")
+		userErrorResponse(c)
 	}
 	userId := value.(string)
 
 	body := SleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		log.Fatalln(err)
+		errorResponse(c, err)
 	}
+
 	createDateAt, err := time.Parse(layout, time.Now().Format(layout))
 	if err != nil {
-		log.Fatalln(err)
+		errorResponse(c, err)
 	}
-	response := database.PostSleepTimeData(userId, body.SleepTime, createDateAt)
+
+	response, err := database.PostSleepTimeData(userId, body.SleepTime, createDateAt)
+	if err != nil {
+		errorResponse(c, err)
+	}
 	c.JSON(200, response)
 }
 
@@ -95,7 +113,7 @@ func postSleepTimeHandler(c *gin.Context) {
 func getMessageHandler(c *gin.Context) {
 	value, exists := c.Get("userId")
 	if !exists {
-		log.Fatalln("user is not exist.")
+		userErrorResponse(c)
 	}
 	userId := value.(string)
 
@@ -104,8 +122,12 @@ func getMessageHandler(c *gin.Context) {
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
-		log.Fatalln(err)
+		errorResponse(c, err)
 	}
-	response := database.GetMessageData(userId, ParsedOldDateAt)
+
+	response, err := database.GetMessageData(userId, ParsedOldDateAt)
+	if err != nil {
+		errorResponse(c, err)
+	}
 	c.JSON(200, response)
 }
