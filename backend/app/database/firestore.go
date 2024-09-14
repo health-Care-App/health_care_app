@@ -8,45 +8,6 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-type (
-	dict map[string]interface{}
-
-	Healths struct {
-		Id     string    `json:"id" validate:"required"`
-		Date   time.Time `json:"Date" validate:"required"`
-		Health int64     `json:"health" validate:"required"`
-	}
-
-	HealthGetResponse struct {
-		Healths []Healths `json:"healths" validate:"required"`
-	}
-
-	PostResponse struct {
-		Message string `json:"message" validate:"required"`
-	}
-
-	SleepTimes struct {
-		Id        string    `json:"id" validate:"required"`
-		Date      time.Time `json:"Date" validate:"required"`
-		SleepTime int64     `json:"sleepTime" validate:"required"`
-	}
-
-	SleepTimeGetResponse struct {
-		SleepTimes []SleepTimes `json:"sleepTimes" validate:"required"`
-	}
-
-	Messages struct {
-		Id   string    `json:"id" validate:"required"`
-		Who  string    `json:"who" validate:"required,oneof=user system"`
-		Date time.Time `json:"Date" validate:"required"`
-		Text string    `json:"text" validate:"required"`
-	}
-
-	MessageGetResponse struct {
-		Messages []Messages `json:"messages" validate:"required"`
-	}
-)
-
 // データベースから健康状態のデータを取得する関数
 func GetHealthData(userId string, oldDateAt time.Time) HealthGetResponse {
 	client, ctx := firebaseinit.FirestoreInitializer()
@@ -76,9 +37,9 @@ func GetHealthData(userId string, oldDateAt time.Time) HealthGetResponse {
 func PostHelthData(userId string, health int, createDateAt time.Time) PostResponse {
 	client, ctx := firebaseinit.FirestoreInitializer()
 	_, _, err := client.Collection("health").Doc(userId).Collection("healths").Add(
-		ctx, dict{
-			"health": health,
-			"Date":   createDateAt,
+		ctx, PostHelthDataQuery{
+			Health: health,
+			Date:   createDateAt,
 		},
 	)
 	if err != nil {
@@ -117,9 +78,9 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) SleepTimeGetResponse {
 func PostSleepTimeData(userId string, sleepTime int, createDateAt time.Time) PostResponse {
 	client, ctx := firebaseinit.FirestoreInitializer()
 	_, _, err := client.Collection("sleepTime").Doc(userId).Collection("sleepTimes").Add(
-		ctx, dict{
-			"sleepTime": sleepTime,
-			"Date":      createDateAt,
+		ctx, PostSleepTimeDataQuery{
+			SleepTime: sleepTime,
+			Date:      createDateAt,
 		},
 	)
 	if err != nil {

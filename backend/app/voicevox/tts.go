@@ -2,13 +2,12 @@ package voicevox
 
 import (
 	"fmt"
-	"os"
 	"sync"
 
 	voicevoxcorego "github.com/sh1ma/voicevoxcore.go"
 )
 
-func SpeechSynth(text string, wg *sync.WaitGroup) {
+func SpeechSynth(text string, wg *sync.WaitGroup, audioBytes chan<- []byte) {
 
 	core := voicevoxcorego.New()
 	initializeOptions := voicevoxcorego.NewVoicevoxInitializeOptions(0, 0, false, "/app/voicevox_core/open_jtalk_dic_utf_8-1.11")
@@ -22,12 +21,7 @@ func SpeechSynth(text string, wg *sync.WaitGroup) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	audioBytes <- result
 
-	f, _ := os.Create(text + ".wav")
-	_, err = f.Write(result)
-
-	if err != nil {
-		fmt.Println(err)
-	}
 	wg.Done()
 }
