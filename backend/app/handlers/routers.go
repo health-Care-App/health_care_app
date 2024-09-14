@@ -27,7 +27,7 @@ func Initializer() {
 		authorized.GET(sleepTimePath, getSleepTimeHandler)
 		authorized.POST(sleepTimePath, postSleepTimeHandler)
 		authorized.GET(messagePath, getMessageHandler)
+		authorized.GET(wsPath, websocket.Wshandler)
 	}
-	r.GET(wsPath, websocket.Wshandler)
 	r.Run(port)
 }
