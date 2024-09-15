@@ -23,7 +23,7 @@ func CreateChatStream(question string, audioBytes chan<- []byte) error {
 	audioNum := 0
 	isPunctuationMatched := false
 
-	stream, err := ConnectGPT(question)
+	stream, err := InitializeGPT(question)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func CreateChatStream(question string, audioBytes chan<- []byte) error {
 
 }
 
-func ConnectGPT(question string) (*openai.ChatCompletionStream, error) {
+func InitializeGPT(question string) (*openai.ChatCompletionStream, error) {
 	openaiToken, isExist := os.LookupEnv("OPENAI_TOKEN")
 	if !isExist {
 		return nil, errors.New("env variable OPENAI_TOKEN is not exist")
