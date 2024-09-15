@@ -1,7 +1,6 @@
-package websocket
+package ws
 
 import (
-	"app/gpt"
 	"encoding/base64"
 	"log"
 
@@ -14,6 +13,12 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type Message struct {
+	Question string `json:"question" validate:"required"`
+	//ずんだもんの場合0, 春日部つむぎの場合1
+	Model uint `json:"model" validate:"required,oneof=0 1"`
+}
+
 func Wshandler(c *gin.Context) {
 	audioBytes := make(chan []byte, 10)
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -22,13 +27,14 @@ func Wshandler(c *gin.Context) {
 		return
 	}
 
-	_, message, err := conn.ReadMessage()
+	var message Message
+	err = conn.ReadJSON(&message)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	err = gpt.CreateChatStream(string(message), audioBytes)
+	err = CreateChatStream(message, audioBytes)
 	if err != nil {
 		log.Println(err)
 		return

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"app/middleware"
-	"app/websocket"
+	"app/ws"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -27,7 +27,7 @@ func Initializer() {
 		AllowOrigins: []string{
 			"http://localhost:5000",
 			"http://localhost:8888",
-			"health-care-app-3e333.web.app",
+			"https://health-care-app-3e333.web.app",
 		},
 		AllowMethods: []string{
 			"POST",
@@ -56,7 +56,7 @@ func Initializer() {
 		authorized.GET(sleepTimePath, getSleepTimeHandler)
 		authorized.POST(sleepTimePath, postSleepTimeHandler)
 		authorized.GET(messagePath, getMessageHandler)
-		authorized.GET(wsPath, websocket.Wshandler)
+		authorized.GET(wsPath, ws.Wshandler)
 	}
 	r.Run(port)
 }
