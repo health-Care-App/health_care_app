@@ -2,7 +2,7 @@ package websocket
 
 import (
 	"app/gpt"
-	b64 "encoding/base64"
+	"encoding/base64"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -18,24 +18,31 @@ func Wshandler(c *gin.Context) {
 	audioBytes := make(chan []byte, 10)
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
+		log.Println(err)
 		return
 	}
-	defer conn.Close()
 
 	_, message, err := conn.ReadMessage()
 	if err != nil {
-		log.Printf("ReadMessage Error. ERROR: %+v\n", err)
+		log.Println(err)
+		return
 	}
 
-	gpt.CreateChatStream(string(message), audioBytes)
+	err = gpt.CreateChatStream(string(message), audioBytes)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	for {
 		bytes, ok := <-audioBytes
 		if ok {
-			base64Data := b64.StdEncoding.EncodeToString(bytes)
+			base64Data := base64.StdEncoding.EncodeToString(bytes)
 			conn.WriteMessage(websocket.TextMessage, []byte(base64Data))
 		} else {
 			break
 		}
 	}
+
+	defer conn.Close()
 }

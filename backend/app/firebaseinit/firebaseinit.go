@@ -2,7 +2,6 @@ package firebaseinit
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"cloud.google.com/go/firestore"
@@ -11,7 +10,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func adminSDKInitializer() (*firebase.App, context.Context) {
+func adminSDKInitializer() (*firebase.App, context.Context, error) {
 	var app *firebase.App
 	var err error
 
@@ -27,25 +26,33 @@ func adminSDKInitializer() (*firebase.App, context.Context) {
 	}
 
 	if err != nil {
-		log.Fatalln(err)
+		return nil, nil, err
 	}
-	return app, ctx
+	return app, ctx, nil
 }
 
-func FirestoreInitializer() (*firestore.Client, context.Context) {
-	app, ctx := adminSDKInitializer()
+func FirestoreInitializer() (*firestore.Client, context.Context, error) {
+	app, ctx, err := adminSDKInitializer()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	client, err := app.Firestore(ctx)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, nil, err
 	}
-	return client, ctx
+	return client, ctx, nil
 }
 
-func AuthInitializer() (*auth.Client, context.Context) {
-	app, ctx := adminSDKInitializer()
+func AuthInitializer() (*auth.Client, context.Context, error) {
+	app, ctx, err := adminSDKInitializer()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	client, err := app.Auth(ctx)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, nil, err
 	}
-	return client, ctx
+	return client, ctx, nil
 }

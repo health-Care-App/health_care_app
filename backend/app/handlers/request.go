@@ -2,12 +2,10 @@ package handlers
 
 type (
 	HealthPostRequestBody struct {
-		UserId string `json:"userId" binding:"required"`
-		Health int    `json:"health" binding:"required"`
+		Health int `json:"health" validate:"required"`
 	}
 
 	SleepTimePostRequestBody struct {
-		UserId    string `json:"userId" binding:"required"`
-		SleepTime int    `json:"sleepTime" binding:"required"`
+		SleepTime int `json:"sleepTime" validate:"required"`
 	}
 )

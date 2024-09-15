@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"regexp"
-	"sync"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -18,16 +17,17 @@ const (
 	maxTokensLength   = 50
 )
 
-func CreateChatStream(question string, audioBytes chan<- []byte) {
-	var buffer string
-	var wg sync.WaitGroup
+func CreateChatStream(question string, audioBytes chan<- []byte) error {
+	var errChan = make(chan error)
+	buffer := ""
+	audioNum := 0
 	isPunctuationMatched := false
 
-	stream, err := ConnectGPT(question)
+	stream, err := InitializeGPT(question)
 	if err != nil {
-		fmt.Printf("ChatCompletionStream error: %v\n", err)
-		return
+		return err
 	}
+
 	defer stream.Close()
 	defer close(audioBytes)
 
@@ -35,28 +35,33 @@ func CreateChatStream(question string, audioBytes chan<- []byte) {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
 			if isPunctuationMatched {
-				go voicevox.SpeechSynth(buffer, &wg, audioBytes)
-				wg.Add(1)
+				go voicevox.SpeechSynth(buffer, audioBytes, errChan)
+				audioNum++
 			}
-			wg.Wait()
-			return
+
+			for i := 0; i < audioNum; i++ {
+				if err := <-errChan; err != nil {
+					return err
+				}
+			}
+
+			return nil
 		}
 
 		if err != nil {
-			fmt.Printf("\nStream error: %v\n", err)
-			return
+			return err
 		}
 
 		newToken := response.Choices[0].Delta.Content
-		TextToAudioByte(&wg, &isPunctuationMatched, &buffer, newToken, audioBytes)
+		TextToAudioByte(&audioNum, &isPunctuationMatched, &buffer, newToken, audioBytes, errChan)
 	}
+
 }
 
-func ConnectGPT(question string) (stream *openai.ChatCompletionStream, err error) {
+func InitializeGPT(question string) (*openai.ChatCompletionStream, error) {
 	openaiToken, isExist := os.LookupEnv("OPENAI_TOKEN")
 	if !isExist {
-		fmt.Println("OPENAI_TOKEN should be setted")
-		return
+		return nil, errors.New("env variable OPENAI_TOKEN is not exist")
 	}
 
 	config := openai.DefaultConfig(openaiToken)
@@ -82,7 +87,7 @@ func patternChecked(pattern string, checkText string) bool {
 	return regexp.MustCompile(pattern).MatchString(checkText)
 }
 
-func TextToAudioByte(wg *sync.WaitGroup, isPunctuationMatched *bool, buffer *string, newToken string, audioBytes chan<- []byte) {
+func TextToAudioByte(audioNum *int, isPunctuationMatched *bool, buffer *string, newToken string, audioBytes chan<- []byte, errChan chan<- error) {
 	if *isPunctuationMatched {
 		//今ループが句読点にマッチしてないとき
 		if !patternChecked(`[。\.!\?！？]$`, newToken) {
@@ -90,8 +95,8 @@ func TextToAudioByte(wg *sync.WaitGroup, isPunctuationMatched *bool, buffer *str
 
 			fmt.Println(*buffer)
 			//音声合成処理処理
-			go voicevox.SpeechSynth(*buffer, wg, audioBytes)
-			wg.Add(1)
+			go voicevox.SpeechSynth(*buffer, audioBytes, errChan)
+			*audioNum++
 			*buffer = newToken
 
 			//今ループが句読点のとき

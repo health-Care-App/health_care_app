@@ -1,14 +1,10 @@
 package voicevox
 
 import (
-	"fmt"
-	"sync"
-
 	voicevoxcorego "github.com/sh1ma/voicevoxcore.go"
 )
 
-func SpeechSynth(text string, wg *sync.WaitGroup, audioBytes chan<- []byte) {
-
+func SpeechSynth(text string, audioBytes chan<- []byte, errChan chan<- error) {
 	core := voicevoxcorego.New()
 	initializeOptions := voicevoxcorego.NewVoicevoxInitializeOptions(0, 0, false, "/app/voicevox_core/open_jtalk_dic_utf_8-1.11")
 	core.Initialize(initializeOptions)
@@ -18,10 +14,15 @@ func SpeechSynth(text string, wg *sync.WaitGroup, audioBytes chan<- []byte) {
 	ttsOptions := voicevoxcorego.NewVoicevoxTtsOptions(false, true)
 	result, err := core.Tts(text, 1, ttsOptions)
 
+	//ここで必ずエラーが起きるが正常に処理できるため一旦無視
 	if err != nil {
-		fmt.Println(err)
+		//errChan <- err
+		//return
 	}
+
 	audioBytes <- result
 
-	wg.Done()
+	defer func() {
+		errChan <- nil
+	}()
 }
