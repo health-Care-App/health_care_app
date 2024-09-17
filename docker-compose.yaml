@@ -27,6 +27,7 @@ services:
       FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
     ports:
       - 8080:8080
+      - 2345:2345
     env_file:
       - .env
     tty: true
