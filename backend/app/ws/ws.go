@@ -3,6 +3,7 @@ package ws
 import (
 	"encoding/base64"
 	"log"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -21,6 +22,8 @@ type Message struct {
 
 func Wshandler(c *gin.Context) {
 	audioBytes := make(chan []byte, 10)
+	errCh := make(chan error, 10)
+	var wg sync.WaitGroup
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
@@ -34,11 +37,7 @@ func Wshandler(c *gin.Context) {
 		return
 	}
 
-	err = CreateChatStream(message, audioBytes)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	go CreateChatStream(message, audioBytes, errCh, &wg)
 
 	for {
 		bytes, ok := <-audioBytes
@@ -48,6 +47,10 @@ func Wshandler(c *gin.Context) {
 		} else {
 			break
 		}
+	}
+
+	if err, ok := <-errCh; ok {
+		log.Println(err)
 	}
 
 	defer conn.Close()

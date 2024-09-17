@@ -8,6 +8,8 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"strconv"
+	"sync"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -17,42 +19,77 @@ const (
 	maxTokensLength   = 100
 )
 
-func CreateChatStream(message Message, audioBytes chan<- []byte) error {
-	var errChan = make(chan error)
+func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- error, wg *sync.WaitGroup) {
+	all := ""
 	buffer := ""
-	audioNum := 0
 	isPunctuationMatched := false
+	var speakerId int
+
+	defer close(audioBytes)
+	defer close(errCh)
 
 	stream, err := InitializeGPT(message)
 	if err != nil {
-		return err
+		errCh <- err
+		return
 	}
 
 	defer stream.Close()
-	defer close(audioBytes)
+
+	//ヘッダー読み込み
+	var matched []string
+	for !patternChecked(`^\[model=(\d+)\]`, all) {
+		response, err := stream.Recv()
+		if err != nil {
+			errCh <- err
+			return
+		}
+
+		newToken := response.Choices[0].Delta.Content
+		all = fmt.Sprintf("%s%s", all, newToken)
+
+		if len(all) > 10 {
+			errCh <- errors.New(`model invalid`)
+			return
+		}
+	}
+
+	matched = regexp.MustCompile(`^\[model=(\d+)\]`).FindStringSubmatch(all)
+
+	//"[model="数字"]"のフォーマットに合うかどうか
+	if matched != nil {
+		switch matched[1] {
+		case "3", "1", "5", "22", "38", "76", "8":
+			speakerId, err = strconv.Atoi(matched[1])
+			if err != nil {
+				errCh <- err
+				return
+			}
+
+		default:
+			errCh <- errors.New(`speaker id invalid`)
+			return
+		}
+	}
 
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
 			if isPunctuationMatched {
-				go voicevox.SpeechSynth(buffer, message.Model, audioBytes, errChan)
-				audioNum++
+				wg.Add(1)
+				go voicevox.SpeechSynth(buffer, uint(speakerId), audioBytes, errCh, wg)
 			}
-
-			for i := 0; i < audioNum; i++ {
-				if err := <-errChan; err != nil {
-					return err
-				}
-			}
-
-			return nil
+			wg.Wait()
+			return
 		}
 
 		if err != nil {
-			return err
+			errCh <- err
+			return
 		}
 
 		newToken := response.Choices[0].Delta.Content
+		all += newToken
 
 		if isPunctuationMatched {
 			//今ループが句読点にマッチしてないとき
@@ -61,8 +98,8 @@ func CreateChatStream(message Message, audioBytes chan<- []byte) error {
 
 				fmt.Println(buffer)
 				//音声合成処理処理
-				go voicevox.SpeechSynth(buffer, message.Model, audioBytes, errChan)
-				audioNum++
+				wg.Add(1)
+				go voicevox.SpeechSynth(buffer, uint(speakerId), audioBytes, errCh, wg)
 				buffer = newToken
 
 				//今ループが句読点のとき

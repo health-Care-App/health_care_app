@@ -1,7 +1,8 @@
 FROM golang:1.22.3
 WORKDIR /app/
 
-RUN go install github.com/air-verse/air@latest
+RUN go install github.com/air-verse/air@latest \
+    && go install github.com/go-delve/delve/cmd/dlv@latest
 
 COPY ./app/go.mod ./app/go.sum ./
 RUN go mod download
