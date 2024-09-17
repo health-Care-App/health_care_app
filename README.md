@@ -45,7 +45,7 @@ Go, Gin
 
 3. http://localhost:8888 にアクセスして正常に動作しているか確認
 
-## APIとwebsocket
+# APIとwebsocket
 データの送受信は基本的にAPIとwebsocketを利用しています。  
 2つの方式どちらもリクエストパラメータのヘッダー`Authorization`にfirebaseのユーザー認証トークン`idToken`を指定する必要があります。 
 ```
@@ -62,9 +62,9 @@ Swaggerを参照。
 リクエストはJSON形式、レスポンスは一文で区切った音声データをbase64形式で返します。返答が2文以上ある場合その数と同数のデータを返します。  
 
 ```
-#リクエスト
-#question: 質問文を指定
-#model: ずんだもんの場合0, 春日つむぎの場合1を指定
+# リクエスト
+# question: 質問文を指定
+# model: ずんだもんの場合0, 春日つむぎの場合1を指定
 
 {
   question: "質問"
@@ -73,9 +73,8 @@ Swaggerを参照。
 ```
 
 ```
-
-#レスポンス
-#base64
+# レスポンス
+# base64
 
 "UklGRiRWAgBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQBWAgAAAA ... AAA///9//r/+v/6//v/+//5//n/+v/6//v/+//7//r/+f/5//n/+f/5//f/"
 ```
