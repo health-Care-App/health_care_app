@@ -57,6 +57,7 @@ Go, Gin
 ```
 ## API
 Swaggerを参照。  
+https://app.swaggerhub.com/apis/SUISAN0731_1/healthCareAppApi/1.0.0
 ## websocket
 音声合成のみwebsocketを利用しています。  
 リクエストはJSON形式、レスポンスは一文で区切った音声データをbase64形式で返します。返答が2文以上ある場合その数と同数のデータを返します。  
