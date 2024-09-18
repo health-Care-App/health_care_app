@@ -34,7 +34,7 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 	defer close(audioBytes)
 	defer close(errCh)
 
-	stream, err := InitializeGPT(message)
+	stream, err := InitializeGPT(userId, message)
 	if err != nil {
 		errCh <- err
 		return
@@ -111,7 +111,7 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 	}
 }
 
-func InitializeGPT(message Message) (*openai.ChatCompletionStream, error) {
+func InitializeGPT(userId string, message Message) (*openai.ChatCompletionStream, error) {
 	openaiToken, isExist := os.LookupEnv("OPENAI_TOKEN")
 	if !isExist {
 		return nil, errors.New("env variable OPENAI_TOKEN is not exist")
@@ -121,6 +121,10 @@ func InitializeGPT(message Message) (*openai.ChatCompletionStream, error) {
 	config.BaseURL = openaiApiEndpoint
 	client := openai.NewClientWithConfig(config)
 	ctx := context.Background()
+	systemConf, err := createSystemConf(userId, message.Model)
+	if err != nil {
+		return nil, err
+	}
 
 	req := openai.ChatCompletionRequest{
 		Model:     openai.GPT4oMini,
@@ -128,7 +132,7 @@ func InitializeGPT(message Message) (*openai.ChatCompletionStream, error) {
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
-				Content: createSystemConf(message.Model),
+				Content: systemConf,
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
