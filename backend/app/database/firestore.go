@@ -44,18 +44,7 @@ func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error
 
 // データベースに健康状態のデータを保存する関数
 func PostHelthData(userId string, queryData HealthsDoc) (PostResponse, error) {
-	client, ctx, err := firebaseinit.FirestoreInitializer()
-	if err != nil {
-		return PostResponse{}, err
-	}
-	defer client.Close()
-
-	_, _, err = client.Collection("health").Doc(userId).Collection("healths").Add(ctx, queryData)
-	if err != nil {
-		return PostResponse{}, err
-	}
-
-	return PostResponse{Message: "ok"}, nil
+	return postData(userId, queryData, "health", "healths")
 }
 
 // データベースから睡眠時間のデータを保存する関数
@@ -95,18 +84,7 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse,
 
 // データベースに睡眠時間のデータを保存する関数
 func PostSleepTimeData(userId string, queryData SleepTimesDoc) (PostResponse, error) {
-	client, ctx, err := firebaseinit.FirestoreInitializer()
-	if err != nil {
-		return PostResponse{}, err
-	}
-	defer client.Close()
-
-	_, _, err = client.Collection("sleepTime").Doc(userId).Collection("sleepTimes").Add(ctx, queryData)
-	if err != nil {
-		return PostResponse{}, err
-	}
-
-	return PostResponse{Message: "ok"}, nil
+	return postData(userId, queryData, "sleepTime", "sleepTimes")
 }
 
 // データベースからメッセージデータを取得する関数
@@ -147,13 +125,17 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 
 // データベースにGPTとの会話テキストデータを保存する関数
 func PostMessageData(userId string, queryData MessagesDoc) (PostResponse, error) {
+	return postData(userId, queryData, "message", "messages")
+}
+
+func postData(userId string, queryData interface{}, collec string, subCollec string) (PostResponse, error) {
 	client, ctx, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return PostResponse{}, err
 	}
 	defer client.Close()
 
-	_, _, err = client.Collection("message").Doc(userId).Collection("messages").Add(ctx, queryData)
+	_, _, err = client.Collection(collec).Doc(userId).Collection(subCollec).Add(ctx, queryData)
 	if err != nil {
 		return PostResponse{}, err
 	}

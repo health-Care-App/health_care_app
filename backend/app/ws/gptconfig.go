@@ -10,7 +10,7 @@ import (
 )
 
 func createSystemConf(userId string, model uint) (string, error) {
-	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -systemWeekTerm).Format(layout)
 	ParsedOldDateAt, err := time.Parse(layout, defaultDate)
 	if err != nil {
 		return "", err
@@ -51,12 +51,12 @@ func createSystemConf(userId string, model uint) (string, error) {
 		characterText = tsumugiText
 	}
 
-	return fmt.Sprintf(fullText, characterText, weekTerm, healthText, sleepTimeText), nil
+	return fmt.Sprintf(fullText, characterText, systemWeekTerm, healthText, sleepTimeText), nil
 }
 
 func newChatCompletionMessages(userId string, message Message) ([]openai.ChatCompletionMessage, error) {
 	var chatCompletionMessges []openai.ChatCompletionMessage
-	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -chatWeekTerm).Format(layout)
 	ParsedOldDateAt, err := time.Parse(layout, defaultDate)
 	if err != nil {
 		return []openai.ChatCompletionMessage{}, err

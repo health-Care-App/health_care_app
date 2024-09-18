@@ -4,12 +4,13 @@ const (
 	openaiApiEndpoint = "https://api.openai.iniad.org/api/v1"
 	labelPattern      = `^\[model=(\d+)\]`
 	textEndPattern    = `[。\.!\?！？]$`
-	maxTokensLength   = 100
+	maxTokensLength   = 70
 	labelMaxLength    = 10
 	addStep           = 1
 	errLabel          = -1
 
-	weekTerm = 7
+	systemWeekTerm = 7
+	chatWeekTerm   = 1
 
 	layout        = "2006-01-02T15:04:05Z07:00"
 	audioChLength = 10
