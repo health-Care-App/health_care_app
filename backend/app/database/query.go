@@ -4,18 +4,18 @@ import "time"
 
 type (
 	HealthsDoc struct {
-		Health int       `json:"health" validate:"required"`
-		Date   time.Time `json:"Date" validate:"required"`
+		Health int       `json:"health" firestore:"health" validate:"required"`
+		Date   time.Time `json:"Date" firestore:"Date" validate:"required"`
 	}
 
 	SleepTimesDoc struct {
-		SleepTime int       `json:"sleep_time" validate:"required"`
-		Date      time.Time `json:"Date" validate:"required"`
+		SleepTime int       `json:"sleep_time" firestore:"sleep_time" validate:"required"`
+		Date      time.Time `json:"Date" firestore:"Date" validate:"required"`
 	}
 
 	MessagesDoc struct {
-		Who  string    `json:"who" validate:"required,oneof=user system"`
-		Text string    `json:"text" validate:"required"`
-		Date time.Time `json:"Date" validate:"required"`
+		Question string    `json:"question" firestore:"question" validate:"required"`
+		Answer   string    `json:"answer" firestore:"answer" validate:"required"`
+		Date     time.Time `json:"Date" firestore:"Date" validate:"required"`
 	}
 )

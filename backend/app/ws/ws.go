@@ -1,37 +1,18 @@
 package ws
 
 import (
-	"app/database"
 	"app/voicevox"
 	"encoding/base64"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
-const (
-	layout        = "2006-01-02"
-	audioChLength = 10
-	errChLength   = 1
-)
-
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-}
-
-type Message struct {
-	Question string `json:"question" validate:"required"`
-	//ずんだもんの場合0, 春日部つむぎの場合1
-	Model uint `json:"model" validate:"required,oneof=0 1"`
-}
-
-type Audio struct {
-	Audiobytes []byte `validate:"required"`
-	Number     int    `validate:"required"`
 }
 
 func Wshandler(c *gin.Context) {
@@ -55,24 +36,6 @@ func Wshandler(c *gin.Context) {
 	err = conn.ReadJSON(&message)
 	if err != nil {
 		log.Println(err)
-		return
-	}
-
-	//データベースに質問文を保存
-	createDateAt, err := time.Parse(layout, time.Now().Format(layout))
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-	_, err = database.PostMessageData(
-		userId,
-		database.MessagesDoc{
-			Who:  "user",
-			Text: message.Question,
-			Date: createDateAt,
-		})
-	if err != nil {
-		log.Println(err.Error())
 		return
 	}
 

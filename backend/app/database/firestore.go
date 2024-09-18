@@ -135,10 +135,10 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 		}
 
 		messages = append(messages, Messages{
-			Id:   doc.Ref.ID,
-			Who:  messagesDoc.Who,
-			Date: messagesDoc.Date,
-			Text: messagesDoc.Text,
+			Id:       doc.Ref.ID,
+			Date:     messagesDoc.Date,
+			Question: messagesDoc.Question,
+			Answer:   messagesDoc.Answer,
 		})
 	}
 
@@ -153,7 +153,7 @@ func PostMessageData(userId string, queryData MessagesDoc) (PostResponse, error)
 	}
 	defer client.Close()
 
-	_, _, err = client.Collection("message").Doc(userId).Collection("mesasges").Add(ctx, queryData)
+	_, _, err = client.Collection("message").Doc(userId).Collection("messages").Add(ctx, queryData)
 	if err != nil {
 		return PostResponse{}, err
 	}

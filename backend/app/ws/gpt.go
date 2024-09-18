@@ -16,16 +16,6 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-const (
-	openaiApiEndpoint = "https://api.openai.iniad.org/api/v1"
-	labelPattern      = `^\[model=(\d+)\]`
-	textEndPattern    = `[。\.!\?！？]$`
-	maxTokensLength   = 100
-	labelMaxLength    = 10
-	addStep           = 1
-	errLabel          = -1
-)
-
 func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
@@ -64,13 +54,13 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 				errCh <- err
 				return
 			}
-			_, err = database.PostMessageData(
-				userId,
-				database.MessagesDoc{
-					Who:  "system",
-					Text: fullText,
-					Date: createDateAt,
-				})
+
+			messagesDoc := database.MessagesDoc{
+				Question: message.Question,
+				Answer:   fullText,
+				Date:     createDateAt,
+			}
+			_, err = database.PostMessageData(userId, messagesDoc)
 			if err != nil {
 				errCh <- err
 				return
@@ -102,14 +92,14 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 
 				//今ループが句読点のとき
 			} else {
-				buffer = fmt.Sprintf("%s%s", buffer, newToken)
+				buffer += newToken
 			}
 			//今ループで句読点にマッチしたとき
 		} else if patternChecked(textEndPattern, newToken) {
 			isPunctuationMatched = true
-			buffer = fmt.Sprintf("%s%s", buffer, newToken)
+			buffer += newToken
 		} else {
-			buffer = fmt.Sprintf("%s%s", buffer, newToken)
+			buffer += newToken
 		}
 	}
 }
@@ -124,7 +114,8 @@ func InitializeGPT(userId string, message Message) (*openai.ChatCompletionStream
 	config.BaseURL = openaiApiEndpoint
 	client := openai.NewClientWithConfig(config)
 	ctx := context.Background()
-	systemConf, err := createSystemConf(userId, message.Model)
+
+	chatCompletionMessages, err := newChatCompletionMessages(userId, message)
 	if err != nil {
 		return nil, err
 	}
@@ -132,17 +123,8 @@ func InitializeGPT(userId string, message Message) (*openai.ChatCompletionStream
 	req := openai.ChatCompletionRequest{
 		Model:     openai.GPT4oMini,
 		MaxTokens: maxTokensLength,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: systemConf,
-			},
-			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: message.Question,
-			},
-		},
-		Stream: true,
+		Messages:  chatCompletionMessages,
+		Stream:    true,
 	}
 	return client.CreateChatCompletionStream(ctx, req)
 }
@@ -161,7 +143,7 @@ func readLabel(fullText *string, stream *openai.ChatCompletionStream) (int, erro
 		}
 
 		newToken := response.Choices[0].Delta.Content
-		*fullText = fmt.Sprintf("%s%s", *fullText, newToken)
+		*fullText += newToken
 
 		if len(*fullText) > labelMaxLength {
 			return errLabel, errors.New(`model invalid`)

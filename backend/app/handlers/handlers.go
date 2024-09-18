@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	layout = "2006-01-02"
-	port   = ":8080"
+	layout   = "2006-01-02T15:04:05Z07:00"
+	port     = ":8080"
+	weekTerm = 7
 )
 
 // 健康状態を取得する関数
@@ -21,7 +22,7 @@ func gethealthHandler(c *gin.Context) {
 	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
-	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
@@ -76,7 +77,7 @@ func getSleepTimeHandler(c *gin.Context) {
 	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
-	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
@@ -129,7 +130,7 @@ func getMessageHandler(c *gin.Context) {
 	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
-	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
