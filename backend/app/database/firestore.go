@@ -27,10 +27,15 @@ func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error
 			return HealthGetResponse{}, err
 		}
 
+		var healthsDoc HealthsDoc
+		if err := doc.DataTo(&healthsDoc); err != nil {
+			return HealthGetResponse{}, err
+		}
+
 		healths = append(healths, Healths{
 			Id:     doc.Ref.ID,
-			Date:   doc.Data()["Date"].(time.Time),
-			Health: doc.Data()["health"].(int64),
+			Date:   healthsDoc.Date,
+			Health: healthsDoc.Health,
 		})
 	}
 
@@ -38,7 +43,7 @@ func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error
 }
 
 // データベースに健康状態のデータを保存する関数
-func PostHelthData(userId string, queryData PostHelthDataQuery) (PostResponse, error) {
+func PostHelthData(userId string, queryData HealthsDoc) (PostResponse, error) {
 	client, ctx, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return PostResponse{}, err
@@ -73,10 +78,15 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse,
 			return SleepTimeGetResponse{}, err
 		}
 
+		var sleepTimesDoc SleepTimesDoc
+		if err := doc.DataTo(&sleepTimesDoc); err != nil {
+			return SleepTimeGetResponse{}, err
+		}
+
 		sleepTimes = append(sleepTimes, SleepTimes{
 			Id:        doc.Ref.ID,
-			Date:      doc.Data()["Date"].(time.Time),
-			SleepTime: doc.Data()["sleepTime"].(int64),
+			Date:      sleepTimesDoc.Date,
+			SleepTime: sleepTimesDoc.SleepTime,
 		})
 	}
 
@@ -84,7 +94,7 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse,
 }
 
 // データベースに睡眠時間のデータを保存する関数
-func PostSleepTimeData(userId string, queryData PostSleepTimeDataQuery) (PostResponse, error) {
+func PostSleepTimeData(userId string, queryData SleepTimesDoc) (PostResponse, error) {
 	client, ctx, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return PostResponse{}, err
@@ -119,11 +129,16 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 			return MessageGetResponse{}, err
 		}
 
+		var messagesDoc MessagesDoc
+		if err := doc.DataTo(&messagesDoc); err != nil {
+			return MessageGetResponse{}, err
+		}
+
 		messages = append(messages, Messages{
 			Id:   doc.Ref.ID,
-			Who:  doc.Data()["who"].(string),
-			Date: doc.Data()["Date"].(time.Time),
-			Text: doc.Data()["text"].(string),
+			Who:  messagesDoc.Who,
+			Date: messagesDoc.Date,
+			Text: messagesDoc.Text,
 		})
 	}
 
@@ -131,7 +146,7 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 }
 
 // データベースにGPTとの会話テキストデータを保存する関数
-func PostMessageData(userId string, queryData PostMessageDataQuery) (PostResponse, error) {
+func PostMessageData(userId string, queryData MessagesDoc) (PostResponse, error) {
 	client, ctx, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return PostResponse{}, err

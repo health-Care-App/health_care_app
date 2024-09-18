@@ -55,7 +55,7 @@ func postHealthHandler(c *gin.Context) {
 
 	response, err := database.PostHelthData(
 		userId,
-		database.PostHelthDataQuery{
+		database.HealthsDoc{
 			Health: body.Health,
 			Date:   createDateAt,
 		},
@@ -110,7 +110,7 @@ func postSleepTimeHandler(c *gin.Context) {
 
 	response, err := database.PostSleepTimeData(
 		userId,
-		database.PostSleepTimeDataQuery{
+		database.SleepTimesDoc{
 			SleepTime: body.SleepTime,
 			Date:      createDateAt,
 		})

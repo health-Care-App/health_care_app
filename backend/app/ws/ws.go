@@ -2,6 +2,7 @@ package ws
 
 import (
 	"app/database"
+	"app/voicevox"
 	"encoding/base64"
 	"log"
 	"sync"
@@ -28,6 +29,11 @@ type Message struct {
 	Model uint `json:"model" validate:"required,oneof=0 1"`
 }
 
+type Audio struct {
+	Audiobytes []byte `validate:"required"`
+	Number     int    `validate:"required"`
+}
+
 func Wshandler(c *gin.Context) {
 	value, exists := c.Get("userId")
 	if !exists {
@@ -36,7 +42,7 @@ func Wshandler(c *gin.Context) {
 	}
 	userId := value.(string)
 
-	audioBytes := make(chan []byte, audioChLength)
+	audioCh := make(chan voicevox.Audio, audioChLength)
 	errCh := make(chan error, errChLength)
 	var wg sync.WaitGroup
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -60,7 +66,7 @@ func Wshandler(c *gin.Context) {
 	}
 	_, err = database.PostMessageData(
 		userId,
-		database.PostMessageDataQuery{
+		database.MessagesDoc{
 			Who:  "user",
 			Text: message.Question,
 			Date: createDateAt,
@@ -70,13 +76,28 @@ func Wshandler(c *gin.Context) {
 		return
 	}
 
-	go CreateChatStream(message, audioBytes, errCh, &wg, userId)
+	go CreateChatStream(message, audioCh, errCh, &wg, userId)
 
+	var audioArray []voicevox.Audio
+	audioSendCounter := 1
 	for {
-		bytes, ok := <-audioBytes
+		audioStatus, ok := <-audioCh
+
+		for len(audioArray) > 0 {
+			for _, audioStatusBuffer := range audioArray {
+				if audioSendCounter == audioStatusBuffer.Number {
+					writeBase64(audioStatusBuffer.Audiobytes, conn, &audioSendCounter)
+					break
+				}
+			}
+			break
+		}
 		if ok {
-			base64Data := base64.StdEncoding.EncodeToString(bytes)
-			conn.WriteMessage(websocket.TextMessage, []byte(base64Data))
+			if audioSendCounter == audioStatus.Number {
+				writeBase64(audioStatus.Audiobytes, conn, &audioSendCounter)
+			} else {
+				audioArray = append(audioArray, audioStatus)
+			}
 		} else {
 			break
 		}
@@ -87,4 +108,10 @@ func Wshandler(c *gin.Context) {
 	}
 
 	defer conn.Close()
+}
+
+func writeBase64(audioBytes []byte, conn *websocket.Conn, audioSendCounter *int) {
+	base64Data := base64.StdEncoding.EncodeToString(audioBytes)
+	conn.WriteMessage(websocket.TextMessage, []byte(base64Data))
+	*audioSendCounter++
 }

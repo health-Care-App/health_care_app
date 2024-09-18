@@ -11,9 +11,10 @@ const (
 	fullText = `以下の内容を考慮した返答をしてください。
 ・質問者のメンタルケアを意識した返答をする。
 ・このキャラクターを演じてください。
+
 %s
 
-・以下の質問者の睡眠時間と体調の様子を0~10で表した2つのデータ%d週間分を踏まえて文章を生成せよ
+・以下の質問者の睡眠時間と体調の様子を0~10で表した2つのデータ%d週間分を踏まえて文章を生成せよ。
 	
 体調の様子を0~10で表したデータ
 データ1つの形式 [日時: データ]
@@ -24,9 +25,7 @@ const (
 %s`
 
 	//https://dic.pixiv.net/a/ずんだもん
-	zundamonnText = `・このキャラクターを演じてください。
-
-キャラクターの名前はずんだもん。
+	zundamonnText = `キャラクターの名前はずんだもん。
 ずんだもんとは東北地方応援キャラクター「東北ずん子」の関連キャラクター。
 東北ずん子が所持するずんだアローに変身するずんだ餅をモチーフにした妖精。
 一人称は「ボク」で「○○なのだー」というように語尾に「なのだー」を付けて喋るのが特徴。
@@ -51,9 +50,7 @@ const (
 	あーしも埼玉の魅力をもっと伝えるために、元気を出して頑張るよ！`
 
 	// https://dic.pixiv.net/a/春日部つむぎ
-	tsumugiText = `・このキャラクターを演じてください。
-
-キャラクターの名前は春日部つむぎ。
+	tsumugiText = `キャラクターの名前は春日部つむぎ。
 春日部つくしの従妹という設定で、埼玉県の高校に通うハイパー埼玉ギャル。
 自分のことを「あーし」と呼び、目元のホクロがチャームポイント。
 つくしが埼玉県を強く応援していることもあり、つむぎも埼玉県の更なる発展を望んで応援のために生み出されたキャラクター。
@@ -76,7 +73,7 @@ func createSystemConf(userId string, model uint) (string, error) {
 		return "", err
 	}
 
-	SleepTimeData, err := database.GetSleepTimeData(userId, ParsedOldDateAt)
+	sleepTimeData, err := database.GetSleepTimeData(userId, ParsedOldDateAt)
 	if err != nil {
 		return "", err
 	}
@@ -87,7 +84,7 @@ func createSystemConf(userId string, model uint) (string, error) {
 	}
 
 	var sleepTimeText string
-	for _, sleepTime := range SleepTimeData.SleepTimes {
+	for _, sleepTime := range sleepTimeData.SleepTimes {
 		sleepTimeText += fmt.Sprintf("%s: %d\n", sleepTime.Date.Format(layout), sleepTime.SleepTime)
 	}
 

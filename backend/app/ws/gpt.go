@@ -26,12 +26,13 @@ const (
 	errLabel          = -1
 )
 
-func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- error, wg *sync.WaitGroup, userId string) {
+func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
 	isPunctuationMatched := false
+	audioCounter := 1
 
-	defer close(audioBytes)
+	defer close(audioCh)
 	defer close(errCh)
 
 	stream, err := InitializeGPT(userId, message)
@@ -42,7 +43,7 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 
 	defer stream.Close()
 
-	speakerId, err := readLabel(fullText, stream)
+	speakerId, err := readLabel(&fullText, stream)
 	if err != nil {
 		errCh <- err
 		return
@@ -53,7 +54,7 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 		if errors.Is(err, io.EOF) {
 			if isPunctuationMatched {
 				wg.Add(addStep)
-				go voicevox.SpeechSynth(buffer, uint(speakerId), audioBytes, errCh, wg)
+				go voicevox.SpeechSynth(buffer, uint(speakerId), audioCh, errCh, wg, &audioCounter)
 			}
 			wg.Wait()
 
@@ -65,7 +66,7 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 			}
 			_, err = database.PostMessageData(
 				userId,
-				database.PostMessageDataQuery{
+				database.MessagesDoc{
 					Who:  "system",
 					Text: fullText,
 					Date: createDateAt,
@@ -75,6 +76,8 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 				return
 			}
 
+			//正常終了
+			fmt.Println("successful completion")
 			return
 		}
 
@@ -94,7 +97,7 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 				fmt.Println(buffer)
 				//音声合成処理処理
 				wg.Add(addStep)
-				go voicevox.SpeechSynth(buffer, uint(speakerId), audioBytes, errCh, wg)
+				go voicevox.SpeechSynth(buffer, uint(speakerId), audioCh, errCh, wg, &audioCounter)
 				buffer = newToken
 
 				//今ループが句読点のとき
@@ -148,24 +151,24 @@ func patternChecked(pattern string, checkText string) bool {
 	return regexp.MustCompile(pattern).MatchString(checkText)
 }
 
-func readLabel(fullText string, stream *openai.ChatCompletionStream) (int, error) {
+func readLabel(fullText *string, stream *openai.ChatCompletionStream) (int, error) {
 	//ラベル読み込み
 	var matched []string
-	for !patternChecked(labelPattern, fullText) {
+	for !patternChecked(labelPattern, *fullText) {
 		response, err := stream.Recv()
 		if err != nil {
 			return errLabel, err
 		}
 
 		newToken := response.Choices[0].Delta.Content
-		fullText = fmt.Sprintf("%s%s", fullText, newToken)
+		*fullText = fmt.Sprintf("%s%s", *fullText, newToken)
 
-		if len(fullText) > labelMaxLength {
+		if len(*fullText) > labelMaxLength {
 			return errLabel, errors.New(`model invalid`)
 		}
 	}
 
-	matched = regexp.MustCompile(labelPattern).FindStringSubmatch(fullText)
+	matched = regexp.MustCompile(labelPattern).FindStringSubmatch(*fullText)
 
 	//"[model="数字"]"のフォーマットに合うかどうか
 	switch matched[1] {
