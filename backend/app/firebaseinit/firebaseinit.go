@@ -10,16 +10,21 @@ import (
 	"google.golang.org/api/option"
 )
 
+const (
+	projectId             = "health-care-app-3e333"
+	serviceAccountKeyPath = "../serviceAccountKey.json"
+)
+
 func adminSDKInitializer() (*firebase.App, context.Context, error) {
 	var app *firebase.App
 	var err error
 
 	ctx := context.Background()
-	conf := &firebase.Config{ProjectID: "health-care-app-3e333"}
+	conf := &firebase.Config{ProjectID: projectId}
 
 	//PROD環境の場合serviceAccountKey.jsonを読み込む
 	if _, isDev := os.LookupEnv("FIRESTORE_EMULATOR_HOST"); !isDev {
-		sa := option.WithCredentialsFile("../serviceAccountKey.json")
+		sa := option.WithCredentialsFile(serviceAccountKeyPath)
 		app, err = firebase.NewApp(ctx, conf, sa)
 	} else {
 		app, err = firebase.NewApp(ctx, conf)

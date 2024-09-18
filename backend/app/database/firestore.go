@@ -13,6 +13,7 @@ func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error
 	if err != nil {
 		return HealthGetResponse{}, err
 	}
+	defer client.Close()
 
 	query := client.Collection("health").Doc(userId).Collection("healths")
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
@@ -33,28 +34,22 @@ func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error
 		})
 	}
 
-	defer client.Close()
 	return HealthGetResponse{Healths: healths}, nil
 }
 
 // データベースに健康状態のデータを保存する関数
-func PostHelthData(userId string, health int, createDateAt time.Time) (PostResponse, error) {
+func PostHelthData(userId string, queryData PostHelthDataQuery) (PostResponse, error) {
 	client, ctx, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return PostResponse{}, err
 	}
+	defer client.Close()
 
-	_, _, err = client.Collection("health").Doc(userId).Collection("healths").Add(
-		ctx, PostHelthDataQuery{
-			Health: health,
-			Date:   createDateAt,
-		},
-	)
+	_, _, err = client.Collection("health").Doc(userId).Collection("healths").Add(ctx, queryData)
 	if err != nil {
 		return PostResponse{}, err
 	}
 
-	defer client.Close()
 	return PostResponse{Message: "ok"}, nil
 }
 
@@ -64,6 +59,7 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse,
 	if err != nil {
 		return SleepTimeGetResponse{}, err
 	}
+	defer client.Close()
 
 	query := client.Collection("sleepTime").Doc(userId).Collection("sleepTimes")
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
@@ -84,28 +80,22 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse,
 		})
 	}
 
-	defer client.Close()
 	return SleepTimeGetResponse{SleepTimes: sleepTimes}, nil
 }
 
 // データベースに睡眠時間のデータを保存する関数
-func PostSleepTimeData(userId string, sleepTime int, createDateAt time.Time) (PostResponse, error) {
+func PostSleepTimeData(userId string, queryData PostSleepTimeDataQuery) (PostResponse, error) {
 	client, ctx, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return PostResponse{}, err
 	}
+	defer client.Close()
 
-	_, _, err = client.Collection("sleepTime").Doc(userId).Collection("sleepTimes").Add(
-		ctx, PostSleepTimeDataQuery{
-			SleepTime: sleepTime,
-			Date:      createDateAt,
-		},
-	)
+	_, _, err = client.Collection("sleepTime").Doc(userId).Collection("sleepTimes").Add(ctx, queryData)
 	if err != nil {
 		return PostResponse{}, err
 	}
 
-	defer client.Close()
 	return PostResponse{Message: "ok"}, nil
 }
 
@@ -115,6 +105,7 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 	if err != nil {
 		return MessageGetResponse{}, err
 	}
+	defer client.Close()
 
 	query := client.Collection("message").Doc(userId).Collection("messages")
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
@@ -136,6 +127,21 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 		})
 	}
 
-	defer client.Close()
 	return MessageGetResponse{Messages: messages}, nil
+}
+
+// データベースにGPTとの会話テキストデータを保存する関数
+func PostMessageData(userId string, queryData PostMessageDataQuery) (PostResponse, error) {
+	client, ctx, err := firebaseinit.FirestoreInitializer()
+	if err != nil {
+		return PostResponse{}, err
+	}
+	defer client.Close()
+
+	_, _, err = client.Collection("message").Doc(userId).Collection("mesasges").Add(ctx, queryData)
+	if err != nil {
+		return PostResponse{}, err
+	}
+
+	return PostResponse{Message: "ok"}, nil
 }

@@ -53,7 +53,13 @@ func postHealthHandler(c *gin.Context) {
 		errorResponse(c, err)
 	}
 
-	response, err := database.PostHelthData(userId, body.Health, createDateAt)
+	response, err := database.PostHelthData(
+		userId,
+		database.PostHelthDataQuery{
+			Health: body.Health,
+			Date:   createDateAt,
+		},
+	)
 	if err != nil {
 		errorResponse(c, err)
 	}
@@ -102,7 +108,12 @@ func postSleepTimeHandler(c *gin.Context) {
 		errorResponse(c, err)
 	}
 
-	response, err := database.PostSleepTimeData(userId, body.SleepTime, createDateAt)
+	response, err := database.PostSleepTimeData(
+		userId,
+		database.PostSleepTimeDataQuery{
+			SleepTime: body.SleepTime,
+			Date:      createDateAt,
+		})
 	if err != nil {
 		errorResponse(c, err)
 	}

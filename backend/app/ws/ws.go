@@ -1,12 +1,20 @@
 package ws
 
 import (
+	"app/database"
 	"encoding/base64"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+)
+
+const (
+	layout        = "2006-01-02"
+	audioChLength = 10
+	errChLength   = 1
 )
 
 var upgrader = websocket.Upgrader{
@@ -21,8 +29,15 @@ type Message struct {
 }
 
 func Wshandler(c *gin.Context) {
-	audioBytes := make(chan []byte, 10)
-	errCh := make(chan error, 10)
+	value, exists := c.Get("userId")
+	if !exists {
+		log.Println("invalid userId")
+		return
+	}
+	userId := value.(string)
+
+	audioBytes := make(chan []byte, audioChLength)
+	errCh := make(chan error, errChLength)
 	var wg sync.WaitGroup
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -37,7 +52,25 @@ func Wshandler(c *gin.Context) {
 		return
 	}
 
-	go CreateChatStream(message, audioBytes, errCh, &wg)
+	//データベースに質問文を保存
+	createDateAt, err := time.Parse(layout, time.Now().Format(layout))
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	_, err = database.PostMessageData(
+		userId,
+		database.PostMessageDataQuery{
+			Who:  "user",
+			Text: message.Question,
+			Date: createDateAt,
+		})
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	go CreateChatStream(message, audioBytes, errCh, &wg, userId)
 
 	for {
 		bytes, ok := <-audioBytes

@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"app/database"
 	"app/voicevox"
 	"context"
 	"errors"
@@ -10,20 +11,25 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
+	"time"
 
 	openai "github.com/sashabaranov/go-openai"
 )
 
 const (
 	openaiApiEndpoint = "https://api.openai.iniad.org/api/v1"
+	labelPattern      = `^\[model=(\d+)\]`
+	textEndPattern    = `[。\.!\?！？]$`
 	maxTokensLength   = 100
+	labelMaxLength    = 10
+	addStep           = 1
+	errLabel          = -1
 )
 
-func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- error, wg *sync.WaitGroup) {
-	all := ""
+func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- error, wg *sync.WaitGroup, userId string) {
+	fullText := ""
 	buffer := ""
 	isPunctuationMatched := false
-	var speakerId int
 
 	defer close(audioBytes)
 	defer close(errCh)
@@ -36,50 +42,39 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 
 	defer stream.Close()
 
-	//ヘッダー読み込み
-	var matched []string
-	for !patternChecked(`^\[model=(\d+)\]`, all) {
-		response, err := stream.Recv()
-		if err != nil {
-			errCh <- err
-			return
-		}
-
-		newToken := response.Choices[0].Delta.Content
-		all = fmt.Sprintf("%s%s", all, newToken)
-
-		if len(all) > 10 {
-			errCh <- errors.New(`model invalid`)
-			return
-		}
-	}
-
-	matched = regexp.MustCompile(`^\[model=(\d+)\]`).FindStringSubmatch(all)
-
-	//"[model="数字"]"のフォーマットに合うかどうか
-	if matched != nil {
-		switch matched[1] {
-		case "3", "1", "5", "22", "38", "76", "8":
-			speakerId, err = strconv.Atoi(matched[1])
-			if err != nil {
-				errCh <- err
-				return
-			}
-
-		default:
-			errCh <- errors.New(`speaker id invalid`)
-			return
-		}
+	speakerId, err := readLabel(fullText, stream)
+	if err != nil {
+		errCh <- err
+		return
 	}
 
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
 			if isPunctuationMatched {
-				wg.Add(1)
+				wg.Add(addStep)
 				go voicevox.SpeechSynth(buffer, uint(speakerId), audioBytes, errCh, wg)
 			}
 			wg.Wait()
+
+			//データベースにGPTの回答を保存
+			createDateAt, err := time.Parse(layout, time.Now().Format(layout))
+			if err != nil {
+				errCh <- err
+				return
+			}
+			_, err = database.PostMessageData(
+				userId,
+				database.PostMessageDataQuery{
+					Who:  "system",
+					Text: fullText,
+					Date: createDateAt,
+				})
+			if err != nil {
+				errCh <- err
+				return
+			}
+
 			return
 		}
 
@@ -89,16 +84,16 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 		}
 
 		newToken := response.Choices[0].Delta.Content
-		all += newToken
+		fullText += newToken
 
 		if isPunctuationMatched {
 			//今ループが句読点にマッチしてないとき
-			if !patternChecked(`[。\.!\?！？]$`, newToken) {
+			if !patternChecked(textEndPattern, newToken) {
 				isPunctuationMatched = false
 
 				fmt.Println(buffer)
 				//音声合成処理処理
-				wg.Add(1)
+				wg.Add(addStep)
 				go voicevox.SpeechSynth(buffer, uint(speakerId), audioBytes, errCh, wg)
 				buffer = newToken
 
@@ -107,7 +102,7 @@ func CreateChatStream(message Message, audioBytes chan<- []byte, errCh chan<- er
 				buffer = fmt.Sprintf("%s%s", buffer, newToken)
 			}
 			//今ループで句読点にマッチしたとき
-		} else if patternChecked(`[。\.!\?！？]$`, newToken) {
+		} else if patternChecked(textEndPattern, newToken) {
 			isPunctuationMatched = true
 			buffer = fmt.Sprintf("%s%s", buffer, newToken)
 		} else {
@@ -147,4 +142,37 @@ func InitializeGPT(message Message) (*openai.ChatCompletionStream, error) {
 
 func patternChecked(pattern string, checkText string) bool {
 	return regexp.MustCompile(pattern).MatchString(checkText)
+}
+
+func readLabel(fullText string, stream *openai.ChatCompletionStream) (int, error) {
+	//ラベル読み込み
+	var matched []string
+	for !patternChecked(labelPattern, fullText) {
+		response, err := stream.Recv()
+		if err != nil {
+			return errLabel, err
+		}
+
+		newToken := response.Choices[0].Delta.Content
+		fullText = fmt.Sprintf("%s%s", fullText, newToken)
+
+		if len(fullText) > labelMaxLength {
+			return errLabel, errors.New(`model invalid`)
+		}
+	}
+
+	matched = regexp.MustCompile(labelPattern).FindStringSubmatch(fullText)
+
+	//"[model="数字"]"のフォーマットに合うかどうか
+	switch matched[1] {
+	case "3", "1", "5", "22", "38", "76", "8":
+		speakerId, err := strconv.Atoi(matched[1])
+		if err != nil {
+			return errLabel, err
+		}
+		return speakerId, nil
+
+	default:
+		return errLabel, errors.New(`speaker id invalid`)
+	}
 }
