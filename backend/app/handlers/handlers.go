@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	layout = "2006-01-02"
-	port   = ":8080"
+	layout   = "2006-01-02T15:04:05Z07:00"
+	port     = ":8080"
+	weekTerm = 7
 )
 
 // 健康状態を取得する関数
@@ -21,7 +22,7 @@ func gethealthHandler(c *gin.Context) {
 	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
-	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
@@ -53,7 +54,13 @@ func postHealthHandler(c *gin.Context) {
 		errorResponse(c, err)
 	}
 
-	response, err := database.PostHelthData(userId, body.Health, createDateAt)
+	response, err := database.PostHelthData(
+		userId,
+		database.HealthsDoc{
+			Health: body.Health,
+			Date:   createDateAt,
+		},
+	)
 	if err != nil {
 		errorResponse(c, err)
 	}
@@ -70,7 +77,7 @@ func getSleepTimeHandler(c *gin.Context) {
 	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
-	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {
@@ -102,7 +109,12 @@ func postSleepTimeHandler(c *gin.Context) {
 		errorResponse(c, err)
 	}
 
-	response, err := database.PostSleepTimeData(userId, body.SleepTime, createDateAt)
+	response, err := database.PostSleepTimeData(
+		userId,
+		database.SleepTimesDoc{
+			SleepTime: body.SleepTime,
+			Date:      createDateAt,
+		})
 	if err != nil {
 		errorResponse(c, err)
 	}
@@ -118,7 +130,7 @@ func getMessageHandler(c *gin.Context) {
 	userId := value.(string)
 
 	//現在の1週間前をdefaultとする
-	defaultDate := time.Now().AddDate(0, 0, -7).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
 	if err != nil {

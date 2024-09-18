@@ -3,12 +3,10 @@ package database
 import "time"
 
 type (
-	Dict map[string]interface{}
-
 	Healths struct {
 		Id     string    `json:"id" validate:"required"`
 		Date   time.Time `json:"Date" validate:"required"`
-		Health int64     `json:"health" validate:"required"`
+		Health int       `json:"health" validate:"required"`
 	}
 
 	HealthGetResponse struct {
@@ -22,7 +20,7 @@ type (
 	SleepTimes struct {
 		Id        string    `json:"id" validate:"required"`
 		Date      time.Time `json:"Date" validate:"required"`
-		SleepTime int64     `json:"sleep_time" validate:"required"`
+		SleepTime int       `json:"sleep_time" validate:"required"`
 	}
 
 	SleepTimeGetResponse struct {
@@ -30,10 +28,10 @@ type (
 	}
 
 	Messages struct {
-		Id   string    `json:"id" validate:"required"`
-		Who  string    `json:"who" validate:"required,oneof=user system"`
-		Date time.Time `json:"Date" validate:"required"`
-		Text string    `json:"text" validate:"required"`
+		Id       string    `json:"id" validate:"required"`
+		Date     time.Time `json:"Date" validate:"required"`
+		Question string    `json:"question" validate:"required"`
+		Answer   string    `json:"answer" validate:"required"`
 	}
 
 	MessageGetResponse struct {

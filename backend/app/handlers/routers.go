@@ -20,6 +20,9 @@ const (
 
 func Initializer() {
 	r := gin.Default()
+	r.ForwardedByClientIP = true
+	r.SetTrustedProxies([]string{"localhost", "health-care-app-3e333.web.app"})
+
 	authorized := r.Group(rootPath)
 
 	// CORS対策

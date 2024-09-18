@@ -4,13 +4,14 @@ go 1.22.3
 
 require (
 	firebase.google.com/go/v4 v4.14.1
+	github.com/gin-contrib/cors v1.7.2
 	github.com/gorilla/websocket v1.5.3
 	github.com/sashabaranov/go-openai v1.29.1
 	github.com/sh1ma/voicevoxcore.go v0.0.5
 )
 
 require (
-	github.com/gin-contrib/cors v1.7.2 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 )
