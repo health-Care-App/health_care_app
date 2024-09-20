@@ -11,7 +11,6 @@ func ErrorResponse(c *gin.Context, err error) {
 	c.JSON(500, gin.H{
 		"error": err.Error(),
 	})
-	c.Abort()
 }
 
 func UserErrorResponse(c *gin.Context) {
@@ -19,5 +18,4 @@ func UserErrorResponse(c *gin.Context) {
 	c.JSON(500, gin.H{
 		"error": "invalid userId",
 	})
-	c.Abort()
 }

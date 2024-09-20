@@ -14,6 +14,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
+	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 )
 
 require (

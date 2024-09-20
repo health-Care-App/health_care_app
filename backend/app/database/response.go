@@ -6,7 +6,7 @@ type (
 	Healths struct {
 		Id     string    `json:"id" validate:"required"`
 		Date   time.Time `json:"Date" validate:"required"`
-		Health int       `json:"health" validate:"required"`
+		Health int       `json:"health" validate:"min=1,max=10"`
 	}
 
 	HealthGetResponse struct {
@@ -20,7 +20,7 @@ type (
 	SleepTimes struct {
 		Id        string    `json:"id" validate:"required"`
 		Date      time.Time `json:"Date" validate:"required"`
-		SleepTime int       `json:"sleep_time" validate:"required"`
+		SleepTime int       `json:"sleep_time" validate:"min=0,max=24"`
 	}
 
 	SleepTimeGetResponse struct {

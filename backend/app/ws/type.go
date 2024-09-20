@@ -3,7 +3,7 @@ package ws
 type Message struct {
 	Question string `json:"question" validate:"required"`
 	//ずんだもんの場合0, 春日部つむぎの場合1
-	Model uint `json:"model" validate:"required,oneof=0 1"`
+	Model int `json:"model" validate:"min=0,max=1"`
 }
 
 type Audio struct {
