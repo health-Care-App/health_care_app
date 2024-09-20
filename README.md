@@ -68,8 +68,8 @@ https://app.swaggerhub.com/apis/SUISAN0731_1/healthCareAppApi/1.0.0
 # model: ずんだもんの場合0, 春日つむぎの場合1を指定
 
 {
-  question: "質問"
-  model: 0
+  "question": "質問"
+  "model": 0
 }
 ```
 
