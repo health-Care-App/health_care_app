@@ -49,12 +49,7 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 			wg.Wait()
 
 			//データベースにGPTの回答を保存
-			createDateAt, err := time.Parse(layout, time.Now().Format(layout))
-			if err != nil {
-				errCh <- err
-				return
-			}
-
+			createDateAt := time.Now()
 			messagesDoc := database.MessagesDoc{
 				Question: message.Question,
 				Answer:   fullText,

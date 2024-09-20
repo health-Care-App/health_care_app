@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"app/common"
 	"app/database"
 	"fmt"
 	"sort"
@@ -10,8 +11,8 @@ import (
 )
 
 func createSystemConf(userId string, model uint) (string, error) {
-	defaultDate := time.Now().AddDate(0, 0, -systemWeekTerm).Format(layout)
-	ParsedOldDateAt, err := time.Parse(layout, defaultDate)
+	defaultDate := time.Now().AddDate(0, 0, -systemWeekTerm).Format(common.Layout)
+	ParsedOldDateAt, err := time.Parse(common.Layout, defaultDate)
 	if err != nil {
 		return "", err
 	}
@@ -29,7 +30,7 @@ func createSystemConf(userId string, model uint) (string, error) {
 	healthText := ""
 	if len(healthData.Healths) > 0 {
 		for _, health := range healthData.Healths {
-			healthText += fmt.Sprintf("%s: %d\n", health.Date.Format(layout), health.Health)
+			healthText += fmt.Sprintf("%s: %d\n", health.Date.Format(common.Layout), health.Health)
 		}
 	} else {
 		healthText += "データなし"
@@ -38,7 +39,7 @@ func createSystemConf(userId string, model uint) (string, error) {
 	sleepTimeText := ""
 	if len(sleepTimeData.SleepTimes) > 0 {
 		for _, sleepTime := range sleepTimeData.SleepTimes {
-			sleepTimeText += fmt.Sprintf("%s: %d\n", sleepTime.Date.Format(layout), sleepTime.SleepTime)
+			sleepTimeText += fmt.Sprintf("%s: %d\n", sleepTime.Date.Format(common.Layout), sleepTime.SleepTime)
 		}
 	} else {
 		sleepTimeText += "データなし"
@@ -56,8 +57,8 @@ func createSystemConf(userId string, model uint) (string, error) {
 
 func newChatCompletionMessages(userId string, message Message) ([]openai.ChatCompletionMessage, error) {
 	var chatCompletionMessges []openai.ChatCompletionMessage
-	defaultDate := time.Now().AddDate(0, 0, -chatWeekTerm).Format(layout)
-	ParsedOldDateAt, err := time.Parse(layout, defaultDate)
+	defaultDate := time.Now().AddDate(0, 0, -chatWeekTerm).Format(common.Layout)
+	ParsedOldDateAt, err := time.Parse(common.Layout, defaultDate)
 	if err != nil {
 		return []openai.ChatCompletionMessage{}, err
 	}

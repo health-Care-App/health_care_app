@@ -12,7 +12,6 @@ const (
 	systemWeekTerm = 7
 	chatWeekTerm   = 1
 
-	layout        = "2006-01-02T15:04:05Z07:00"
 	audioChLength = 10
 	errChLength   = 1
 )

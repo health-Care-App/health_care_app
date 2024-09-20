@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	projectId             = "health-care-app-3e333"
-	serviceAccountKeyPath = "serviceAccountKey.json"
+	projectId = "health-care-app-3e333"
 )
 
 func adminSDKInitializer() (*firebase.App, context.Context, error) {
