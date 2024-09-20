@@ -12,7 +12,7 @@ Flutterを直接起動した開発サーバ（[Flutterをホットリロード�
 ## バックエンド
 Go, Gin  
   
-本番サーバ: https://go-server-ielplqf5oa-uc.a.run.app  
+本番サーバ: https://go-server-xrfznls4va-uc.a.run.app  
 開発サーバ: http://localhost:8080  
 ## 開発環境
 - Docker  
