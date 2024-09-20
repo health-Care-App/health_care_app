@@ -55,6 +55,10 @@ Go, Gin
 ```
 "Authorization": "Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoic2hvZ28iLCJwaWN0dXJlIjoiIiwiZW1haWwiOiJzdWlzYW4wNzMxQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiYXV0aF90aW1lIjoxNzI2NTg5NjIxLCJ1c2VyX2lkIjoiSTBWc0k1Q3lvbENsT0Q0Zkxld1BZTldDUmxlcCIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsic3Vpc2FuMDczMUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3MjY1ODk2MjEsImV4cCI6MTcyNjU5MzIyMSwiYXVkIjoiaGVhbHRoLWNhcmUtYXBwLTNlMzMzIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2hlYWx0aC1jYXJlLWFwcC0zZTMzMyIsInN1YiI6IkkwVnNJNUN5b2xDbE9ENGZMZXdQWU5XQ1JsZXAifQ."
 ```
+Flutter(フロントエンド)でIdTokenを取得する方法はこちらの記事を参考にしてください。  
+- [Did anyone manage to get the id token from google sign in (Flutter)](https://stackoverflow.com/questions/52458968/did-anyone-manage-to-get-the-id-token-from-google-sign-in-flutter/66203310#66203310)
+
+
 ## API
 Swaggerを参照。  
 https://app.swaggerhub.com/apis/SUISAN0731_1/healthCareAppApi/1.0.0
