@@ -83,3 +83,5 @@ https://app.swaggerhub.com/apis/SUISAN0731_1/healthCareAppApi/1.0.0
 
 "UklGRiRWAgBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQBWAgAAAA ... AAA///9//r/+v/6//v/+//5//n/+v/6//v/+//7//r/+f/5//n/+f/5//f/"
 ```
+# 日付時間の形式
+バックエンド・フロントエンドどちらも`RFC3339`形式で統一
