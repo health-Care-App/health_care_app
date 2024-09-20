@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"app/common"
 	"app/database"
 	"time"
 
@@ -8,9 +9,8 @@ import (
 )
 
 const (
-	layout   = "2006-01-02T15:04:05Z07:00"
-	port     = ":8080"
-	weekTerm = 7
+	port            = ":8080"
+	defaultWeekTerm = 7
 )
 
 // 健康状態を取得する関数
@@ -26,11 +26,8 @@ func postHealthHandler(c *gin.Context) {
 	if err := c.ShouldBind(&body); err != nil {
 		errorResponse(c, err)
 	}
-	createDateAt, err := time.Parse(layout, time.Now().Format(layout))
-	if err != nil {
-		errorResponse(c, err)
-	}
 
+	createDateAt := time.Now()
 	response, err := database.PostHelthData(
 		userId,
 		database.HealthsDoc{
@@ -59,11 +56,7 @@ func postSleepTimeHandler(c *gin.Context) {
 		errorResponse(c, err)
 	}
 
-	createDateAt, err := time.Parse(layout, time.Now().Format(layout))
-	if err != nil {
-		errorResponse(c, err)
-	}
-
+	createDateAt := time.Now()
 	response, err := database.PostSleepTimeData(
 		userId,
 		database.SleepTimesDoc{
@@ -86,9 +79,9 @@ func getHandler[T database.HealthGetResponse | database.SleepTimeGetResponse | d
 	userId := newUserId(c)
 
 	//現在の1週間前をdefaultとする
-	defaultDate := time.Now().AddDate(0, 0, -weekTerm).Format(layout)
+	defaultDate := time.Now().AddDate(0, 0, -defaultWeekTerm).Format(common.Layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
-	ParsedOldDateAt, err := time.Parse(layout, oldDateAt)
+	ParsedOldDateAt, err := time.Parse(common.Layout, oldDateAt)
 	if err != nil {
 		errorResponse(c, err)
 	}
