@@ -3,6 +3,7 @@ package handlers
 import (
 	"app/common"
 	"app/database"
+	"app/validate"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -25,18 +26,25 @@ func postHealthHandler(c *gin.Context) {
 	body := HealthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
 		common.ErrorResponse(c, err)
+		return
 	}
 
 	createDateAt := time.Now()
-	response, err := database.PostHelthData(
-		userId,
-		database.HealthsDoc{
-			Health: body.Health,
-			Date:   createDateAt,
-		},
-	)
+	queryData := database.HealthsDoc{
+		Health: body.Health,
+		Date:   createDateAt,
+	}
+
+	//データが正しいか検証
+	if err := validate.Validation(queryData); err != nil {
+		common.ErrorResponse(c, err)
+		return
+	}
+
+	response, err := database.PostHelthData(userId, queryData)
 	if err != nil {
 		common.ErrorResponse(c, err)
+		return
 	}
 
 	c.JSON(200, response)
@@ -54,17 +62,25 @@ func postSleepTimeHandler(c *gin.Context) {
 	body := SleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
 		common.ErrorResponse(c, err)
+		return
 	}
 
 	createDateAt := time.Now()
-	response, err := database.PostSleepTimeData(
-		userId,
-		database.SleepTimesDoc{
-			SleepTime: body.SleepTime,
-			Date:      createDateAt,
-		})
+	queryData := database.SleepTimesDoc{
+		SleepTime: body.SleepTime,
+		Date:      createDateAt,
+	}
+
+	//データが正しいか検証
+	if err := validate.Validation(queryData); err != nil {
+		common.ErrorResponse(c, err)
+		return
+	}
+
+	response, err := database.PostSleepTimeData(userId, queryData)
 	if err != nil {
 		common.ErrorResponse(c, err)
+		return
 	}
 	c.JSON(200, response)
 }
@@ -84,11 +100,13 @@ func getHandler[T database.HealthGetResponse | database.SleepTimeGetResponse | d
 	ParsedOldDateAt, err := time.Parse(common.Layout, oldDateAt)
 	if err != nil {
 		common.ErrorResponse(c, err)
+		return
 	}
 
 	response, err := getData(userId, ParsedOldDateAt)
 	if err != nil {
 		common.ErrorResponse(c, err)
+		return
 	}
 
 	c.JSON(200, response)

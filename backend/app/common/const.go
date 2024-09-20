@@ -1,5 +1,7 @@
 package common
 
+import "time"
+
 const (
-	Layout = "2006-01-02T15:04:05Z07:00"
+	Layout = time.RFC3339
 )

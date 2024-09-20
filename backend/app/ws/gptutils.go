@@ -15,7 +15,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func createSystemConf(userId string, model uint) (string, error) {
+func createSystemConf(userId string, model int) (string, error) {
 	defaultDate := time.Now().AddDate(0, 0, -systemWeekTerm).Format(common.Layout)
 	ParsedOldDateAt, err := time.Parse(common.Layout, defaultDate)
 	if err != nil {

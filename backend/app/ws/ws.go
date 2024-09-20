@@ -2,6 +2,7 @@ package ws
 
 import (
 	"app/common"
+	"app/validate"
 	"app/voicevox"
 	"encoding/base64"
 	"log"
@@ -17,11 +18,6 @@ var upgrader = websocket.Upgrader{
 }
 
 func Wshandler(c *gin.Context) {
-	userId := common.NewUserId(c)
-
-	audioCh := make(chan voicevox.Audio, audioChLength)
-	errCh := make(chan error, errChLength)
-	var wg sync.WaitGroup
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
@@ -37,6 +33,15 @@ func Wshandler(c *gin.Context) {
 		return
 	}
 
+	if err := validate.Validation(message); err != nil {
+		log.Println(err)
+		return
+	}
+
+	var wg sync.WaitGroup
+	audioCh := make(chan voicevox.Audio, audioChLength)
+	errCh := make(chan error, errChLength)
+	userId := common.NewUserId(c)
 	go CreateChatStream(message, audioCh, errCh, &wg, userId)
 
 	var audioArray []voicevox.Audio

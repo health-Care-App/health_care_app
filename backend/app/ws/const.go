@@ -4,7 +4,7 @@ const (
 	openaiApiEndpoint = "https://api.openai.iniad.org/api/v1"
 	labelPattern      = `^\[model=(\d+)\]`
 	textEndPattern    = `[。\.!\?！？]$`
-	maxTokensLength   = 70
+	maxTokensLength   = 500
 	labelMaxLength    = 10
 	addStep           = 1
 	errLabel          = -1
@@ -18,7 +18,7 @@ const (
 
 const (
 	fullText = `以下の内容を考慮した返答をしてください。
-・質問者のメンタルケアを意識した返答をする。
+・質問者のメンタルケアを意識した100文字以下の返答をする。
 ・このキャラクターを演じてください。
 
 %s

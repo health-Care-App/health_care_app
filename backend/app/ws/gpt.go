@@ -49,6 +49,7 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 				Answer:   fullText,
 				Date:     createDateAt,
 			}
+
 			_, err = database.PostMessageData(userId, messagesDoc)
 			if err != nil {
 				errCh <- err
