@@ -13,13 +13,9 @@ const (
 )
 
 func adminSDKInitializer() (*firebase.App, context.Context, error) {
-	var app *firebase.App
-	var err error
-
 	ctx := context.Background()
 	conf := &firebase.Config{ProjectID: projectId}
-	app, err = firebase.NewApp(ctx, conf)
-
+	app, err := firebase.NewApp(ctx, conf)
 	if err != nil {
 		return nil, nil, err
 	}

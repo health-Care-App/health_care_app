@@ -3,17 +3,11 @@ package ws
 import (
 	"app/database"
 	"app/voicevox"
-	"context"
 	"errors"
 	"fmt"
 	"io"
-	"os"
-	"regexp"
-	"strconv"
 	"sync"
 	"time"
-
-	openai "github.com/sashabaranov/go-openai"
 )
 
 func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, wg *sync.WaitGroup, userId string) {
@@ -96,67 +90,5 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 		} else {
 			buffer += newToken
 		}
-	}
-}
-
-func InitializeGPT(userId string, message Message) (*openai.ChatCompletionStream, error) {
-	openaiToken, isExist := os.LookupEnv("OPENAI_TOKEN")
-	if !isExist {
-		return nil, errors.New("env variable OPENAI_TOKEN is not exist")
-	}
-
-	config := openai.DefaultConfig(openaiToken)
-	config.BaseURL = openaiApiEndpoint
-	client := openai.NewClientWithConfig(config)
-	ctx := context.Background()
-
-	chatCompletionMessages, err := newChatCompletionMessages(userId, message)
-	if err != nil {
-		return nil, err
-	}
-
-	req := openai.ChatCompletionRequest{
-		Model:     openai.GPT4oMini,
-		MaxTokens: maxTokensLength,
-		Messages:  chatCompletionMessages,
-		Stream:    true,
-	}
-	return client.CreateChatCompletionStream(ctx, req)
-}
-
-func patternChecked(pattern string, checkText string) bool {
-	return regexp.MustCompile(pattern).MatchString(checkText)
-}
-
-func readLabel(fullText *string, stream *openai.ChatCompletionStream) (int, error) {
-	//ラベル読み込み
-	var matched []string
-	for !patternChecked(labelPattern, *fullText) {
-		response, err := stream.Recv()
-		if err != nil {
-			return errLabel, err
-		}
-
-		newToken := response.Choices[0].Delta.Content
-		*fullText += newToken
-
-		if len(*fullText) > labelMaxLength {
-			return errLabel, errors.New(`model invalid`)
-		}
-	}
-
-	matched = regexp.MustCompile(labelPattern).FindStringSubmatch(*fullText)
-
-	//"[model="数字"]"のフォーマットに合うかどうか
-	switch matched[1] {
-	case "3", "1", "5", "22", "38", "76", "8":
-		speakerId, err := strconv.Atoi(matched[1])
-		if err != nil {
-			return errLabel, err
-		}
-		return speakerId, nil
-
-	default:
-		return errLabel, errors.New(`speaker id invalid`)
 	}
 }

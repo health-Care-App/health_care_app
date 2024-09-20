@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"app/common"
 	"app/voicevox"
 	"encoding/base64"
 	"log"
@@ -16,12 +17,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func Wshandler(c *gin.Context) {
-	value, exists := c.Get("userId")
-	if !exists {
-		log.Println("invalid userId")
-		return
-	}
-	userId := value.(string)
+	userId := common.NewUserId(c)
 
 	audioCh := make(chan voicevox.Audio, audioChLength)
 	errCh := make(chan error, errChLength)
@@ -31,6 +27,8 @@ func Wshandler(c *gin.Context) {
 		log.Println(err)
 		return
 	}
+
+	defer conn.Close()
 
 	var message Message
 	err = conn.ReadJSON(&message)
@@ -69,8 +67,6 @@ func Wshandler(c *gin.Context) {
 	if err, ok := <-errCh; ok {
 		log.Println(err)
 	}
-
-	defer conn.Close()
 }
 
 func writeBase64(audioBytes []byte, conn *websocket.Conn, audioSendCounter *int) {
