@@ -12,7 +12,7 @@ import (
 
 const (
 	projectId             = "health-care-app-3e333"
-	serviceAccountKeyPath = "/app/serviceAccountKey.json"
+	serviceAccountKeyPath = "serviceAccountKey.json"
 )
 
 func adminSDKInitializer() (*firebase.App, context.Context, error) {
