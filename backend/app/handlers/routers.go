@@ -23,10 +23,8 @@ func Initializer() {
 	r.ForwardedByClientIP = true
 	r.SetTrustedProxies([]string{"localhost", "health-care-app-3e333.web.app"})
 
-	authorized := r.Group(rootPath)
-
 	// CORS対策
-	authorized.Use(cors.New(cors.Config{
+	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:5000",
 			"http://localhost:8888",
@@ -52,6 +50,7 @@ func Initializer() {
 		MaxAge:           24 * time.Hour,
 	}))
 
+	authorized := r.Group(rootPath)
 	authorized.Use(middleware.Authorized())
 	{
 		authorized.GET(healthPath, gethealthHandler)

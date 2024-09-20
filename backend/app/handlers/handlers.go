@@ -20,11 +20,11 @@ func gethealthHandler(c *gin.Context) {
 
 // 健康状態を保存する関数
 func postHealthHandler(c *gin.Context) {
-	userId := newUserId(c)
+	userId := common.NewUserId(c)
 
 	body := HealthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		errorResponse(c, err)
+		common.ErrorResponse(c, err)
 	}
 
 	createDateAt := time.Now()
@@ -36,7 +36,7 @@ func postHealthHandler(c *gin.Context) {
 		},
 	)
 	if err != nil {
-		errorResponse(c, err)
+		common.ErrorResponse(c, err)
 	}
 
 	c.JSON(200, response)
@@ -49,11 +49,11 @@ func getSleepTimeHandler(c *gin.Context) {
 
 // 睡眠時間を保存する関数
 func postSleepTimeHandler(c *gin.Context) {
-	userId := newUserId(c)
+	userId := common.NewUserId(c)
 
 	body := SleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		errorResponse(c, err)
+		common.ErrorResponse(c, err)
 	}
 
 	createDateAt := time.Now()
@@ -64,7 +64,7 @@ func postSleepTimeHandler(c *gin.Context) {
 			Date:      createDateAt,
 		})
 	if err != nil {
-		errorResponse(c, err)
+		common.ErrorResponse(c, err)
 	}
 	c.JSON(200, response)
 }
@@ -76,28 +76,20 @@ func getMessageHandler(c *gin.Context) {
 
 // GETハンドラを共通化
 func getHandler[T database.HealthGetResponse | database.SleepTimeGetResponse | database.MessageGetResponse](c *gin.Context, getData func(string, time.Time) (T, error)) {
-	userId := newUserId(c)
+	userId := common.NewUserId(c)
 
 	//現在の1週間前をdefaultとする
 	defaultDate := time.Now().AddDate(0, 0, -defaultWeekTerm).Format(common.Layout)
 	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
 	ParsedOldDateAt, err := time.Parse(common.Layout, oldDateAt)
 	if err != nil {
-		errorResponse(c, err)
+		common.ErrorResponse(c, err)
 	}
 
 	response, err := getData(userId, ParsedOldDateAt)
 	if err != nil {
-		errorResponse(c, err)
+		common.ErrorResponse(c, err)
 	}
 
 	c.JSON(200, response)
-}
-
-func newUserId(c *gin.Context) string {
-	value, exists := c.Get("userId")
-	if !exists {
-		userErrorResponse(c)
-	}
-	return value.(string)
 }
