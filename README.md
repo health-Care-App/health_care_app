@@ -47,7 +47,7 @@ Go, Gin
 
 # APIとwebsocket
 データの送受信は基本的にAPIとwebsocketを利用しています。  
-2つの方式どちらもリクエストのヘッダーパラメータ`Authorization`にfirebaseのユーザー認証トークン`idToken`を指定する必要があります。 
+2つの方式どちらもリクエストのヘッダーパラメータ`Authorization`にfirebaseのユーザ別認証トークン`IdToken`を指定する必要があります。 
 ```
 "Authorization": "Bearer idToken"
 ```
