@@ -9,11 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	port            = ":8080"
-	defaultWeekTerm = 7
-)
-
 // 健康状態を取得する関数
 func gethealthHandler(c *gin.Context) {
 	getHandler(c, database.GetHealthData)
@@ -96,7 +91,7 @@ func getHandler[T database.HealthGetResponse | database.SleepTimeGetResponse | d
 
 	//現在の1週間前をdefaultとする
 	defaultDate := time.Now().AddDate(0, 0, -defaultWeekTerm).Format(common.Layout)
-	oldDateAt := c.DefaultQuery("oldDateAt", defaultDate)
+	oldDateAt := c.DefaultQuery(oldDateAtParam, defaultDate)
 	ParsedOldDateAt, err := time.Parse(common.Layout, oldDateAt)
 	if err != nil {
 		common.ErrorResponse(c, err)

@@ -7,6 +7,17 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+const (
+	healthCollec       = "health"
+	healthSubCollec    = "healths"
+	sleepTimeCollec    = "sleepTime"
+	sleepTimeSubCollec = "sleepTimes"
+	messageCollec      = "message"
+	messageSubCollec   = "messages"
+
+	statusOk = "ok"
+)
+
 // データベースから健康状態のデータを取得する関数
 func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error) {
 	client, ctx, err := firebaseinit.FirestoreInitializer()
@@ -15,7 +26,7 @@ func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error
 	}
 	defer client.Close()
 
-	query := client.Collection("health").Doc(userId).Collection("healths")
+	query := client.Collection(healthCollec).Doc(userId).Collection(healthSubCollec)
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
 	var healths []Healths
 	for {
@@ -44,7 +55,7 @@ func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error
 
 // データベースに健康状態のデータを保存する関数
 func PostHelthData(userId string, queryData HealthsDoc) (PostResponse, error) {
-	return postData(userId, queryData, "health", "healths")
+	return postData(userId, queryData, healthCollec, healthSubCollec)
 }
 
 // データベースから睡眠時間のデータを保存する関数
@@ -55,7 +66,7 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse,
 	}
 	defer client.Close()
 
-	query := client.Collection("sleepTime").Doc(userId).Collection("sleepTimes")
+	query := client.Collection(sleepTimeCollec).Doc(userId).Collection(sleepTimeSubCollec)
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
 	var sleepTimes []SleepTimes
 	for {
@@ -84,7 +95,7 @@ func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse,
 
 // データベースに睡眠時間のデータを保存する関数
 func PostSleepTimeData(userId string, queryData SleepTimesDoc) (PostResponse, error) {
-	return postData(userId, queryData, "sleepTime", "sleepTimes")
+	return postData(userId, queryData, sleepTimeCollec, sleepTimeSubCollec)
 }
 
 // データベースからメッセージデータを取得する関数
@@ -95,7 +106,7 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 	}
 	defer client.Close()
 
-	query := client.Collection("message").Doc(userId).Collection("messages")
+	query := client.Collection(messageCollec).Doc(userId).Collection(messageSubCollec)
 	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
 	var messages []Messages
 	for {
@@ -125,7 +136,7 @@ func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, err
 
 // データベースにGPTとの会話テキストデータを保存する関数
 func PostMessageData(userId string, queryData MessagesDoc) (PostResponse, error) {
-	return postData(userId, queryData, "message", "messages")
+	return postData(userId, queryData, messageCollec, messageSubCollec)
 }
 
 func postData(userId string, queryData interface{}, collec string, subCollec string) (PostResponse, error) {
@@ -140,5 +151,5 @@ func postData(userId string, queryData interface{}, collec string, subCollec str
 		return PostResponse{}, err
 	}
 
-	return PostResponse{Message: "ok"}, nil
+	return PostResponse{Message: statusOk}, nil
 }

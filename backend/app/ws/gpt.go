@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -13,7 +15,6 @@ import (
 func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
-	isPunctuationMatched := false
 	audioCounter := 1
 
 	defer close(audioCh)
@@ -27,19 +28,9 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 
 	defer stream.Close()
 
-	speakerId, err := readLabel(&fullText, stream)
-	if err != nil {
-		errCh <- err
-		return
-	}
-
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
-			if isPunctuationMatched {
-				wg.Add(addStep)
-				go voicevox.SpeechSynth(buffer, uint(speakerId), audioCh, errCh, wg, &audioCounter)
-			}
 			wg.Wait()
 
 			//データベースにGPTの回答を保存
@@ -49,7 +40,6 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 				Answer:   fullText,
 				Date:     createDateAt,
 			}
-
 			_, err = database.PostMessageData(userId, messagesDoc)
 			if err != nil {
 				errCh <- err
@@ -68,28 +58,35 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 
 		newToken := response.Choices[0].Delta.Content
 		fullText += newToken
+		buffer += newToken
 
-		if isPunctuationMatched {
-			//今ループが句読点にマッチしてないとき
-			if !patternChecked(textEndPattern, newToken) {
-				isPunctuationMatched = false
+		var matched []string
+		if patternChecked(lineTextPattern, buffer) {
+			matched = regexp.MustCompile(lineTextPattern).FindStringSubmatch(buffer)
 
-				fmt.Println(buffer)
-				//音声合成処理処理
+			//フォーマットに合うかどうか
+			switch matched[1] {
+			case "3", "1", "5", "22", "38", "76", "8":
+				speakerId, err := strconv.Atoi(matched[1])
+				if err != nil {
+					errCh <- err
+					return
+				}
+
+				if matched[1] != matched[3] {
+					errCh <- errors.New(`text line format invalid`)
+					return
+				}
+
 				wg.Add(addStep)
-				go voicevox.SpeechSynth(buffer, uint(speakerId), audioCh, errCh, wg, &audioCounter)
-				buffer = newToken
+				fmt.Println(matched[2])
+				buffer = ""
+				go voicevox.SpeechSynth(matched[2], uint(speakerId), audioCh, errCh, wg, &audioCounter)
 
-				//今ループが句読点のとき
-			} else {
-				buffer += newToken
+			default:
+				errCh <- errors.New(`speaker id invalid`)
+				return
 			}
-			//今ループで句読点にマッチしたとき
-		} else if patternChecked(textEndPattern, newToken) {
-			isPunctuationMatched = true
-			buffer += newToken
-		} else {
-			buffer += newToken
 		}
 	}
 }

@@ -3,51 +3,53 @@ package handlers
 import (
 	"app/middleware"
 	"app/ws"
-	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	//endPoint定義
-	rootPath      = "/"
-	healthPath    = "/health"
-	sleepTimePath = "/sleepTime"
-	messagePath   = "/message"
-	wsPath        = "/ws"
+var (
+	trustedProxiesAdress = []string{
+		"localhost",
+		"health-care-app-3e333.web.app",
+	}
+	allowedOrigins = []string{
+		"http://localhost:5000",
+		"http://localhost:8888",
+		"https://health-care-app-3e333.web.app",
+	}
+	allowedMethods = []string{
+		"POST",
+		"GET",
+		"OPTIONS",
+		"PUT",
+		"DELETE",
+	}
+	allowedHeaders = []string{
+		"Content-Type",
+		"Content-Length",
+		"Accept-Encoding",
+		"X-CSRF-Token",
+		"Authorization",
+	}
 )
 
 func Initializer() {
 	r := gin.Default()
 	r.ForwardedByClientIP = true
-	r.SetTrustedProxies([]string{"localhost", "health-care-app-3e333.web.app"})
+	r.SetTrustedProxies(trustedProxiesAdress)
 
 	// CORS対策
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{
-			"http://localhost:5000",
-			"http://localhost:8888",
-			"https://health-care-app-3e333.web.app",
-		},
-		AllowMethods: []string{
-			"POST",
-			"GET",
-			"OPTIONS",
-			"PUT",
-			"DELETE",
-		},
-		AllowHeaders: []string{
-			"Content-Type",
-			"Content-Length",
-			"Accept-Encoding",
-			"X-CSRF-Token",
-			"Authorization",
-		},
+		AllowOrigins: allowedOrigins,
+		AllowMethods: allowedMethods,
+		AllowHeaders: allowedHeaders,
 
-		//cookie
-		AllowCredentials: true,
-		MaxAge:           24 * time.Hour,
+		//cookieを送受信するか
+		AllowCredentials: isAllowdCookie,
+
+		//Cookieの期限
+		MaxAge: cookieExpire,
 	}))
 
 	authorized := r.Group(rootPath)
