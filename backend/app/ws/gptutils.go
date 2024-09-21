@@ -9,7 +9,6 @@ import (
 	"os"
 	"regexp"
 	"sort"
-	"strconv"
 	"time"
 
 	openai "github.com/sashabaranov/go-openai"
@@ -110,39 +109,6 @@ func newChatCompletionMessages(userId string, message Message) ([]openai.ChatCom
 
 func patternChecked(pattern string, checkText string) bool {
 	return regexp.MustCompile(pattern).MatchString(checkText)
-}
-
-func readLabel(fullText *string, stream *openai.ChatCompletionStream) (int, error) {
-	//ラベル読み込み
-	var matched []string
-	for !patternChecked(labelPattern, *fullText) {
-		response, err := stream.Recv()
-		if err != nil {
-			return errLabel, err
-		}
-
-		newToken := response.Choices[0].Delta.Content
-		*fullText += newToken
-
-		if len(*fullText) > labelMaxLength {
-			return errLabel, errors.New(`model invalid`)
-		}
-	}
-
-	matched = regexp.MustCompile(labelPattern).FindStringSubmatch(*fullText)
-
-	//"[model="数字"]"のフォーマットに合うかどうか
-	switch matched[1] {
-	case "3", "1", "5", "22", "38", "76", "8":
-		speakerId, err := strconv.Atoi(matched[1])
-		if err != nil {
-			return errLabel, err
-		}
-		return speakerId, nil
-
-	default:
-		return errLabel, errors.New(`speaker id invalid`)
-	}
 }
 
 func InitializeGPT(userId string, message Message) (*openai.ChatCompletionStream, error) {
