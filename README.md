@@ -65,9 +65,18 @@ https://app.swaggerhub.com/apis/SUISAN0731_1/healthCareAppApi/1.0.0
 ## websocket
 音声合成のみwebsocketを利用しています。  
 リクエストはJSON形式、レスポンスは一文で区切った音声データをbase64形式で返します。返答が2文以上ある場合その数と同数のデータを返します。  
-
+  
+### エンドポイント    
+開発サーバー  
 ```
-# リクエスト
+ws://localhost:8080/ws
+```    
+本番サーバー  
+```
+ws://go-server-xrfznls4va-uc.a.run.app/ws
+```    
+### リクエスト
+```
 # question: 質問文を指定
 # model: ずんだもんの場合0, 春日つむぎの場合1を指定
 
@@ -76,10 +85,9 @@ https://app.swaggerhub.com/apis/SUISAN0731_1/healthCareAppApi/1.0.0
   "model": 0
 }
 ```
-
+### レスポンス
 ```
-# レスポンス
-# base64
+# base64形式
 
 "UklGRiRWAgBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQBWAgAAAA ... AAA///9//r/+v/6//v/+//5//n/+v/6//v/+//7//r/+f/5//n/+f/5//f/"
 ```
