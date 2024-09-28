@@ -29,7 +29,6 @@ func Wshandler(c *gin.Context) {
 	messageCh := make(chan gpt.Message, 1)
 	userId := common.NewUserId(c)
 	errCh := make(chan error, errChLength)
-
 	go readJson(&isProcessing, conn, messageCh, errCh)
 	for {
 		select {
