@@ -12,12 +12,10 @@ import (
 	"time"
 )
 
-func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, wg *sync.WaitGroup, userId string) {
+func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
 	audioCounter := 0
-
-	defer close(audioCh)
 
 	stream, err := InitializeGPT(userId, message)
 	if err != nil {
@@ -26,6 +24,9 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 	}
 
 	defer stream.Close()
+	defer func() {
+		doneCh <- true
+	}()
 
 	for {
 		response, err := stream.Recv()

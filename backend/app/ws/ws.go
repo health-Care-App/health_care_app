@@ -25,19 +25,37 @@ func Wshandler(c *gin.Context) {
 
 	defer conn.Close()
 
-	isProcessing := false
-	messageCh := make(chan gpt.Message, 1)
-	userId := common.NewUserId(c)
+	messageCh := make(chan gpt.Message, messageChLength)
+	audioCh := make(chan voicevox.Audio, audioChLength)
 	errCh := make(chan error, errChLength)
+	doneCh := make(chan bool, doneChLength)
+	defer close(messageCh)
+	defer close(audioCh)
+	defer close(errCh)
+	defer close(doneCh)
+
+	userId := common.NewUserId(c)
+	audioSendNumber := 1
+	isProcessing := false
+	var audioBuffer []voicevox.Audio
+
 	go readJson(&isProcessing, conn, messageCh, errCh)
 	for {
 		select {
 		case message := <-messageCh:
 			var wg sync.WaitGroup
-			audioCh := make(chan voicevox.Audio, audioChLength)
 
-			go gpt.CreateChatStream(message, audioCh, errCh, &wg, userId)
-			go encodeBase64(audioCh, conn, &isProcessing)
+			go gpt.CreateChatStream(message, audioCh, errCh, doneCh, &wg, userId)
+		case audioStatus, ok := <-audioCh:
+			if ok {
+				sendJson(audioStatus, &audioBuffer, &audioSendNumber, conn)
+			}
+		case done, ok := <-doneCh:
+			if done && ok {
+				audioSendNumber = 1
+				isProcessing = false
+				audioBuffer = []voicevox.Audio{}
+			}
 		case err, notOk := <-errCh:
 			if notOk {
 				log.Println(err)

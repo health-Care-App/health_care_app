@@ -10,49 +10,38 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func writeJson(audioStatus voicevox.Audio, conn *websocket.Conn, audioSendCounter *int) {
+func writeJson(audioStatus voicevox.Audio, conn *websocket.Conn, audioSendNumber *int) {
 	base64Data := base64.StdEncoding.EncodeToString(audioStatus.Audiobytes)
 	wsResponse := WsResponse{
 		Base64Data: base64Data,
 		Text:       audioStatus.Text,
 	}
 	conn.WriteJSON(wsResponse)
-	*audioSendCounter++
+	*audioSendNumber++
 }
 
-func encodeBase64(audioCh <-chan voicevox.Audio, conn *websocket.Conn, isProcessing *bool) {
-	var audioBuffer []voicevox.Audio
-	audioSendCounter := 1
-	for {
-		audioStatus, ok := <-audioCh
-
-		fmt.Printf("audioStatus.Number: %d\n", audioStatus.Number)
-		for len(audioBuffer) > 0 {
-			isPopped := false
-			for i, bufferAudioStatus := range audioBuffer {
-				if audioSendCounter == bufferAudioStatus.Number {
-					writeJson(bufferAudioStatus, conn, &audioSendCounter)
-					audioBuffer = append(audioBuffer[:i], audioBuffer[i+1:]...)
-					isPopped = true
-					break
-				}
-			}
-			if !isPopped {
+func sendJson(audioStatus voicevox.Audio, audioBuffer *[]voicevox.Audio, audioSendNumber *int, conn *websocket.Conn) {
+	fmt.Printf("audioStatus.Number: %d\n", audioStatus.Number)
+	for len(*audioBuffer) > 0 {
+		isPopped := false
+		for i, bufferAudioStatus := range *audioBuffer {
+			if *audioSendNumber == bufferAudioStatus.Number {
+				writeJson(bufferAudioStatus, conn, audioSendNumber)
+				*audioBuffer = append((*audioBuffer)[:i], (*audioBuffer)[i+1:]...)
+				isPopped = true
 				break
 			}
 		}
-
-		if ok {
-			if audioSendCounter == audioStatus.Number {
-				writeJson(audioStatus, conn, &audioSendCounter)
-			} else {
-				audioBuffer = append(audioBuffer, audioStatus)
-			}
-		} else {
+		if !isPopped {
 			break
 		}
 	}
-	*isProcessing = false
+
+	if *audioSendNumber == audioStatus.Number {
+		writeJson(audioStatus, conn, audioSendNumber)
+	} else {
+		*audioBuffer = append(*audioBuffer, audioStatus)
+	}
 }
 
 func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- gpt.Message, errCh chan<- error) {
@@ -71,6 +60,8 @@ func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- gpt.Mes
 		if !*isProcessing {
 			*isProcessing = true
 			messageCh <- message
+		} else {
+			fmt.Println("dropped Message")
 		}
 	}
 }
