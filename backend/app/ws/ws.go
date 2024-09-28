@@ -2,9 +2,8 @@ package ws
 
 import (
 	"app/common"
-	"app/validate"
+	"app/gpt"
 	"app/voicevox"
-	"encoding/base64"
 	"log"
 	"sync"
 
@@ -26,56 +25,42 @@ func Wshandler(c *gin.Context) {
 
 	defer conn.Close()
 
-	var message Message
-	err = conn.ReadJSON(&message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	if err := validate.Validation(message); err != nil {
-		log.Println(err)
-		return
-	}
-
-	var wg sync.WaitGroup
+	messageCh := make(chan gpt.Message, messageChLength)
 	audioCh := make(chan voicevox.Audio, audioChLength)
 	errCh := make(chan error, errChLength)
+	doneCh := make(chan bool, doneChLength)
+	defer close(messageCh)
+	defer close(audioCh)
+	defer close(errCh)
+	defer close(doneCh)
+
 	userId := common.NewUserId(c)
-	go CreateChatStream(message, audioCh, errCh, &wg, userId)
+	audioSendNumber := 1
+	isProcessing := false
+	var audioBuffer []voicevox.Audio
 
-	var audioArray []voicevox.Audio
-	audioSendCounter := 1
+	go readJson(&isProcessing, conn, messageCh, errCh)
 	for {
-		audioStatus, ok := <-audioCh
+		select {
+		case message := <-messageCh:
+			var wg sync.WaitGroup
 
-		for len(audioArray) > 0 {
-			for _, audioStatusBuffer := range audioArray {
-				if audioSendCounter == audioStatusBuffer.Number {
-					writeBase64(audioStatusBuffer.Audiobytes, conn, &audioSendCounter)
-					break
-				}
+			go gpt.CreateChatStream(message, audioCh, errCh, doneCh, &wg, userId)
+		case audioStatus, ok := <-audioCh:
+			if ok {
+				sendJson(audioStatus, &audioBuffer, &audioSendNumber, conn)
 			}
-			break
-		}
-		if ok {
-			if audioSendCounter == audioStatus.Number {
-				writeBase64(audioStatus.Audiobytes, conn, &audioSendCounter)
-			} else {
-				audioArray = append(audioArray, audioStatus)
+		case done, ok := <-doneCh:
+			if done && ok {
+				audioSendNumber = 1
+				isProcessing = false
+				audioBuffer = []voicevox.Audio{}
 			}
-		} else {
-			break
+		case err, notOk := <-errCh:
+			if notOk {
+				log.Println(err)
+				return
+			}
 		}
 	}
-
-	if err, ok := <-errCh; ok {
-		log.Println(err)
-	}
-}
-
-func writeBase64(audioBytes []byte, conn *websocket.Conn, audioSendCounter *int) {
-	base64Data := base64.StdEncoding.EncodeToString(audioBytes)
-	conn.WriteMessage(websocket.TextMessage, []byte(base64Data))
-	*audioSendCounter++
 }

@@ -1,4 +1,4 @@
-package ws
+package gpt
 
 import (
 	"app/common"

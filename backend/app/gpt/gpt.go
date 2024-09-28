@@ -1,4 +1,4 @@
-package ws
+package gpt
 
 import (
 	"app/database"
@@ -12,13 +12,10 @@ import (
 	"time"
 )
 
-func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, wg *sync.WaitGroup, userId string) {
+func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
-	audioCounter := 1
-
-	defer close(audioCh)
-	defer close(errCh)
+	audioCounter := 0
 
 	stream, err := InitializeGPT(userId, message)
 	if err != nil {
@@ -27,6 +24,9 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 	}
 
 	defer stream.Close()
+	defer func() {
+		doneCh <- true
+	}()
 
 	for {
 		response, err := stream.Recv()
@@ -81,7 +81,9 @@ func CreateChatStream(message Message, audioCh chan<- voicevox.Audio, errCh chan
 				wg.Add(addStep)
 				fmt.Println(matched[2])
 				buffer = ""
-				go voicevox.SpeechSynth(matched[2], uint(speakerId), audioCh, errCh, wg, &audioCounter)
+				audioCounter++
+				go voicevox.SpeechSynth(matched[2], uint(speakerId), audioCh, errCh, wg, audioCounter)
+				fmt.Printf("audioCounter: %d\n", audioCounter)
 
 			default:
 				errCh <- errors.New(`speaker id invalid`)

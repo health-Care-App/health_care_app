@@ -20,13 +20,11 @@ const (
 type Audio struct {
 	Audiobytes []byte `validate:"required"`
 	Number     int    `validate:"required"`
+	Text       string `validate:"required"`
 }
 
-func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<- error, wg *sync.WaitGroup, audioCounter *int) {
-	defer func() {
-		*audioCounter++
-		wg.Done()
-	}()
+func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<- error, wg *sync.WaitGroup, audioCounter int) {
+	defer wg.Done()
 
 	core := voicevoxcorego.New()
 
@@ -39,8 +37,8 @@ func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<-
 	audioQueryOption := voicevoxcorego.NewVoicevoxAudioQueryOptions(kana)
 	audioQuery, err := core.AudioQuery(text, speakerId, audioQueryOption)
 	if err != nil {
-		errCh <- err
-		return
+		//errCh <- err
+		//return
 	}
 
 	//audioQuery調整
@@ -58,6 +56,7 @@ func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<-
 
 	audioCh <- Audio{
 		Audiobytes: result,
-		Number:     *audioCounter,
+		Number:     audioCounter,
+		Text:       text,
 	}
 }
