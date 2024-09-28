@@ -10,9 +10,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func writeBase64(audioBytes []byte, conn *websocket.Conn, audioSendCounter *int) {
-	base64Data := base64.StdEncoding.EncodeToString(audioBytes)
-	conn.WriteMessage(websocket.TextMessage, []byte(base64Data))
+func writeJson(audioStatus voicevox.Audio, conn *websocket.Conn, audioSendCounter *int) {
+	base64Data := base64.StdEncoding.EncodeToString(audioStatus.Audiobytes)
+	wsResponse := WsResponse{
+		Base64Data: base64Data,
+		Text:       audioStatus.Text,
+	}
+	conn.WriteJSON(wsResponse)
 	*audioSendCounter++
 }
 
@@ -27,7 +31,7 @@ func encodeBase64(audioCh <-chan voicevox.Audio, conn *websocket.Conn, isProcess
 			isPopped := false
 			for i, bufferAudioStatus := range audioBuffer {
 				if audioSendCounter == bufferAudioStatus.Number {
-					writeBase64(bufferAudioStatus.Audiobytes, conn, &audioSendCounter)
+					writeJson(bufferAudioStatus, conn, &audioSendCounter)
 					audioBuffer = append(audioBuffer[:i], audioBuffer[i+1:]...)
 					isPopped = true
 					break
@@ -40,7 +44,7 @@ func encodeBase64(audioCh <-chan voicevox.Audio, conn *websocket.Conn, isProcess
 
 		if ok {
 			if audioSendCounter == audioStatus.Number {
-				writeBase64(audioStatus.Audiobytes, conn, &audioSendCounter)
+				writeJson(audioStatus, conn, &audioSendCounter)
 			} else {
 				audioBuffer = append(audioBuffer, audioStatus)
 			}

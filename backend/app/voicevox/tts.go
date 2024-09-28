@@ -20,6 +20,7 @@ const (
 type Audio struct {
 	Audiobytes []byte `validate:"required"`
 	Number     int    `validate:"required"`
+	Text       string `validate:"required"`
 }
 
 func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<- error, wg *sync.WaitGroup, audioCounter int) {
@@ -56,5 +57,6 @@ func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<-
 	audioCh <- Audio{
 		Audiobytes: result,
 		Number:     audioCounter,
+		Text:       text,
 	}
 }

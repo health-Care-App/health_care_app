@@ -1,6 +1,6 @@
 package ws
 
-type Audio struct {
-	Audiobytes []byte `validate:"required"`
-	Number     int    `validate:"required"`
+type WsResponse struct {
+	Base64Data string `json:"base64_data" validate:"required"`
+	Text       string `json:"text" validate:"required"`
 }
