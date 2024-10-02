@@ -18,7 +18,6 @@ class LoginSample extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Login Sample',
-      // home: const MyHomePage(title: 'Login Sample'),
       home: LoginPage(),
     );
   }
@@ -34,7 +33,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   // メッセージ表示用
   String infoText = '';
-  // 入力するメールアドレス・パスワード用
+  // 入力したメールアドレス・パスワード
   String email = '';
   String password = '';
 
@@ -96,7 +95,55 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                 ),
-              )
+              ),
+              SizedBox(
+                width: double.infinity,
+                // ログインボタン
+                child: ElevatedButton(
+                  child: const Text('ログイン'),
+                  onPressed: () async {
+                    try {
+                      // メール/パスワードでログイン
+                      final FirebaseAuth auth = FirebaseAuth.instance;
+                      await auth.signInWithEmailAndPassword(
+                        email: email,
+                        password: password,
+                      );
+                      // ユーザー登録に成功した場合
+                      setState(() {
+                        infoText = "ログインに成功しました！";
+                      });
+                    } catch (e) {
+                      // ユーザー登録に失敗した場合
+                      setState(() {
+                        infoText = "ログインに失敗しました：${e.toString()}";
+                      });
+                    }
+                  },
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                // ログアウトボタン
+                child: ElevatedButton(
+                  child: const Text('ログアウト'),
+                  onPressed: () async {
+                    try {
+                      // ログアウト
+                      await FirebaseAuth.instance.signOut();
+                      // ユーザー登録に成功した場合
+                      setState(() {
+                        infoText = "ログアウトしました";
+                      });
+                    } catch (e) {
+                      // ユーザー登録に失敗した場合
+                      setState(() {
+                        infoText = "ログアウトに失敗しました：${e.toString()}";
+                      });
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         ),
