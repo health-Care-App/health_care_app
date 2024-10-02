@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'home_page.dart';  // HomePageを定義したファイルをインポート
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -109,12 +110,16 @@ class _LoginPageState extends State<LoginPage> {
                         email: email,
                         password: password,
                       );
-                      // ユーザー登録に成功した場合
+                      // ログイン成功した場合、ホーム画面に遷移
                       setState(() {
                         infoText = "ログインに成功しました！";
                       });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
                     } catch (e) {
-                      // ユーザー登録に失敗した場合
+                      // ログインに失敗した場合
                       setState(() {
                         infoText = "ログインに失敗しました：${e.toString()}";
                       });
@@ -131,12 +136,12 @@ class _LoginPageState extends State<LoginPage> {
                     try {
                       // ログアウト
                       await FirebaseAuth.instance.signOut();
-                      // ユーザー登録に成功した場合
+                      // ログアウトに成功した場合
                       setState(() {
                         infoText = "ログアウトしました";
                       });
                     } catch (e) {
-                      // ユーザー登録に失敗した場合
+                      // ログアウトに失敗した場合
                       setState(() {
                         infoText = "ログアウトに失敗しました：${e.toString()}";
                       });
