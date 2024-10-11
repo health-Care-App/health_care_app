@@ -6,12 +6,14 @@ services:
     env_file: .env
     volumes:
       - ./frontend/app:/app
+      - flutter-sdk:/app/flutter
     ports:
       - 4000:4000
       - 5000:5000
       - 9099:9099
       - 8000:8000
       - 8888:8888
+      - 5900:5900
     tty: true
     stdin_open: true
 
@@ -27,7 +29,6 @@ services:
       FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
     ports:
       - 8080:8080
-      - 2345:2345
     env_file:
       - .env
     tty: true
@@ -38,3 +39,4 @@ services:
 volumes:
   tmp-data:
   voicevox-core-volume:
+  flutter-sdk:
