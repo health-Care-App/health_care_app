@@ -15,5 +15,5 @@ func main() {
 		gin.SetMode(gin.DebugMode)
 	}
 
-	handlers.Initializer()
+	handlers.Init()
 }

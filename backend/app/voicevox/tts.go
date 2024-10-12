@@ -1,6 +1,7 @@
 package voicevox
 
 import (
+	"fmt"
 	"sync"
 
 	voicevoxcorego "github.com/sh1ma/voicevoxcore.go"
@@ -45,6 +46,7 @@ func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<-
 	audioQuery.SpeedScale = 1.05
 
 	//音声合成
+	fmt.Println("音声合成開始")
 	synthesisOption := voicevoxcorego.NewVoicevoxSynthesisOptions(enableInterrogativeUpspeak)
 	result, err := core.Synthesis(audioQuery, int(speakerId), synthesisOption)
 

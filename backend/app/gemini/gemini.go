@@ -1,4 +1,4 @@
-package gpt
+package gemini
 
 import (
 	"app/common"
@@ -6,35 +6,36 @@ import (
 	"app/voicevox"
 	"errors"
 	"fmt"
-	"io"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
+
+	"google.golang.org/api/iterator"
 )
 
-func GptChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+func GemChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
 	audioCounter := 0
 
-	stream, err := InitGPT(userId, message)
+	stream, err := InitGem(userId, message)
 	if err != nil {
 		errCh <- err
 		return
 	}
 
-	defer stream.Close()
 	defer func() {
 		doneCh <- true
 	}()
 
 	for {
-		response, err := stream.Recv()
-		if errors.Is(err, io.EOF) {
+		response, err := stream.Next()
+		if err == iterator.Done {
 			wg.Wait()
 
-			//データベースにGPTの回答を保存
+			//データベースにGeminiの回答を保存
 			createDateAt := time.Now()
 			messagesDoc := database.MessagesDoc{
 				Question: message.Question,
@@ -57,39 +58,43 @@ func GptChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh 
 			return
 		}
 
-		newToken := response.Choices[0].Delta.Content
+		newToken := recvGemResponse(response)
 		fullText += newToken
 		buffer += newToken
 
-		var matched []string
-		if common.PatternChecked(common.LineTextPattern, buffer) {
-			matched = regexp.MustCompile(common.LineTextPattern).FindStringSubmatch(buffer)
+		matched := regexp.MustCompile(common.LineTextPattern).FindAllStringSubmatch(buffer, -1)
+		for _, data := range matched {
+			recvText := data[2]
+			recvModel := data[1]
 
 			//フォーマットに合うかどうか
-			switch matched[1] {
+			switch recvModel {
 			case "3", "1", "5", "22", "38", "76", "8":
-				speakerId, err := strconv.Atoi(matched[1])
+				speakerId, err := strconv.Atoi(recvModel)
 				if err != nil {
 					errCh <- err
 					return
 				}
 
-				if matched[1] != matched[3] {
+				if recvModel != data[3] {
 					errCh <- errors.New(`text line format invalid`)
 					return
 				}
 
 				wg.Add(common.AddStep)
-				fmt.Println(matched[2])
-				buffer = ""
+				fmt.Println(recvText)
 				audioCounter++
-				go voicevox.SpeechSynth(matched[2], uint(speakerId), audioCh, errCh, wg, audioCounter)
+				go voicevox.SpeechSynth(recvText, uint(speakerId), audioCh, errCh, wg, audioCounter)
 				fmt.Printf("audioCounter: %d\n", audioCounter)
 
 			default:
 				errCh <- errors.New(`speaker id invalid`)
 				return
 			}
+
+			//マッチした文章をバッファから削除
+			rep := strings.NewReplacer(data[0], "")
+			buffer = rep.Replace(buffer)
 		}
 	}
 }

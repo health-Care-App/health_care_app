@@ -1,4 +1,4 @@
-package gpt
+package common
 
 type Message struct {
 	Question string `json:"question" validate:"required"`
