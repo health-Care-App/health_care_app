@@ -45,6 +45,8 @@ func getAudioFromBuf(audioBuffer *[]voicevox.Audio, audioSendNumber *int, conn *
 
 func sendJson(audioStatus voicevox.Audio, audioBuffer *[]voicevox.Audio, audioSendNumber *int, conn *websocket.Conn, errCh chan<- error) {
 	fmt.Printf("audioStatus.Number: %d\n", audioStatus.Number)
+
+	//bufferに残ったaudioを処理
 	getAudioFromBuf(audioBuffer, audioSendNumber, conn, errCh)
 
 	if *audioSendNumber == audioStatus.Number {
@@ -52,6 +54,9 @@ func sendJson(audioStatus voicevox.Audio, audioBuffer *[]voicevox.Audio, audioSe
 	} else {
 		*audioBuffer = append(*audioBuffer, audioStatus)
 	}
+
+	//bufferに残ったaudioを処理
+	getAudioFromBuf(audioBuffer, audioSendNumber, conn, errCh)
 }
 
 func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- common.Message, errCh chan<- error) {

@@ -2,7 +2,7 @@ package ws
 
 import (
 	"app/common"
-	"app/gemini"
+	"app/gpt"
 	"app/voicevox"
 	"log"
 	"sync"
@@ -45,7 +45,7 @@ func Wshandler(c *gin.Context) {
 		select {
 		case message, ok := <-messageCh:
 			if ok {
-				go gemini.GemChatStream(message, audioCh, errCh, doneCh, &wg, userId)
+				go gpt.GptChatStream(message, audioCh, errCh, doneCh, &wg, userId)
 			}
 		case audioStatus, ok := <-audioCh:
 			if ok {
@@ -53,9 +53,6 @@ func Wshandler(c *gin.Context) {
 			}
 		case done, ok := <-doneCh:
 			if done && ok {
-				//bufferに残ったaudioを処理
-				getAudioFromBuf(&audioBuffer, &audioSendNumber, conn, errCh)
-
 				audioSendNumber = 1
 				isProcessing = false
 				audioBuffer = []voicevox.Audio{}
