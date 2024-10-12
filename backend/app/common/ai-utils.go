@@ -50,7 +50,7 @@ func InitPrompt(userId string, model int) (string, error) {
 		characterText = tsumugiText
 	}
 
-	return fmt.Sprintf(fullText, characterText, systemWeekTerm, healthText, sleepTimeText), nil
+	return fmt.Sprintf(fullText, systemWeekTerm, healthText, sleepTimeText, characterText), nil
 }
 
 func RecvPromptMessage(userId string) (database.MessageGetResponse, error) {

@@ -28,35 +28,33 @@ func InitGem(userId string, message common.Message) (*genai.GenerateContentRespo
 	//モデル設定
 	model := client.GenerativeModel(gemModel)
 	model.SetMaxOutputTokens(common.MaxTokensLength)
-	model.SetTemperature(0.9)
-	model.SetTopK(30)
-	model.SetTopP(0.2)
+	model.SetTemperature(2)
 
 	cs := model.StartChat()
 	cs.History = []*genai.Content{}
 
-	// response, err := common.RecvPromptMessage(userId)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	response, err := common.RecvPromptMessage(userId)
+	if err != nil {
+		return nil, err
+	}
 
 	//会話履歴を生成
-	// for _, data := range response.Messages {
-	// 	cs.History = append(cs.History,
-	// 		&genai.Content{
-	// 			Parts: []genai.Part{
-	// 				genai.Text(data.Question),
-	// 			},
-	// 			Role: "user",
-	// 		},
-	// 		&genai.Content{
-	// 			Parts: []genai.Part{
-	// 				genai.Text(data.Answer),
-	// 			},
-	// 			Role: "model",
-	// 		},
-	// 	)
-	// }
+	for _, data := range response.Messages {
+		cs.History = append(cs.History,
+			&genai.Content{
+				Parts: []genai.Part{
+					genai.Text(data.Question),
+				},
+				Role: "user",
+			},
+			&genai.Content{
+				Parts: []genai.Part{
+					genai.Text(data.Answer),
+				},
+				Role: "model",
+			},
+		)
+	}
 
 	//プロンプトを生成
 	prompt, err := common.InitPrompt(userId, message.Model)
