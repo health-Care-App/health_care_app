@@ -28,7 +28,7 @@ func InitGem(userId string, message common.Message) (*genai.GenerateContentRespo
 	//モデル設定
 	model := client.GenerativeModel(gemModel)
 	model.SetMaxOutputTokens(common.MaxTokensLength)
-	model.SetTemperature(2)
+	model.SetTemperature(temp)
 
 	cs := model.StartChat()
 	cs.History = []*genai.Content{}
