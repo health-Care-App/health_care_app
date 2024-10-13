@@ -34,7 +34,7 @@ var (
 	}
 )
 
-func Initializer() {
+func Init() {
 	r := gin.Default()
 	r.ForwardedByClientIP = true
 	r.SetTrustedProxies(trustedProxiesAdress)
