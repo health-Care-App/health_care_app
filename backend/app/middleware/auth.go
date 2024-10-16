@@ -4,6 +4,7 @@ import (
 	"app/firebaseinit"
 	"strings"
 
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,6 +23,8 @@ func Authorized() gin.HandlerFunc {
 			c.JSON(401, gin.H{"error": err.Error()})
 			c.Abort()
 		}
+		fmt.Printf("token: %s\n", token)
+		fmt.Printf("UUID: %s\n", token.UID)
 
 		c.Set("userId", token.UID)
 		c.Next()
