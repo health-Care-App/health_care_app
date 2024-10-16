@@ -28,14 +28,22 @@ Go, Gin
 # 環境構築手順
 1. リポジトリのクローン  
 `git clone git@github.com:health-Care-App/health_care_app.git`
+
+2. /health_care_app/ 直下に .env ファイルを作成し、`OPENAI_TOKEN` と `GEM_TOKEN` を指定
+```
+#　/health_care_app/.env
+
+OPENAI_TOKEN=YOUR_OPENAI_TOKEN   #ChatGPTのAPIトークン
+GEM_TOKEN=YOUR_GEM_TOKEN         #geminiのAPIトークン
+```
   
-2. health_care_appディレクトリでイメージをビルドする(めっちゃ時間かかる。)  
+4. health_care_appディレクトリでイメージをビルドする(めっちゃ時間かかる。)  
 `docker compose build`
   
-3. コンテナ起動コマンド  
+5. コンテナ起動コマンド  
 `docker compose up -d`
 
-4. http://localhost:4000 にアクセスして正常に動作しているか確認  
+6. http://localhost:4000 にアクセスして正常に動作しているか確認  
 ## Flutterをホットリロードで開発したい場合
 1. flutterコンテナの中に入る  
 `docker compose exec flutter bash`
@@ -77,6 +85,7 @@ ws://go-server-xrfznls4va-uc.a.run.app/ws
 ```    
 ### リクエスト
 ```
+#json形式
 # question: 質問文を指定
 # model: ずんだもんの場合0, 春日つむぎの場合1を指定
 
@@ -87,9 +96,13 @@ ws://go-server-xrfznls4va-uc.a.run.app/ws
 ```
 ### レスポンス
 ```
-# base64形式
+#json形式
 
-"UklGRiRWAgBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQBWAgAAAA ... AAA///9//r/+v/6//v/+//5//n/+v/6//v/+//7//r/+f/5//n/+f/5//f/"
+{
+    "base64_data": "UklGRiR+AQBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQB+AQAgAC ... AMAAwADAAMAAgAEAAQAAgACAAEA", # base64
+    "text": "それは心配なのだー。",
+    "speaker_id": 1
+}
 ```
 # 日付時間の形式
 バックエンド・フロントエンドどちらも`RFC3339`形式で統一
