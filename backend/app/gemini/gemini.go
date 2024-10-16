@@ -15,10 +15,9 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func GemChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+func GemChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
-	audioCounter := 0
 
 	stream, err := InitGem(userId, message)
 	if err != nil {
@@ -83,9 +82,10 @@ func GemChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh 
 
 				wg.Add(common.AddStep)
 				fmt.Println(recvText)
-				audioCounter++
-				go voicevox.SpeechSynth(recvText, uint(speakerId), audioCh, errCh, wg, audioCounter)
-				fmt.Printf("audioCounter: %d\n", audioCounter)
+				ttsTextCh <- voicevox.TtsWaitText{
+					Text:      recvText,
+					SpeakerId: uint(speakerId),
+				}
 
 			default:
 				errCh <- errors.New(`speaker id invalid`)
