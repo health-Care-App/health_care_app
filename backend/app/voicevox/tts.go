@@ -6,7 +6,7 @@ import (
 
 const (
 	accelerationMode = 0
-	cpuNumThreads    = 1 //「cpu_numhreadsが未指定または0」の場合は、「論理コア数の半分」の値を渡す
+	cpuNumThreads    = 0 //「cpu_numhreadsが未指定または0」の場合は、「論理コア数の半分」の値を渡す
 	loadAllModels    = false
 	openJtalkDictDir = `/app/voicevox_core/open_jtalk_dic_utf_8-1.11`
 
@@ -18,7 +18,7 @@ const (
 type Audio struct {
 	Audiobytes []byte `validate:"required"`
 	Text       string `validate:"required"`
-	speakerId  int    `validate:"required"`
+	SpeakerId  uint   `validate:"required"`
 }
 
 type TtsWaitText struct {
@@ -56,6 +56,6 @@ func SpeechSynth(text string, speakerId uint) (Audio, error) {
 	return Audio{
 		Audiobytes: result,
 		Text:       text,
-		speakerId:  int(speakerId),
+		SpeakerId:  speakerId,
 	}, nil
 }

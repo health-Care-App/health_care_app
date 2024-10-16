@@ -16,6 +16,7 @@ func writeJson(audio voicevox.Audio, conn *websocket.Conn, errCh chan<- error) {
 	wsResponse := WsResponse{
 		Base64Data: base64Data,
 		Text:       audio.Text,
+		SpeakerId:  audio.SpeakerId,
 	}
 
 	if err := validate.Validation(wsResponse); err != nil {
