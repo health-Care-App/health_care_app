@@ -24,7 +24,6 @@ services:
       dockerfile: ./Dockerfile.dev
     volumes:
       - ./backend/app:/app/
-      - tmp-data:/app/tmp
       - voicevox-core-volume:/app/voicevox_core
     environment:
       FIRESTORE_EMULATOR_HOST: "flutter:8000"
@@ -47,7 +46,6 @@ services:
 #        FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
 #     ports:
 #       - 8080:8080
-#       - 127.0.0.1:50021:50021
 #     tty: true
 #     stdin_open: true
     
@@ -60,6 +58,5 @@ services:
   #   stdin_open: true
 
 volumes:
-  tmp-data:
   voicevox-core-volume:
   flutter-sdk:
