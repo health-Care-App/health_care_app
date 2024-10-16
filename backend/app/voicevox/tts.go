@@ -1,8 +1,6 @@
 package voicevox
 
 import (
-	"sync"
-
 	voicevoxcorego "github.com/sh1ma/voicevoxcore.go"
 )
 
@@ -19,13 +17,16 @@ const (
 
 type Audio struct {
 	Audiobytes []byte `validate:"required"`
-	Number     int    `validate:"required"`
 	Text       string `validate:"required"`
+	speakerId  int    `validate:"required"`
 }
 
-func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<- error, wg *sync.WaitGroup, audioCounter int) {
-	defer wg.Done()
+type TtsWaitText struct {
+	Text      string
+	SpeakerId uint
+}
 
+func SpeechSynth(text string, speakerId uint) (Audio, error) {
 	core := voicevoxcorego.New()
 
 	//`VoiceVoxCore`の初期化オプションを生成する関数
@@ -37,8 +38,7 @@ func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<-
 	audioQueryOption := voicevoxcorego.NewVoicevoxAudioQueryOptions(kana)
 	audioQuery, err := core.AudioQuery(text, speakerId, audioQueryOption)
 	if err != nil {
-		//errCh <- err
-		//return
+		return Audio{}, err
 	}
 
 	//audioQuery調整
@@ -50,13 +50,12 @@ func SpeechSynth(text string, speakerId uint, audioCh chan<- Audio, errCh chan<-
 
 	//ここで必ずエラーが起きるが正常に処理できるため一旦無視
 	if err != nil {
-		//errCh <- err
-		//return
+		return Audio{}, nil
 	}
 
-	audioCh <- Audio{
+	return Audio{
 		Audiobytes: result,
-		Number:     audioCounter,
 		Text:       text,
-	}
+		speakerId:  int(speakerId),
+	}, nil
 }

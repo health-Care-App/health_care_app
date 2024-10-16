@@ -31,7 +31,6 @@ services:
       FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
     ports:
       - 8080:8080
-      - 127.0.0.1:50021:50021
     env_file:
       - .env
     tty: true
@@ -52,13 +51,13 @@ services:
 #     tty: true
 #     stdin_open: true
     
-  # ceiroink:
-  #   container_name: coeiroink
-  #   image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
-  #   ports:
-  #   - 127.0.0.1:50021:50021
-  #   tty: true
-  #   stdin_open: true
+  ceiroink:
+    container_name: coeiroink
+    image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+    ports:
+    - 127.0.0.1:50021:50021
+    tty: true
+    stdin_open: true
   
 volumes:
   tmp-data:

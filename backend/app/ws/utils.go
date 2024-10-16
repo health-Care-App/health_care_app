@@ -6,15 +6,16 @@ import (
 	"app/voicevox"
 	"encoding/base64"
 	"fmt"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
 
-func writeJson(audioStatus voicevox.Audio, conn *websocket.Conn, audioSendNumber *int, errCh chan<- error) {
-	base64Data := base64.StdEncoding.EncodeToString(audioStatus.Audiobytes)
+func writeJson(audio voicevox.Audio, conn *websocket.Conn, errCh chan<- error) {
+	base64Data := base64.StdEncoding.EncodeToString(audio.Audiobytes)
 	wsResponse := WsResponse{
 		Base64Data: base64Data,
-		Text:       audioStatus.Text,
+		Text:       audio.Text,
 	}
 
 	if err := validate.Validation(wsResponse); err != nil {
@@ -23,40 +24,19 @@ func writeJson(audioStatus voicevox.Audio, conn *websocket.Conn, audioSendNumber
 	}
 
 	conn.WriteJSON(wsResponse)
-	*audioSendNumber++
 }
 
-func getAudioFromBuf(audioBuffer *[]voicevox.Audio, audioSendNumber *int, conn *websocket.Conn, errCh chan<- error) {
-	for len(*audioBuffer) > 0 {
-		isPopped := false
-		for i, bufferAudioStatus := range *audioBuffer {
-			if *audioSendNumber == bufferAudioStatus.Number {
-				writeJson(bufferAudioStatus, conn, audioSendNumber, errCh)
-				*audioBuffer = append((*audioBuffer)[:i], (*audioBuffer)[i+1:]...)
-				isPopped = true
-				break
-			}
+func sendJson(ttsTextCh <-chan voicevox.TtsWaitText, conn *websocket.Conn, wg *sync.WaitGroup, errCh chan<- error) {
+	for {
+		ttsText := <-ttsTextCh
+		audio, err := queueToSynthFunc(ttsText, voicevox.SpeechSynth)
+		if err != nil {
+			errCh <- err
+			return
 		}
-		if !isPopped {
-			break
-		}
+		writeJson(audio, conn, errCh)
+		wg.Done()
 	}
-}
-
-func sendJson(audioStatus voicevox.Audio, audioBuffer *[]voicevox.Audio, audioSendNumber *int, conn *websocket.Conn, errCh chan<- error) {
-	fmt.Printf("audioStatus.Number: %d\n", audioStatus.Number)
-
-	//bufferに残ったaudioを処理
-	getAudioFromBuf(audioBuffer, audioSendNumber, conn, errCh)
-
-	if *audioSendNumber == audioStatus.Number {
-		writeJson(audioStatus, conn, audioSendNumber, errCh)
-	} else {
-		*audioBuffer = append(*audioBuffer, audioStatus)
-	}
-
-	//bufferに残ったaudioを処理
-	getAudioFromBuf(audioBuffer, audioSendNumber, conn, errCh)
 }
 
 func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- common.Message, errCh chan<- error) {
@@ -79,4 +59,8 @@ func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- common.
 			fmt.Println("dropped Message")
 		}
 	}
+}
+
+func queueToSynthFunc(ttsText voicevox.TtsWaitText, synthFunc func(string, uint) (voicevox.Audio, error)) (voicevox.Audio, error) {
+	return synthFunc(ttsText.Text, ttsText.SpeakerId)
 }

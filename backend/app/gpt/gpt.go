@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func GptChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+func GptChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
 	audioCounter := 0
@@ -64,9 +64,11 @@ func GptChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh 
 		var matched []string
 		if common.PatternChecked(common.LineTextPattern, buffer) {
 			matched = regexp.MustCompile(common.LineTextPattern).FindStringSubmatch(buffer)
+			recvText := matched[2]
+			recvModel := matched[1]
 
 			//フォーマットに合うかどうか
-			switch matched[1] {
+			switch recvModel {
 			case "3", "1", "5", "22", "38", "76", "8":
 				speakerId, err := strconv.Atoi(matched[1])
 				if err != nil {
@@ -74,17 +76,19 @@ func GptChatStream(message common.Message, audioCh chan<- voicevox.Audio, errCh 
 					return
 				}
 
-				if matched[1] != matched[3] {
+				if recvModel != matched[3] {
 					errCh <- errors.New(`text line format invalid`)
 					return
 				}
 
 				wg.Add(common.AddStep)
-				fmt.Println(matched[2])
+				fmt.Println(recvText)
 				buffer = ""
 				audioCounter++
-				go voicevox.SpeechSynth(matched[2], uint(speakerId), audioCh, errCh, wg, audioCounter)
-				fmt.Printf("audioCounter: %d\n", audioCounter)
+				ttsTextCh <- voicevox.TtsWaitText{
+					Text: recvText,
+					SpeakerId: uint(speakerId),
+				}
 
 			default:
 				errCh <- errors.New(`speaker id invalid`)
