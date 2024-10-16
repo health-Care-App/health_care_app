@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'home_page.dart';  // HomePageを定義したファイルをインポート
+import 'home_page.dart';
+import 'register_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,9 +33,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // メッセージ表示用
   String infoText = '';
-  // 入力したメールアドレス・パスワード
   String email = '';
   String password = '';
 
@@ -68,49 +67,20 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Container(
                 padding: const EdgeInsets.all(8),
-                // メッセージ表示
                 child: Text(infoText),
               ),
               SizedBox(
-                width: double.infinity,
-                // ユーザー登録ボタン
-                child: ElevatedButton(
-                  child: const Text('ユーザー登録'),
-                  onPressed: () async {
-                    try {
-                      // メール/パスワードでユーザー登録
-                      final FirebaseAuth auth = FirebaseAuth.instance;
-                      await auth.createUserWithEmailAndPassword(
-                        email: email,
-                        password: password,
-                      );
-                      // ユーザー登録に成功した場合
-                      setState(() {
-                        infoText = "登録に成功しました！";
-                      });
-                    } catch (e) {
-                      // ユーザー登録に失敗した場合
-                      setState(() {
-                        infoText = "登録に失敗しました：${e.toString()}";
-                      });
-                    }
-                  },
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
+                width: 200, // ログインボタンの幅を狭める
                 // ログインボタン
                 child: ElevatedButton(
                   child: const Text('ログイン'),
                   onPressed: () async {
                     try {
-                      // メール/パスワードでログイン
                       final FirebaseAuth auth = FirebaseAuth.instance;
                       await auth.signInWithEmailAndPassword(
                         email: email,
                         password: password,
                       );
-                      // ログイン成功した場合、ホーム画面に遷移
                       setState(() {
                         infoText = "ログインに成功しました！";
                       });
@@ -118,41 +88,48 @@ class _LoginPageState extends State<LoginPage> {
                         context,
                         MaterialPageRoute(builder: (context) => HomePage()),
                       );
-                    } catch (e) {
-                      // ログインに失敗した場合
+                    } on FirebaseAuthException catch (e) {
                       setState(() {
-                        infoText = "ログインに失敗しました：${e.toString()}";
+                        infoText = _getErrorMessage(e);
                       });
                     }
                   },
                 ),
               ),
-              SizedBox(
-                width: double.infinity,
-                // ログアウトボタン
-                child: ElevatedButton(
-                  child: const Text('ログアウト'),
-                  onPressed: () async {
-                    try {
-                      // ログアウト
-                      await FirebaseAuth.instance.signOut();
-                      // ログアウトに成功した場合
-                      setState(() {
-                        infoText = "ログアウトしました";
-                      });
-                    } catch (e) {
-                      // ログアウトに失敗した場合
-                      setState(() {
-                        infoText = "ログアウトに失敗しました：${e.toString()}";
-                      });
-                    }
-                  },
-                ),
+              const SizedBox(height: 16), // ログインボタンと登録リンクの間隔を広げる
+              // 新規登録リンク
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RegisterPage()),
+                  );
+                },
+                child: const Text('新規登録はこちら'),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _getErrorMessage(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-email':
+        return 'メールアドレスの形式が正しくありません。';
+      case 'user-disabled':
+        return 'このユーザーアカウントは無効化されています。';
+      case 'user-not-found':
+        return 'ユーザーが見つかりません。';
+      case 'wrong-password':
+        return 'パスワードが間違っています。';
+      case 'invalid-credential':
+        return 'メールアドレスもしくはパスワードが間違っています。';
+      case 'too-many-requests':
+        return 'リクエストが多すぎます。しばらくしてから再試行してください。';
+      default:
+        return 'エラーが発生しました: ${e.code}';
+    }
   }
 }
