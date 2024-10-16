@@ -1,0 +1,38 @@
+FROM golang:1.22.3
+WORKDIR /app/
+
+COPY ./app/go.mod ./app/go.sum ./
+RUN go mod download
+
+RUN curl -sSfL https://github.com/VOICEVOX/voicevox_core/releases/latest/download/download-linux-x64 -o /app/download \
+    && chmod +x download \
+    && ./download
+
+#シンボリックを設定
+RUN ln -s /app/voicevox_core/libvoicevox_core.so /usr/lib \
+    && ln -s /app/voicevox_core/libonnxruntime.so.1.13.1 /usr/lib \
+    && ln -s /app/voicevox_core/model /usr/lib/model \
+    && ln -s /app/voicevox_core/voicevox_core.h /usr/include
+
+COPY ./app/ /app/
+RUN go build -ldflags="-s -w" -trimpath -o /app/run
+
+
+#軽量化のためマルチステージでビルド
+FROM ubuntu:22.04
+
+WORKDIR /app/
+
+#シンボリックを設定
+RUN ln -s /app/voicevox_core/libvoicevox_core.so /usr/lib \
+    && ln -s /app/voicevox_core/libonnxruntime.so.1.13.1 /usr/lib \
+    && ln -s /app/voicevox_core/model /usr/lib/model \
+    && ln -s /app/voicevox_core/voicevox_core.h /usr/include
+
+COPY --from=0 /app/run /app/
+COPY --from=0 /app/download /app/
+
+RUN ./download && rm ./download
+
+EXPOSE 8080
+CMD [ "/app/run" ]
