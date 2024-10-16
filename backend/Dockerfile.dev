@@ -19,5 +19,8 @@ RUN ln -s /app/voicevox_core/libvoicevox_core.so /usr/lib \
     && ln -s /app/voicevox_core/model /usr/lib/model \
     && ln -s /app/voicevox_core/voicevox_core.h /usr/include
 
+#voicevox_engineをgolangイメージに含める
+#COPY --from=voicevox/voicevox_engine:cpu-ubuntu20.04-latest /home/user/.local/share /app
+
 EXPOSE 8080
 CMD [ "air", "-c", ".air.toml" ]
