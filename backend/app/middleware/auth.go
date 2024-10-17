@@ -2,29 +2,30 @@ package middleware
 
 import (
 	"app/firebaseinit"
+	"context"
 	"strings"
 
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 func Authorized() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		client, ctx, err := firebaseinit.AuthInitializer()
+		client, err := firebaseinit.AuthInitializer()
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			c.Abort()
+			return
 		}
 
 		authHeader := c.GetHeader("Authorization")
 		idToken := strings.Replace(authHeader, "Bearer ", "", 1)
-		token, err := client.VerifyIDToken(ctx, idToken)
+
+		token, err := client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
 			c.JSON(401, gin.H{"error": err.Error()})
 			c.Abort()
+			return
 		}
-		fmt.Printf("token: %s\n", token)
-		fmt.Printf("UUID: %s\n", token.UID)
 
 		c.Set("userId", token.UID)
 		c.Next()

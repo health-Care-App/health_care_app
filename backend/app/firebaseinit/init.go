@@ -12,38 +12,38 @@ const (
 	projectId = "health-care-app-3e333"
 )
 
-func adminSDKInitializer() (*firebase.App, context.Context, error) {
+func adminSDKInitializer() (*firebase.App, error) {
 	ctx := context.Background()
 	conf := &firebase.Config{ProjectID: projectId}
 	app, err := firebase.NewApp(ctx, conf)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return app, ctx, nil
+	return app, nil
 }
 
-func FirestoreInitializer() (*firestore.Client, context.Context, error) {
-	app, ctx, err := adminSDKInitializer()
+func FirestoreInitializer() (*firestore.Client, error) {
+	app, err := adminSDKInitializer()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	client, err := app.Firestore(ctx)
+	client, err := app.Firestore(context.Background())
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return client, ctx, nil
+	return client, nil
 }
 
-func AuthInitializer() (*auth.Client, context.Context, error) {
-	app, ctx, err := adminSDKInitializer()
+func AuthInitializer() (*auth.Client, error) {
+	app, err := adminSDKInitializer()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	client, err := app.Auth(ctx)
+	client, err := app.Auth(context.Background())
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return client, ctx, nil
+	return client, nil
 }

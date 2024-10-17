@@ -42,10 +42,13 @@ services:
 #       context: ./backend/
 #       dockerfile: ./Dockerfile.prod
 #     environment:
-#        FIRESTORE_EMULATOR_HOST: "flutter:8000"
-#        FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
+#        GOOGLE_APPLICATION_CREDENTIALS: "/app/serviceAccountKey.json"
 #     ports:
 #       - 8080:8080
+#     volumes:
+#       - ./backend/app/serviceAccountKey.json:/app/serviceAccountKey.json
+#     env_file:
+#        - .env
 #     tty: true
 #     stdin_open: true
     
