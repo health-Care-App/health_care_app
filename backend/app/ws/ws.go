@@ -1,9 +1,9 @@
 package ws
 
 import (
+	"app/chat"
 	"app/common"
-	"app/gpt"
-	"app/voicevox"
+	"app/synth"
 	"log"
 	"sync"
 
@@ -26,7 +26,7 @@ func Wshandler(c *gin.Context) {
 	defer conn.Close()
 
 	messageCh := make(chan common.Message, messageChLength)
-	ttsTextCh := make(chan voicevox.TtsWaitText, ttsTextChLength)
+	ttsTextCh := make(chan synth.TtsText, ttsTextChLength)
 	errCh := make(chan error, errChLength)
 	doneCh := make(chan bool, doneChLength)
 	defer close(messageCh)
@@ -44,7 +44,7 @@ func Wshandler(c *gin.Context) {
 		select {
 		case message, ok := <-messageCh:
 			if ok {
-				go gpt.GptChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				go chat.GptChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
 			}
 		case done, ok := <-doneCh:
 			if done && ok {

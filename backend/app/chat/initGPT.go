@@ -1,4 +1,4 @@
-package gpt
+package chat
 
 import (
 	"app/common"

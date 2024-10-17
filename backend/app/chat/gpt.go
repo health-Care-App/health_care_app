@@ -1,9 +1,9 @@
-package gpt
+package chat
 
 import (
 	"app/common"
 	"app/database"
-	"app/voicevox"
+	"app/synth"
 	"errors"
 	"fmt"
 	"io"
@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func GptChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+func GptChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
 	audioCounter := 0
@@ -85,8 +85,8 @@ func GptChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText
 				fmt.Println(recvText)
 				buffer = ""
 				audioCounter++
-				ttsTextCh <- voicevox.TtsWaitText{
-					Text: recvText,
+				ttsTextCh <- synth.TtsText{
+					Text:      recvText,
 					SpeakerId: uint(speakerId),
 				}
 

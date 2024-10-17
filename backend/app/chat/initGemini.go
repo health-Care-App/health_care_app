@@ -1,4 +1,4 @@
-package gemini
+package chat
 
 import (
 	"app/common"

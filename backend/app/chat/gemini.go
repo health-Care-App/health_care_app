@@ -1,9 +1,9 @@
-package gemini
+package chat
 
 import (
 	"app/common"
 	"app/database"
-	"app/voicevox"
+	"app/synth"
 	"errors"
 	"fmt"
 	"regexp"
@@ -15,7 +15,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func GemChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+func GemChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
 
@@ -82,7 +82,7 @@ func GemChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText
 
 				wg.Add(common.AddStep)
 				fmt.Println(recvText)
-				ttsTextCh <- voicevox.TtsWaitText{
+				ttsTextCh <- synth.TtsText{
 					Text:      recvText,
 					SpeakerId: uint(speakerId),
 				}
