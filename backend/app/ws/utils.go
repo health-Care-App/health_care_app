@@ -2,8 +2,8 @@ package ws
 
 import (
 	"app/common"
-	"app/validate"
 	"app/synth"
+	"app/validate"
 	"encoding/base64"
 	"fmt"
 	"sync"
@@ -31,7 +31,7 @@ func sendJson(ttsTextCh <-chan synth.TtsText, conn *websocket.Conn, wg *sync.Wai
 	for {
 		ttsText := <-ttsTextCh
 
-		audio, err := queueToSynthFunc(ttsText, synth.VoiceVoxCoreSynth)
+		audio, err := queueToSynthFunc(ttsText, synth.VoiceVoxApiSynth)
 		if err != nil {
 			errCh <- err
 			return

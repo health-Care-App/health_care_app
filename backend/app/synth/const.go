@@ -6,7 +6,9 @@ const (
 	loadAllModels    = false
 	openJtalkDictDir = `/app/voicevox_core/open_jtalk_dic_utf_8-1.11`
 
-	kana = false
+	speechspeed = 1.05
+	speechPitch = "0"
+	kana        = false
 
 	enableInterrogativeUpspeak = true
 )

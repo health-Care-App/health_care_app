@@ -20,13 +20,11 @@ func VoiceVoxCoreSynth(ttsText TtsText) (Audio, error) {
 	}
 
 	//audioQuery調整
-	audioQuery.SpeedScale = 1.05
+	audioQuery.SpeedScale = speechspeed
 
 	//音声合成
 	synthesisOption := voicevoxcorego.NewVoicevoxSynthesisOptions(enableInterrogativeUpspeak)
 	result, err := core.Synthesis(audioQuery, int(ttsText.SpeakerId), synthesisOption)
-
-	//ここで必ずエラーが起きるが正常に処理できるため一旦無視
 	if err != nil {
 		return Audio{}, nil
 	}

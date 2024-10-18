@@ -44,7 +44,7 @@ func Wshandler(c *gin.Context) {
 		select {
 		case message, ok := <-messageCh:
 			if ok {
-				go chat.GptChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				go chat.GemChat(message, ttsTextCh, errCh, doneCh, &wg, userId)
 			}
 		case done, ok := <-doneCh:
 			if done && ok {

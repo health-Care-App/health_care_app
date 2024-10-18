@@ -11,7 +11,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func InitGem(userId string, message common.Message) (*genai.GenerateContentResponseIterator, error) {
+func InitGem() (*genai.Client, error) {
 	gemToken, isExist := os.LookupEnv("GEM_TOKEN")
 	if !isExist {
 		return nil, errors.New("env variable GEM_TOKEN is not exist")
@@ -23,22 +23,34 @@ func InitGem(userId string, message common.Message) (*genai.GenerateContentRespo
 		return nil, err
 	}
 
-	defer client.Close()
+	return client, nil
+}
 
+func initGemPrompt(userId string, message common.Message, client *genai.Client, isStream bool) (*genai.ChatSession, error) {
 	//モデル設定
 	model := client.GenerativeModel(gemModel)
 	model.SetMaxOutputTokens(common.MaxTokensLength)
 	model.SetTemperature(temp)
 
+	//キャラの設定を生成
+	prompt, err := common.InitPrompt(userId, message.Model, isStream)
+	if err != nil {
+		return nil, err
+	}
+
+	//キャラの設定をmodelに追加
+	model.SystemInstruction = genai.NewUserContent(genai.Text(prompt))
+
 	cs := model.StartChat()
 	cs.History = []*genai.Content{}
 
+	//会話履歴をとって来る
 	response, err := common.RecvPromptMessage(userId)
 	if err != nil {
 		return nil, err
 	}
 
-	//会話履歴を生成
+	//会話履歴を追加
 	for _, data := range response.Messages {
 		cs.History = append(cs.History,
 			&genai.Content{
@@ -55,18 +67,31 @@ func InitGem(userId string, message common.Message) (*genai.GenerateContentRespo
 			},
 		)
 	}
+	return cs, nil
+}
 
-	//プロンプトを生成
-	prompt, err := common.InitPrompt(userId, message.Model)
+func GemRequestStream(userId string, message common.Message, client *genai.Client) (*genai.GenerateContentResponseIterator, error) {
+	defer client.Close()
+
+	cs, err := initGemPrompt(userId, message, client, true)
 	if err != nil {
 		return nil, err
 	}
 
-	//キャラの設定をプロンプトに追加
-	model.SystemInstruction = genai.NewUserContent(genai.Text(prompt))
+	newQuestion := genai.Text(message.Question)
+	return cs.SendMessageStream(context.Background(), newQuestion), nil
+}
+
+func GemRequest(userId string, message common.Message, client *genai.Client) (*genai.GenerateContentResponse, error) {
+	defer client.Close()
+
+	cs, err := initGemPrompt(userId, message, client, false)
+	if err != nil {
+		return nil, err
+	}
 
 	newQuestion := genai.Text(message.Question)
-	return cs.SendMessageStream(ctx, newQuestion), nil
+	return cs.SendMessage(context.Background(), newQuestion)
 }
 
 func recvGemResponse(resp *genai.GenerateContentResponse) string {
