@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"app/chat"
 	"app/common"
 	"app/database"
+	"app/synth"
 	"app/validate"
+	"app/ws"
+	"encoding/base64"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -100,6 +104,43 @@ func getHandler[T database.HealthGetResponse | database.SleepTimeGetResponse | d
 
 	response, err := getData(userId, ParsedOldDateAt)
 	if err != nil {
+		common.ErrorResponse(c, err)
+		return
+	}
+
+	c.JSON(200, response)
+}
+
+func postMessageHandler(c *gin.Context) {
+	userId := common.NewUserId(c)
+	body := common.Message{}
+
+	if err := c.ShouldBind(&body); err != nil {
+		common.ErrorResponse(c, err)
+		return
+	}
+
+	ttsText, err := chat.GptChatApi(body, userId)
+	if err != nil {
+		common.ErrorResponse(c, err)
+		return
+	}
+
+	audio, err := synth.VoiceVoxApiSynth(ttsText)
+	if err != nil {
+		common.ErrorResponse(c, err)
+		return
+	}
+
+	base64Data := base64.StdEncoding.EncodeToString(audio.Audiobytes)
+	response := ws.WsResponse{
+		Base64Data: base64Data,
+		Text:       ttsText.Text,
+		SpeakerId:  ttsText.SpeakerId,
+	}
+
+	//データが正しいか検証
+	if err := validate.Validation(response); err != nil {
 		common.ErrorResponse(c, err)
 		return
 	}

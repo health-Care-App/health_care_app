@@ -61,6 +61,7 @@ func Init() {
 		authorized.POST(sleepTimePath, postSleepTimeHandler)
 		authorized.GET(messagePath, getMessageHandler)
 		authorized.GET(wsPath, ws.Wshandler)
+		authorized.POST(messagePath, postMessageHandler)
 	}
 	r.Run(port)
 }

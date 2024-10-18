@@ -1,4 +1,4 @@
-package gpt
+package chat
 
 import (
 	"app/common"
@@ -9,7 +9,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func InitGptPrompt(userId string, message common.Message) ([]openai.ChatCompletionMessage, error) {
+func InitGptPrompt(userId string, message common.Message, isStream bool) ([]openai.ChatCompletionMessage, error) {
 	var chatCompletionMessges []openai.ChatCompletionMessage
 
 	response, err := common.RecvPromptMessage(userId)
@@ -30,7 +30,7 @@ func InitGptPrompt(userId string, message common.Message) ([]openai.ChatCompleti
 		)
 	}
 
-	prompt, err := common.InitPrompt(userId, message.Model)
+	prompt, err := common.InitPrompt(userId, message.Model, isStream)
 	if err != nil {
 		return []openai.ChatCompletionMessage{}, err
 	}
@@ -48,7 +48,7 @@ func InitGptPrompt(userId string, message common.Message) ([]openai.ChatCompleti
 	return chatCompletionMessges, nil
 }
 
-func InitGPT(userId string, message common.Message) (*openai.ChatCompletionStream, error) {
+func InitGPT() (*openai.Client, error) {
 	openaiToken, isExist := os.LookupEnv("OPENAI_TOKEN")
 	if !isExist {
 		return nil, errors.New("env variable OPENAI_TOKEN is not exist")
@@ -57,18 +57,36 @@ func InitGPT(userId string, message common.Message) (*openai.ChatCompletionStrea
 	config := openai.DefaultConfig(openaiToken)
 	config.BaseURL = openaiApiEndpoint
 	client := openai.NewClientWithConfig(config)
-	ctx := context.Background()
+	return client, nil
+}
 
-	chatCompletionMessages, err := InitGptPrompt(userId, message)
+func GPTRequest(userId string, message common.Message, client *openai.Client) (openai.ChatCompletionResponse, error) {
+	chatCompletionMessages, err := InitGptPrompt(userId, message, false)
 	if err != nil {
-		return nil, err
+		return openai.ChatCompletionResponse{}, err
 	}
 
 	req := openai.ChatCompletionRequest{
 		Model:     openai.GPT4oMini,
 		MaxTokens: common.MaxTokensLength,
 		Messages:  chatCompletionMessages,
-		Stream:    true,
 	}
-	return client.CreateChatCompletionStream(ctx, req)
+
+	return client.CreateChatCompletion(context.Background(), req)
+}
+
+func GPTRequestStream(userId string, message common.Message, client *openai.Client) (*openai.ChatCompletionStream, error) {
+	chatCompletionMessages, err := InitGptPrompt(userId, message, true)
+	if err != nil {
+		return &openai.ChatCompletionStream{}, err
+	}
+
+	req := openai.ChatCompletionRequest{
+		Model:     openai.GPT4oMini,
+		MaxTokens: common.MaxTokensLength,
+		Messages:  chatCompletionMessages,
+		Stream: true,
+	}
+
+	return client.CreateChatCompletionStream(context.Background(), req)
 }

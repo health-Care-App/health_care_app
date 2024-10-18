@@ -1,9 +1,9 @@
-package gemini
+package chat
 
 import (
 	"app/common"
 	"app/database"
-	"app/voicevox"
+	"app/synth"
 	"errors"
 	"fmt"
 	"regexp"
@@ -15,11 +15,17 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func GemChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+func GemChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
 	fullText := ""
 	buffer := ""
 
-	stream, err := InitGem(userId, message)
+	client, err := InitGem()
+	if err != nil {
+		errCh <- err
+		return
+	}
+
+	stream, err := GemRequestStream(userId, message, client)
 	if err != nil {
 		errCh <- err
 		return
@@ -76,13 +82,13 @@ func GemChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText
 				}
 
 				if recvModel != data[3] {
-					errCh <- errors.New(`text line format invalid`)
+					errCh <- errors.New("response text format invalid")
 					return
 				}
 
 				wg.Add(common.AddStep)
 				fmt.Println(recvText)
-				ttsTextCh <- voicevox.TtsWaitText{
+				ttsTextCh <- synth.TtsText{
 					Text:      recvText,
 					SpeakerId: uint(speakerId),
 				}
@@ -96,5 +102,61 @@ func GemChatStream(message common.Message, ttsTextCh chan<- voicevox.TtsWaitText
 			rep := strings.NewReplacer(data[0], "")
 			buffer = rep.Replace(buffer)
 		}
+	}
+}
+
+func GemChat(message common.Message, ttsTextCh chan<- synth.TtsText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+	client, err := InitGem()
+	if err != nil {
+		errCh <- err
+		return
+	}
+
+	resp, err := GemRequest(userId, message, client)
+	if err != nil {
+		errCh <- err
+		return
+	}
+
+	defer func() {
+		doneCh <- true
+	}()
+
+	// フォーマットチェック
+	respText := recvGemResponse(resp)
+	if !common.PatternChecked(common.LineTextPattern, respText) {
+		errCh <- errors.New("response text format invalid")
+		return
+	}
+
+	matched := regexp.MustCompile(common.LineTextPattern).FindStringSubmatch(respText)
+	recvText := matched[2]
+	recvModel := matched[1]
+
+	// フォーマットに合うかどうか
+	switch recvModel {
+	case "3", "1", "5", "22", "38", "76", "8":
+		speakerId, err := strconv.Atoi(matched[1])
+		if err != nil {
+			errCh <- err
+			return
+		}
+
+		//フォーマットチェック
+		if recvModel != matched[3] {
+			errCh <- errors.New("response text format invalid")
+			return
+		}
+
+		wg.Add(common.AddStep)
+		fmt.Println(recvText)
+		ttsTextCh <- synth.TtsText{
+			Text:      recvText,
+			SpeakerId: uint(speakerId),
+		}
+
+	default:
+		errCh <- errors.New(`speaker id invalid`)
+		return
 	}
 }

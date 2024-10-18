@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func InitPrompt(userId string, model int) (string, error) {
+func InitPrompt(userId string, model int, isSteam bool) (string, error) {
 	defaultDate := time.Now().AddDate(0, 0, -systemWeekTerm).Format(Layout)
 	ParsedOldDateAt, err := time.Parse(Layout, defaultDate)
 	if err != nil {
@@ -44,13 +44,24 @@ func InitPrompt(userId string, model int) (string, error) {
 	}
 
 	var characterText string
+	var outputText string
 	if model == 0 {
 		characterText = zundamonnText
+		if isSteam {
+			outputText = zundamonStreamOutputText
+		} else {
+			outputText = zundamonOutputText
+		}
 	} else {
 		characterText = tsumugiText
+		if isSteam {
+			outputText = tsumugiStreamOutputText
+		} else {
+			outputText = tsumugiOutputText
+		}
 	}
 
-	return fmt.Sprintf(fullText, systemWeekTerm, healthText, sleepTimeText, characterText), nil
+	return fmt.Sprintf(fullText, systemWeekTerm, healthText, sleepTimeText, characterText, outputText), nil
 }
 
 func RecvPromptMessage(userId string) (database.MessageGetResponse, error) {

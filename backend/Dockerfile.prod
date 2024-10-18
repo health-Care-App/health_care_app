@@ -15,24 +15,11 @@ RUN ln -s /app/voicevox_core/libvoicevox_core.so /usr/lib \
     && ln -s /app/voicevox_core/voicevox_core.h /usr/include
 
 COPY ./app/ /app/
-RUN go build -ldflags="-s -w" -trimpath -o /app/run
 
-
-#軽量化のためマルチステージでビルド
-FROM ubuntu:22.04
-
-WORKDIR /app/
-
-#シンボリックを設定
-RUN ln -s /app/voicevox_core/libvoicevox_core.so /usr/lib \
-    && ln -s /app/voicevox_core/libonnxruntime.so.1.13.1 /usr/lib \
-    && ln -s /app/voicevox_core/model /usr/lib/model \
-    && ln -s /app/voicevox_core/voicevox_core.h /usr/include
-
-COPY --from=0 /app/run /app/
-COPY --from=0 /app/download /app/
-
-RUN ./download && rm ./download
+RUN go build -ldflags="-s -w" -trimpath -o /app/run \
+    && ls /app/ |  grep -v -E 'run|voicevox_core' | xargs rm -rf \
+    && rm .air.toml \
+    && rm -rf /root/.cache/go-build
 
 EXPOSE 8080
 CMD [ "/app/run" ]

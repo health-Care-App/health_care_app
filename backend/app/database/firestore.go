@@ -2,6 +2,7 @@ package database
 
 import (
 	"app/firebaseinit"
+	"context"
 	"time"
 
 	"google.golang.org/api/iterator"
@@ -20,14 +21,14 @@ const (
 
 // データベースから健康状態のデータを取得する関数
 func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error) {
-	client, ctx, err := firebaseinit.FirestoreInitializer()
+	client, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return HealthGetResponse{}, err
 	}
 	defer client.Close()
 
 	query := client.Collection(healthCollec).Doc(userId).Collection(healthSubCollec)
-	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
+	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(context.Background())
 	var healths []Healths
 	for {
 		doc, err := dateQuery.Next()
@@ -60,14 +61,14 @@ func PostHelthData(userId string, queryData HealthsDoc) (PostResponse, error) {
 
 // データベースから睡眠時間のデータを保存する関数
 func GetSleepTimeData(userId string, oldDateAt time.Time) (SleepTimeGetResponse, error) {
-	client, ctx, err := firebaseinit.FirestoreInitializer()
+	client, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return SleepTimeGetResponse{}, err
 	}
 	defer client.Close()
 
 	query := client.Collection(sleepTimeCollec).Doc(userId).Collection(sleepTimeSubCollec)
-	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
+	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(context.Background())
 	var sleepTimes []SleepTimes
 	for {
 		doc, err := dateQuery.Next()
@@ -100,14 +101,14 @@ func PostSleepTimeData(userId string, queryData SleepTimesDoc) (PostResponse, er
 
 // データベースからメッセージデータを取得する関数
 func GetMessageData(userId string, oldDateAt time.Time) (MessageGetResponse, error) {
-	client, ctx, err := firebaseinit.FirestoreInitializer()
+	client, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return MessageGetResponse{}, err
 	}
 	defer client.Close()
 
 	query := client.Collection(messageCollec).Doc(userId).Collection(messageSubCollec)
-	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(ctx)
+	dateQuery := query.Where("Date", ">=", oldDateAt).Documents(context.Background())
 	var messages []Messages
 	for {
 		doc, err := dateQuery.Next()
@@ -140,13 +141,13 @@ func PostMessageData(userId string, queryData MessagesDoc) (PostResponse, error)
 }
 
 func postData(userId string, queryData interface{}, collec string, subCollec string) (PostResponse, error) {
-	client, ctx, err := firebaseinit.FirestoreInitializer()
+	client, err := firebaseinit.FirestoreInitializer()
 	if err != nil {
 		return PostResponse{}, err
 	}
 	defer client.Close()
 
-	_, _, err = client.Collection(collec).Doc(userId).Collection(subCollec).Add(ctx, queryData)
+	_, _, err = client.Collection(collec).Doc(userId).Collection(subCollec).Add(context.Background(), queryData)
 	if err != nil {
 		return PostResponse{}, err
 	}
