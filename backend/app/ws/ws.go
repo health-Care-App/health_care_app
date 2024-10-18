@@ -4,6 +4,7 @@ import (
 	"app/chat"
 	"app/common"
 	"app/synth"
+	"app/validate"
 	"log"
 	"sync"
 
@@ -44,11 +45,23 @@ func Wshandler(c *gin.Context) {
 		select {
 		case message, ok := <-messageCh:
 			if ok {
-				go chat.GemChat(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				go chat.GemChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
 			}
 		case done, ok := <-doneCh:
 			if done && ok {
 				isProcessing = false
+
+				//送信終了のデータ
+				wsResponse := WsResponse{
+					Base64Data: "",
+					Text:       "",
+					SpeakerId:  0,
+				}
+				if err := validate.Validation(wsResponse); err != nil {
+					log.Println(err)
+					return
+				}
+				conn.WriteJSON(wsResponse)
 			}
 		case err, notOk := <-errCh:
 			if notOk {

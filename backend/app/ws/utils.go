@@ -32,12 +32,13 @@ func sendJson(ttsTextCh <-chan synth.TtsText, conn *websocket.Conn, wg *sync.Wai
 		ttsText := <-ttsTextCh
 
 		audio, err := queueToSynthFunc(ttsText, synth.VoiceVoxApiSynth)
+		wg.Done()
+
 		if err != nil {
 			errCh <- err
 			return
 		}
 		writeJson(audio, conn, errCh)
-		wg.Done()
 	}
 }
 
