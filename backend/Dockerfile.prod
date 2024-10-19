@@ -1,25 +1,32 @@
-FROM golang:1.22.3
+FROM golang:1.23.2
 WORKDIR /app/
 
 COPY ./app/go.mod ./app/go.sum ./
 RUN go mod download
+COPY ./app/ /app/
 
-RUN curl -sSfL https://github.com/VOICEVOX/voicevox_core/releases/latest/download/download-linux-x64 -o /app/download \
+RUN curl -sSfL https://github.com/VOICEVOX/voicevox_core/releases/latest/download/download-linux-x64 -o ./download \
     && chmod +x download \
     && ./download
 
-#シンボリックを設定
-RUN ln -s /app/voicevox_core/libvoicevox_core.so /usr/lib \
-    && ln -s /app/voicevox_core/libonnxruntime.so.1.13.1 /usr/lib \
-    && ln -s /app/voicevox_core/model /usr/lib/model \
-    && ln -s /app/voicevox_core/voicevox_core.h /usr/include
+#ライブラリをコピー
+RUN cp /app/voicevox_core/libvoicevox_core.so /usr/lib/ \
+    && cp /app/voicevox_core/libonnxruntime.so.1.13.1 /usr/lib/ \
+    && cp -r /app/voicevox_core/model /usr/lib/model \
+    && cp /app/voicevox_core/voicevox_core.h /usr/include/
 
-COPY ./app/ /app/
+RUN go build -ldflags="-s -w" -trimpath -o /app/run 
 
-RUN go build -ldflags="-s -w" -trimpath -o /app/run \
-    && ls /app/ |  grep -v -E 'run|voicevox_core' | xargs rm -rf \
-    && rm .air.toml \
-    && rm -rf /root/.cache/go-build
+FROM debian:bookworm
+WORKDIR /app/
+
+COPY --from=0 /app/run /app/
+COPY --from=0 /app/voicevox_core /app/voicevox_core
+
+RUN mv /app/voicevox_core/libvoicevox_core.so /usr/lib/libvoicevox_core.so \
+    && mv /app/voicevox_core/libonnxruntime.so.1.13.1 /usr/lib/libonnxruntime.so.1.13.1 \
+    && mv /app/voicevox_core/model /usr/lib/model \
+    && mv /app/voicevox_core/voicevox_core.h /usr/include/voicevox_core.h
 
 EXPOSE 8080
 CMD [ "/app/run" ]
