@@ -1,4 +1,4 @@
-package database
+package common
 
 import (
 	"app/firebaseinit"
@@ -6,17 +6,6 @@ import (
 	"time"
 
 	"google.golang.org/api/iterator"
-)
-
-const (
-	healthCollec       = "health"
-	healthSubCollec    = "healths"
-	sleepTimeCollec    = "sleepTime"
-	sleepTimeSubCollec = "sleepTimes"
-	messageCollec      = "message"
-	messageSubCollec   = "messages"
-
-	statusOk = "ok"
 )
 
 // データベースから健康状態のデータを取得する関数

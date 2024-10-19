@@ -1,4 +1,4 @@
-package handlers
+package common
 
 type (
 	HealthPostRequestBody struct {

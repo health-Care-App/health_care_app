@@ -52,7 +52,7 @@ func Wshandler(c *gin.Context) {
 				isProcessing = false
 
 				//送信終了のデータ
-				wsResponse := WsResponse{
+				wsResponse := common.WsResponse{
 					Base64Data: "",
 					Text:       "",
 					SpeakerId:  0,

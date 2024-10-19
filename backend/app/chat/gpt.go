@@ -2,7 +2,6 @@ package chat
 
 import (
 	"app/common"
-	"app/database"
 	"app/synth"
 	"errors"
 	"fmt"
@@ -41,12 +40,12 @@ func GptChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh
 
 			//データベースにGPTの回答を保存
 			createDateAt := time.Now()
-			messagesDoc := database.MessagesDoc{
+			messagesDoc := common.MessagesDoc{
 				Question: message.Question,
 				Answer:   fullText,
 				Date:     createDateAt,
 			}
-			_, err = database.PostMessageData(userId, messagesDoc)
+			_, err = common.PostMessageData(userId, messagesDoc)
 			if err != nil {
 				errCh <- err
 				return

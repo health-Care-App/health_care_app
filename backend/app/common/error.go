@@ -6,16 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ErrorResponse(c *gin.Context, err error) {
+func ErrorResponse(c *gin.Context, err error, errCode int) {
 	log.Println(err)
-	c.JSON(500, gin.H{
-		"error": err.Error(),
+	c.JSON(errCode, ErrResponse{
+		Error: err.Error(),
 	})
 }
 
-func UserErrorResponse(c *gin.Context) {
+func UserErrorResponse(c *gin.Context, errCode int) {
 	log.Println("invalid userId")
-	c.JSON(500, gin.H{
-		"error": "invalid userId",
+	c.JSON(errCode, ErrResponse{
+		Error: `invalid userId`,
 	})
 }

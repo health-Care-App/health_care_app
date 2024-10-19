@@ -13,7 +13,7 @@ import (
 
 func writeJson(audio synth.Audio, conn *websocket.Conn, errCh chan<- error) {
 	base64Data := base64.StdEncoding.EncodeToString(audio.Audiobytes)
-	wsResponse := WsResponse{
+	wsResponse := common.WsResponse{
 		Base64Data: base64Data,
 		Text:       audio.TtsText.Text,
 		SpeakerId:  audio.TtsText.SpeakerId,

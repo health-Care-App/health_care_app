@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"app/common"
 	"app/firebaseinit"
 	"context"
 	"strings"
@@ -12,7 +13,7 @@ func Authorized() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		client, err := firebaseinit.AuthInitializer()
 		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
+			common.ErrorResponse(c, err, common.InternalErrCode)
 			c.Abort()
 			return
 		}
@@ -22,7 +23,7 @@ func Authorized() gin.HandlerFunc {
 
 		token, err := client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			c.JSON(401, gin.H{"error": err.Error()})
+			common.UserErrorResponse(c, common.ExternalErrCode)
 			c.Abort()
 			return
 		}

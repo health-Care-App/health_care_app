@@ -1,4 +1,4 @@
-package database
+package common
 
 import "time"
 
@@ -36,5 +36,15 @@ type (
 
 	MessageGetResponse struct {
 		Messages []Messages `json:"messages" validate:"required"`
+	}
+
+	WsResponse struct {
+		Base64Data string `json:"base64_data" validate:"omitempty"`
+		Text       string `json:"text" validate:"omitempty"`
+		SpeakerId  uint   `json:"speaker_id" validate:"omitempty"`
+	}
+
+	ErrResponse struct {
+		Error string `json:"error" validate:"required"`
 	}
 )

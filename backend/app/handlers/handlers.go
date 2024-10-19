@@ -3,10 +3,8 @@ package handlers
 import (
 	"app/chat"
 	"app/common"
-	"app/database"
 	"app/synth"
 	"app/validate"
-	"app/ws"
 	"encoding/base64"
 	"time"
 
@@ -15,82 +13,82 @@ import (
 
 // 健康状態を取得する関数
 func gethealthHandler(c *gin.Context) {
-	getHandler(c, database.GetHealthData)
+	getHandler(c, common.GetHealthData)
 }
 
 // 健康状態を保存する関数
 func postHealthHandler(c *gin.Context) {
 	userId := common.NewUserId(c)
 
-	body := HealthPostRequestBody{}
+	body := common.HealthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	createDateAt := time.Now()
-	queryData := database.HealthsDoc{
+	queryData := common.HealthsDoc{
 		Health: body.Health,
 		Date:   createDateAt,
 	}
 
 	//データが正しいか検証
 	if err := validate.Validation(queryData); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	response, err := database.PostHelthData(userId, queryData)
+	response, err := common.PostHelthData(userId, queryData)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }
 
 // 睡眠時間を取得する関数
 func getSleepTimeHandler(c *gin.Context) {
-	getHandler(c, database.GetSleepTimeData)
+	getHandler(c, common.GetSleepTimeData)
 }
 
 // 睡眠時間を保存する関数
 func postSleepTimeHandler(c *gin.Context) {
 	userId := common.NewUserId(c)
 
-	body := SleepTimePostRequestBody{}
+	body := common.SleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	createDateAt := time.Now()
-	queryData := database.SleepTimesDoc{
+	queryData := common.SleepTimesDoc{
 		SleepTime: body.SleepTime,
 		Date:      createDateAt,
 	}
 
 	//データが正しいか検証
 	if err := validate.Validation(queryData); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	response, err := database.PostSleepTimeData(userId, queryData)
+	response, err := common.PostSleepTimeData(userId, queryData)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }
 
 // メッセージを取得する関数
 func getMessageHandler(c *gin.Context) {
-	getHandler(c, database.GetMessageData)
+	getHandler(c, common.GetMessageData)
 }
 
 // GETハンドラを共通化
-func getHandler[T database.HealthGetResponse | database.SleepTimeGetResponse | database.MessageGetResponse](c *gin.Context, getData func(string, time.Time) (T, error)) {
+func getHandler[T common.HealthGetResponse | common.SleepTimeGetResponse | common.MessageGetResponse](c *gin.Context, getData func(string, time.Time) (T, error)) {
 	userId := common.NewUserId(c)
 
 	//現在の1週間前をdefaultとする
@@ -98,17 +96,17 @@ func getHandler[T database.HealthGetResponse | database.SleepTimeGetResponse | d
 	oldDateAt := c.DefaultQuery(oldDateAtParam, defaultDate)
 	ParsedOldDateAt, err := time.Parse(common.Layout, oldDateAt)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	response, err := getData(userId, ParsedOldDateAt)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }
 
 func postMessageHandler(c *gin.Context) {
@@ -116,24 +114,24 @@ func postMessageHandler(c *gin.Context) {
 	body := common.Message{}
 
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	ttsText, err := chat.GptChatApi(body, userId)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	audio, err := synth.VoiceVoxApiSynth(ttsText)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	base64Data := base64.StdEncoding.EncodeToString(audio.Audiobytes)
-	response := ws.WsResponse{
+	response := common.WsResponse{
 		Base64Data: base64Data,
 		Text:       ttsText.Text,
 		SpeakerId:  ttsText.SpeakerId,
@@ -141,9 +139,9 @@ func postMessageHandler(c *gin.Context) {
 
 	//データが正しいか検証
 	if err := validate.Validation(response); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }

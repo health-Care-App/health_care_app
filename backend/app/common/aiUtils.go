@@ -1,7 +1,6 @@
 package common
 
 import (
-	"app/database"
 	"fmt"
 	"regexp"
 	"sort"
@@ -15,12 +14,12 @@ func InitPrompt(userId string, model int, isSteam bool) (string, error) {
 		return "", err
 	}
 
-	healthData, err := database.GetHealthData(userId, ParsedOldDateAt)
+	healthData, err := GetHealthData(userId, ParsedOldDateAt)
 	if err != nil {
 		return "", err
 	}
 
-	sleepTimeData, err := database.GetSleepTimeData(userId, ParsedOldDateAt)
+	sleepTimeData, err := GetSleepTimeData(userId, ParsedOldDateAt)
 	if err != nil {
 		return "", err
 	}
@@ -64,16 +63,16 @@ func InitPrompt(userId string, model int, isSteam bool) (string, error) {
 	return fmt.Sprintf(fullText, systemWeekTerm, healthText, sleepTimeText, characterText, outputText), nil
 }
 
-func RecvPromptMessage(userId string) (database.MessageGetResponse, error) {
+func RecvPromptMessage(userId string) (MessageGetResponse, error) {
 	defaultDate := time.Now().AddDate(0, 0, -chatWeekTerm).Format(Layout)
 	ParsedOldDateAt, err := time.Parse(Layout, defaultDate)
 	if err != nil {
-		return database.MessageGetResponse{}, err
+		return MessageGetResponse{}, err
 	}
 
-	response, err := database.GetMessageData(userId, ParsedOldDateAt)
+	response, err := GetMessageData(userId, ParsedOldDateAt)
 	if err != nil {
-		return database.MessageGetResponse{}, err
+		return MessageGetResponse{}, err
 	}
 
 	sort.Slice(response.Messages, func(i, j int) bool {
