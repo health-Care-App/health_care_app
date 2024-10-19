@@ -22,7 +22,7 @@ func postHealthHandler(c *gin.Context) {
 
 	body := common.HealthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
@@ -34,17 +34,17 @@ func postHealthHandler(c *gin.Context) {
 
 	//データが正しいか検証
 	if err := validate.Validation(queryData); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	response, err := common.PostHelthData(userId, queryData)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }
 
 // 睡眠時間を取得する関数
@@ -58,7 +58,7 @@ func postSleepTimeHandler(c *gin.Context) {
 
 	body := common.SleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
@@ -70,16 +70,16 @@ func postSleepTimeHandler(c *gin.Context) {
 
 	//データが正しいか検証
 	if err := validate.Validation(queryData); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	response, err := common.PostSleepTimeData(userId, queryData)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }
 
 // メッセージを取得する関数
@@ -96,17 +96,17 @@ func getHandler[T common.HealthGetResponse | common.SleepTimeGetResponse | commo
 	oldDateAt := c.DefaultQuery(oldDateAtParam, defaultDate)
 	ParsedOldDateAt, err := time.Parse(common.Layout, oldDateAt)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	response, err := getData(userId, ParsedOldDateAt)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }
 
 func postMessageHandler(c *gin.Context) {
@@ -114,19 +114,19 @@ func postMessageHandler(c *gin.Context) {
 	body := common.Message{}
 
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	ttsText, err := chat.GptChatApi(body, userId)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
 	audio, err := synth.VoiceVoxApiSynth(ttsText)
 	if err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
@@ -139,9 +139,9 @@ func postMessageHandler(c *gin.Context) {
 
 	//データが正しいか検証
 	if err := validate.Validation(response); err != nil {
-		common.ErrorResponse(c, err)
+		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	c.JSON(200, response)
+	c.JSON(successCode, response)
 }

@@ -8,17 +8,6 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-const (
-	healthCollec       = "health"
-	healthSubCollec    = "healths"
-	sleepTimeCollec    = "sleepTime"
-	sleepTimeSubCollec = "sleepTimes"
-	messageCollec      = "message"
-	messageSubCollec   = "messages"
-
-	statusOk = "ok"
-)
-
 // データベースから健康状態のデータを取得する関数
 func GetHealthData(userId string, oldDateAt time.Time) (HealthGetResponse, error) {
 	client, err := firebaseinit.FirestoreInitializer()

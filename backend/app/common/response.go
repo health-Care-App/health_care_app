@@ -43,4 +43,8 @@ type (
 		Text       string `json:"text" validate:"omitempty"`
 		SpeakerId  uint   `json:"speaker_id" validate:"omitempty"`
 	}
+
+	ErrResponse struct {
+		Error string `json:"error" validate:"required"`
+	}
 )
