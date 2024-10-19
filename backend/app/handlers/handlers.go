@@ -5,7 +5,6 @@ import (
 	"app/common"
 	"app/synth"
 	"app/validate"
-	"app/ws"
 	"encoding/base64"
 	"time"
 
@@ -132,7 +131,7 @@ func postMessageHandler(c *gin.Context) {
 	}
 
 	base64Data := base64.StdEncoding.EncodeToString(audio.Audiobytes)
-	response := ws.WsResponse{
+	response := common.WsResponse{
 		Base64Data: base64Data,
 		Text:       ttsText.Text,
 		SpeakerId:  ttsText.SpeakerId,
