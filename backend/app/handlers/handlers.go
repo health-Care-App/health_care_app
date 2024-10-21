@@ -5,7 +5,7 @@ import (
 	"app/common"
 	"app/synth"
 	"app/validate"
-	"encoding/base64"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -118,19 +118,28 @@ func postMessageHandler(c *gin.Context) {
 		return
 	}
 
-	ttsText, err := chat.GptChatApi(body, userId)
+	var ttsText synth.TtsText
+	var err error
+	if body.ChatModel == 0 {
+		//chatGPTで対話
+		fmt.Println("chatGPT called")
+		ttsText, err = chat.GptChatApi(body, userId)
+	} else {
+		//geminiで対話
+		fmt.Println("gemini called")
+		ttsText, err = chat.GeminiChatApi(body, userId)
+	}
 	if err != nil {
 		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	audio, err := synth.VoiceVoxApiSynth(ttsText)
+	base64Data, err := synth.TextToBase64(body.IsSynth, ttsText)
 	if err != nil {
 		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	base64Data := base64.StdEncoding.EncodeToString(audio.Audiobytes)
 	response := common.WsResponse{
 		Base64Data: base64Data,
 		Text:       ttsText.Text,

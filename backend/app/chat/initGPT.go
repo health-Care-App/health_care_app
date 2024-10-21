@@ -12,7 +12,7 @@ import (
 func InitGptPrompt(userId string, message common.Message, isStream bool) ([]openai.ChatCompletionMessage, error) {
 	var chatCompletionMessges []openai.ChatCompletionMessage
 
-	response, err := common.RecvPromptMessage(userId)
+	response, err := RecvPromptMessage(userId)
 	if err != nil {
 		return []openai.ChatCompletionMessage{}, err
 	}
@@ -30,7 +30,7 @@ func InitGptPrompt(userId string, message common.Message, isStream bool) ([]open
 		)
 	}
 
-	prompt, err := common.InitPrompt(userId, message.Model, isStream)
+	prompt, err := InitPrompt(userId, message.SynthModel, isStream)
 	if err != nil {
 		return []openai.ChatCompletionMessage{}, err
 	}
@@ -85,7 +85,7 @@ func GPTRequestStream(userId string, message common.Message, client *openai.Clie
 		Model:     openai.GPT4oMini,
 		MaxTokens: common.MaxTokensLength,
 		Messages:  chatCompletionMessages,
-		Stream: true,
+		Stream:    true,
 	}
 
 	return client.CreateChatCompletionStream(context.Background(), req)

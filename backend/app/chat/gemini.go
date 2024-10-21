@@ -3,7 +3,6 @@ package chat
 import (
 	"app/common"
 	"app/synth"
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -81,7 +80,7 @@ func GemChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh
 				}
 
 				if recvModel != data[3] {
-					errCh <- errors.New("response text format invalid")
+					errCh <- errGeminiTagMissMatch
 					return
 				}
 
@@ -93,7 +92,7 @@ func GemChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh
 				}
 
 			default:
-				errCh <- errors.New(`speaker id invalid`)
+				errCh <- errGeminiSpeakerId
 				return
 			}
 
@@ -104,28 +103,21 @@ func GemChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh
 	}
 }
 
-func GemChat(message common.Message, ttsTextCh chan<- synth.TtsText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
+func GeminiChatApi(message common.Message, userId string) (synth.TtsText, error) {
 	client, err := InitGem()
 	if err != nil {
-		errCh <- err
-		return
+		return synth.TtsText{}, err
 	}
 
 	resp, err := GemRequest(userId, message, client)
 	if err != nil {
-		errCh <- err
-		return
+		return synth.TtsText{}, err
 	}
-
-	defer func() {
-		doneCh <- true
-	}()
 
 	// フォーマットチェック
 	respText := recvGemResponse(resp)
-	if !common.PatternChecked(common.LineTextPattern, respText) {
-		errCh <- errors.New("response text format invalid")
-		return
+	if !PatternChecked(common.LineTextPattern, respText) {
+		return synth.TtsText{}, errGeminiTextMissMatch
 	}
 
 	matched := regexp.MustCompile(common.LineTextPattern).FindStringSubmatch(respText)
@@ -137,25 +129,21 @@ func GemChat(message common.Message, ttsTextCh chan<- synth.TtsText, errCh chan<
 	case "3", "1", "5", "22", "38", "76", "8":
 		speakerId, err := strconv.Atoi(matched[1])
 		if err != nil {
-			errCh <- err
-			return
+			return synth.TtsText{}, err
 		}
 
 		//フォーマットチェック
 		if recvModel != matched[3] {
-			errCh <- errors.New("response text format invalid")
-			return
+			return synth.TtsText{}, errGeminiTagMissMatch
 		}
 
-		wg.Add(common.AddStep)
 		fmt.Println(recvText)
-		ttsTextCh <- synth.TtsText{
+		return synth.TtsText{
 			Text:      recvText,
 			SpeakerId: uint(speakerId),
-		}
+		}, nil
 
 	default:
-		errCh <- errors.New(`speaker id invalid`)
-		return
+		return synth.TtsText{}, errGeminiSpeakerId
 	}
 }
