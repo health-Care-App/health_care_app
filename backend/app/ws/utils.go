@@ -4,7 +4,6 @@ import (
 	"app/common"
 	"app/synth"
 	"app/validate"
-	"encoding/base64"
 	"fmt"
 	"sync"
 
@@ -12,15 +11,9 @@ import (
 )
 
 func sendJson(isSynth bool, ttsText synth.TtsText, wg *sync.WaitGroup, conn *websocket.Conn, errCh chan<- error) {
-	var base64Data string
-	if isSynth {
-		audio, err := queueToSynthFunc(ttsText, synth.VoiceVoxApiSynth)
-		if err != nil {
-			errCh <- err
-		}
-		base64Data = base64.StdEncoding.EncodeToString(audio.Audiobytes)
-	} else {
-		base64Data = ""
+	base64Data, err := synth.TextToBase64(isSynth, ttsText)
+	if err != nil {
+		errCh <- err
 	}
 	wg.Done()
 
@@ -58,8 +51,4 @@ func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- common.
 			fmt.Println("dropped Message")
 		}
 	}
-}
-
-func queueToSynthFunc(ttsText synth.TtsText, synthFunc func(synth.TtsText) (synth.Audio, error)) (synth.Audio, error) {
-	return synthFunc(ttsText)
 }

@@ -33,7 +33,7 @@ func initGemPrompt(userId string, message common.Message, client *genai.Client, 
 	model.SetTemperature(temp)
 
 	//キャラの設定を生成
-	prompt, err := common.InitPrompt(userId, message.SynthModel, isStream)
+	prompt, err := InitPrompt(userId, message.SynthModel, isStream)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func initGemPrompt(userId string, message common.Message, client *genai.Client, 
 	cs.History = []*genai.Content{}
 
 	//会話履歴をとって来る
-	response, err := common.RecvPromptMessage(userId)
+	response, err := RecvPromptMessage(userId)
 	if err != nil {
 		return nil, err
 	}

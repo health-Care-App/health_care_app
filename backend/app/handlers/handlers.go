@@ -5,7 +5,6 @@ import (
 	"app/common"
 	"app/synth"
 	"app/validate"
-	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -130,26 +129,15 @@ func postMessageHandler(c *gin.Context) {
 		fmt.Println("gemini called")
 		ttsText, err = chat.GeminiChatApi(body, userId)
 	}
-
 	if err != nil {
 		common.ErrorResponse(c, err, common.InternalErrCode)
 		return
 	}
 
-	var audio synth.Audio
-	var base64Data string
-	//リクエストパラメータ"is_synth"がtrueの場合音声合成を行う
-	if body.IsSynth {
-		audio, err = synth.VoiceVoxApiSynth(ttsText)
-		if err != nil {
-			common.ErrorResponse(c, err, common.InternalErrCode)
-			return
-		}
-
-		base64Data = base64.StdEncoding.EncodeToString(audio.Audiobytes)
-	} else {
-		//音声合成を行わない場合空文字を返す
-		base64Data = ""
+	base64Data, err := synth.TextToBase64(body.IsSynth, ttsText)
+	if err != nil {
+		common.ErrorResponse(c, err, common.InternalErrCode)
+		return
 	}
 
 	response := common.WsResponse{

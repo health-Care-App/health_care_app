@@ -12,7 +12,7 @@ import (
 func InitGptPrompt(userId string, message common.Message, isStream bool) ([]openai.ChatCompletionMessage, error) {
 	var chatCompletionMessges []openai.ChatCompletionMessage
 
-	response, err := common.RecvPromptMessage(userId)
+	response, err := RecvPromptMessage(userId)
 	if err != nil {
 		return []openai.ChatCompletionMessage{}, err
 	}
@@ -30,7 +30,7 @@ func InitGptPrompt(userId string, message common.Message, isStream bool) ([]open
 		)
 	}
 
-	prompt, err := common.InitPrompt(userId, message.SynthModel, isStream)
+	prompt, err := InitPrompt(userId, message.SynthModel, isStream)
 	if err != nil {
 		return []openai.ChatCompletionMessage{}, err
 	}

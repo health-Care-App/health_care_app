@@ -116,7 +116,7 @@ func GeminiChatApi(message common.Message, userId string) (synth.TtsText, error)
 
 	// フォーマットチェック
 	respText := recvGemResponse(resp)
-	if !common.PatternChecked(common.LineTextPattern, respText) {
+	if !PatternChecked(common.LineTextPattern, respText) {
 		return synth.TtsText{}, errGeminiTextMissMatch
 	}
 

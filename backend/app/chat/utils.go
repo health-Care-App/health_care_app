@@ -1,6 +1,7 @@
-package common
+package chat
 
 import (
+	"app/common"
 	"fmt"
 	"regexp"
 	"sort"
@@ -8,18 +9,18 @@ import (
 )
 
 func InitPrompt(userId string, model int, isSteam bool) (string, error) {
-	defaultDate := time.Now().AddDate(0, 0, -systemWeekTerm).Format(Layout)
-	ParsedOldDateAt, err := time.Parse(Layout, defaultDate)
+	defaultDate := time.Now().AddDate(0, 0, -systemWeekTerm).Format(common.Layout)
+	ParsedOldDateAt, err := time.Parse(common.Layout, defaultDate)
 	if err != nil {
 		return "", err
 	}
 
-	healthData, err := GetHealthData(userId, ParsedOldDateAt)
+	healthData, err := common.GetHealthData(userId, ParsedOldDateAt)
 	if err != nil {
 		return "", err
 	}
 
-	sleepTimeData, err := GetSleepTimeData(userId, ParsedOldDateAt)
+	sleepTimeData, err := common.GetSleepTimeData(userId, ParsedOldDateAt)
 	if err != nil {
 		return "", err
 	}
@@ -27,7 +28,7 @@ func InitPrompt(userId string, model int, isSteam bool) (string, error) {
 	healthText := ""
 	if len(healthData.Healths) > 0 {
 		for _, health := range healthData.Healths {
-			healthText += fmt.Sprintf("%s: %d\n", health.Date.Format(Layout), health.Health)
+			healthText += fmt.Sprintf("%s: %d\n", health.Date.Format(common.Layout), health.Health)
 		}
 	} else {
 		healthText += "データなし"
@@ -36,7 +37,7 @@ func InitPrompt(userId string, model int, isSteam bool) (string, error) {
 	sleepTimeText := ""
 	if len(sleepTimeData.SleepTimes) > 0 {
 		for _, sleepTime := range sleepTimeData.SleepTimes {
-			sleepTimeText += fmt.Sprintf("%s: %d\n", sleepTime.Date.Format(Layout), sleepTime.SleepTime)
+			sleepTimeText += fmt.Sprintf("%s: %d\n", sleepTime.Date.Format(common.Layout), sleepTime.SleepTime)
 		}
 	} else {
 		sleepTimeText += "データなし"
@@ -63,16 +64,16 @@ func InitPrompt(userId string, model int, isSteam bool) (string, error) {
 	return fmt.Sprintf(fullText, systemWeekTerm, healthText, sleepTimeText, characterText, outputText), nil
 }
 
-func RecvPromptMessage(userId string) (MessageGetResponse, error) {
-	defaultDate := time.Now().AddDate(0, 0, -chatWeekTerm).Format(Layout)
-	ParsedOldDateAt, err := time.Parse(Layout, defaultDate)
+func RecvPromptMessage(userId string) (common.MessageGetResponse, error) {
+	defaultDate := time.Now().AddDate(0, 0, -chatWeekTerm).Format(common.Layout)
+	ParsedOldDateAt, err := time.Parse(common.Layout, defaultDate)
 	if err != nil {
-		return MessageGetResponse{}, err
+		return common.MessageGetResponse{}, err
 	}
 
-	response, err := GetMessageData(userId, ParsedOldDateAt)
+	response, err := common.GetMessageData(userId, ParsedOldDateAt)
 	if err != nil {
-		return MessageGetResponse{}, err
+		return common.MessageGetResponse{}, err
 	}
 
 	sort.Slice(response.Messages, func(i, j int) bool {

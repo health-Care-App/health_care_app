@@ -65,7 +65,7 @@ func GptChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh
 		fullText += newToken
 		buffer += newToken
 
-		if common.PatternChecked(common.LineTextPattern, buffer) {
+		if PatternChecked(common.LineTextPattern, buffer) {
 			matched := regexp.MustCompile(common.LineTextPattern).FindStringSubmatch(buffer)
 			recvText := matched[2]
 			recvModel := matched[1]
@@ -113,7 +113,7 @@ func GptChatApi(message common.Message, userId string) (synth.TtsText, error) {
 
 	//フォーマットチェック
 	respText := resp.Choices[0].Message.Content
-	if !common.PatternChecked(common.LineTextPattern, respText) {
+	if !PatternChecked(common.LineTextPattern, respText) {
 		return synth.TtsText{}, errGptTextMissMatch
 	}
 
