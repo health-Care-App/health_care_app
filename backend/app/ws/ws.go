@@ -5,6 +5,7 @@ import (
 	"app/common"
 	"app/synth"
 	"app/validate"
+	"fmt"
 	"log"
 	"sync"
 
@@ -37,21 +38,36 @@ func Wshandler(c *gin.Context) {
 
 	userId := common.NewUserId(c)
 	var wg sync.WaitGroup
+	var isSynth bool
 	isProcessing := false
 
 	go readJson(&isProcessing, conn, messageCh, errCh)
-	go sendJson(ttsTextCh, conn, &wg, errCh)
 	for {
 		select {
 		case message, ok := <-messageCh:
 			if ok {
-				go chat.GemChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				isSynth = message.IsSynth
+				if message.ChatModel == 0 {
+					//Gptで会話
+					fmt.Println("Gpt called")
+					go chat.GptChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				} else {
+					//Geminiで会話
+					fmt.Println("Gemini called")
+					go chat.GemChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				}
 			}
+
+		case ttsText, ok := <-ttsTextCh:
+			if ok {
+				sendJson(isSynth, ttsText, &wg, conn, errCh)
+			}
+
 		case done, ok := <-doneCh:
 			if done && ok {
 				isProcessing = false
 
-				//送信終了のデータ
+				//送信終了を知らせる空データ
 				wsResponse := common.WsResponse{
 					Base64Data: "",
 					Text:       "",
@@ -63,6 +79,7 @@ func Wshandler(c *gin.Context) {
 				}
 				conn.WriteJSON(wsResponse)
 			}
+
 		case err, notOk := <-errCh:
 			if notOk {
 				log.Println(err)

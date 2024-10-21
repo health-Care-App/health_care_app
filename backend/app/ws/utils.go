@@ -11,12 +11,23 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func writeJson(audio synth.Audio, conn *websocket.Conn, errCh chan<- error) {
-	base64Data := base64.StdEncoding.EncodeToString(audio.Audiobytes)
+func sendJson(isSynth bool, ttsText synth.TtsText, wg *sync.WaitGroup, conn *websocket.Conn, errCh chan<- error) {
+	var base64Data string
+	if isSynth {
+		audio, err := queueToSynthFunc(ttsText, synth.VoiceVoxApiSynth)
+		if err != nil {
+			errCh <- err
+		}
+		base64Data = base64.StdEncoding.EncodeToString(audio.Audiobytes)
+	} else {
+		base64Data = ""
+	}
+	wg.Done()
+
 	wsResponse := common.WsResponse{
 		Base64Data: base64Data,
-		Text:       audio.TtsText.Text,
-		SpeakerId:  audio.TtsText.SpeakerId,
+		Text:       ttsText.Text,
+		SpeakerId:  ttsText.SpeakerId,
 	}
 
 	if err := validate.Validation(wsResponse); err != nil {
@@ -25,21 +36,6 @@ func writeJson(audio synth.Audio, conn *websocket.Conn, errCh chan<- error) {
 	}
 
 	conn.WriteJSON(wsResponse)
-}
-
-func sendJson(ttsTextCh <-chan synth.TtsText, conn *websocket.Conn, wg *sync.WaitGroup, errCh chan<- error) {
-	for {
-		ttsText := <-ttsTextCh
-
-		audio, err := queueToSynthFunc(ttsText, synth.VoiceVoxApiSynth)
-		wg.Done()
-
-		if err != nil {
-			errCh <- err
-			return
-		}
-		writeJson(audio, conn, errCh)
-	}
 }
 
 func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- common.Message, errCh chan<- error) {
