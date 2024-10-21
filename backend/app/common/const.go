@@ -12,8 +12,6 @@ const (
 	ExternalErrCode = 401
 )
 
-
-
 // firestore
 const (
 	healthCollec       = "health"
