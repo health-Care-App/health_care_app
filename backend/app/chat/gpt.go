@@ -80,7 +80,7 @@ func GptChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh
 				}
 
 				if recvModel != matched[3] {
-					errCh <- errors.New("response text format invalid")
+					errCh <- errGptTagMissMatch
 					return
 				}
 
@@ -93,66 +93,10 @@ func GptChatStream(message common.Message, ttsTextCh chan<- synth.TtsText, errCh
 				}
 
 			default:
-				errCh <- errors.New(`speaker id invalid`)
+				errCh <- errGptSpeakerId
 				return
 			}
 		}
-	}
-}
-
-func GptChat(message common.Message, ttsTextCh chan<- synth.TtsText, errCh chan<- error, doneCh chan<- bool, wg *sync.WaitGroup, userId string) {
-	client, err := InitGPT()
-	if err != nil {
-		errCh <- err
-		return
-	}
-
-	resp, err := GPTRequest(userId, message, client)
-	if err != nil {
-		errCh <- err
-		return
-	}
-
-	defer func() {
-		doneCh <- true
-	}()
-
-	//フォーマットチェック
-	respText := resp.Choices[0].Message.Content
-	if !common.PatternChecked(common.LineTextPattern, respText) {
-		errCh <- errors.New("response text format invalid")
-		return
-	}
-
-	matched := regexp.MustCompile(common.LineTextPattern).FindStringSubmatch(respText)
-	recvText := matched[2]
-	recvModel := matched[1]
-
-	//フォーマットに合うかどうか
-	switch recvModel {
-	case "3", "1", "5", "22", "38", "76", "8":
-		speakerId, err := strconv.Atoi(matched[1])
-		if err != nil {
-			errCh <- err
-			return
-		}
-
-		//フォーマットチェック
-		if recvModel != matched[3] {
-			errCh <- errors.New("response text format invalid")
-			return
-		}
-
-		wg.Add(common.AddStep)
-		fmt.Println(recvText)
-		ttsTextCh <- synth.TtsText{
-			Text:      recvText,
-			SpeakerId: uint(speakerId),
-		}
-
-	default:
-		errCh <- errors.New(`speaker id invalid`)
-		return
 	}
 }
 
@@ -170,7 +114,7 @@ func GptChatApi(message common.Message, userId string) (synth.TtsText, error) {
 	//フォーマットチェック
 	respText := resp.Choices[0].Message.Content
 	if !common.PatternChecked(common.LineTextPattern, respText) {
-		return synth.TtsText{}, errors.New("response text format invalid")
+		return synth.TtsText{}, errGptTextMissMatch
 	}
 
 	matched := regexp.MustCompile(common.LineTextPattern).FindStringSubmatch(respText)
@@ -197,6 +141,6 @@ func GptChatApi(message common.Message, userId string) (synth.TtsText, error) {
 		}, nil
 
 	default:
-		return synth.TtsText{}, errors.New(`speaker id invalid`)
+		return synth.TtsText{}, errGptSpeakerId
 	}
 }

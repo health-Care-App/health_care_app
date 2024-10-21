@@ -33,7 +33,7 @@ func initGemPrompt(userId string, message common.Message, client *genai.Client, 
 	model.SetTemperature(temp)
 
 	//キャラの設定を生成
-	prompt, err := common.InitPrompt(userId, message.Model, isStream)
+	prompt, err := common.InitPrompt(userId, message.SynthModel, isStream)
 	if err != nil {
 		return nil, err
 	}
