@@ -86,18 +86,50 @@ ws://go-server-xrfznls4va-uc.a.run.app/ws
 ### リクエスト
 ```
 #json形式
-# question: 質問文を指定
-# model: ずんだもんの場合0, 春日つむぎの場合1を指定
-
 {
-  "question": "質問"
-  "model": 0
+  "question": "質問",    # 質問文を指定
+  "chat_model": 0,    # ずんだもんの場合0, 春日つむぎの場合1を指定
+  "synth_model": 0,    # chatGPTの場合0, geminiの場合1
+  "is_synth": true    #bool値。音声合成を行う場合trueを指定。falseの場合レスポンスのbase64_dataフィールドが空文字で返される
 }
 ```
 ### レスポンス
 ```
 #json形式
-
+{
+    "base64_data": "UklGRiR+AQBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQB+AQAgAC ... AMAAwADAAMAAgAEAAQAAgACAAEA", # base64
+    "text": "それは心配なのだー。",
+    "speaker_id": 1
+}
+```
+一つの質問に対する回答の送信が終わったことときにそれ知らせる空データを送信します
+```
+#空データ
+{
+    "base64_data": "",
+    "text": "",
+    "speaker_id": 0
+}
+```
+### その他
+一文ずつ送信するwebsocketに対し、全文を一気に音声合成して一つのレスポンスとして返すAPIも実装済み  
+エンドポイント: `\message`  
+メソッド: `POST`  
+### リクエスト
+```
+# json形式
+# websocketの時と同様
+{
+  "question": "質問",    # 質問文を指定
+  "chat_model": 0,    # ずんだもんの場合0, 春日つむぎの場合1を指定
+  "synth_model": 0,    # chatGPTの場合0, geminiの場合1
+  "is_synth": true    #bool値。音声合成を行う場合trueを指定。falseの場合レスポンスのbase64_dataフィールドが空文字で返される
+}
+```
+### レスポンス
+```
+# json形式
+# websocketの時と形式は同様だが、全文のテキスト及びそれを音声合成したbase64データを返し空データは返さない
 {
     "base64_data": "UklGRiR+AQBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQB+AQAgAC ... AMAAwADAAMAAgAEAAQAAgACAAEA", # base64
     "text": "それは心配なのだー。",
