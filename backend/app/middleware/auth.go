@@ -23,7 +23,7 @@ func Authorized() gin.HandlerFunc {
 
 		token, err := client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			common.UserErrorResponse(c, common.ExternalErrCode)
+			common.ErrorResponse(c, err, common.ExternalErrCode)
 			c.Abort()
 			return
 		}

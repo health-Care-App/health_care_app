@@ -4,7 +4,7 @@ import (
 	voicevoxcorego "github.com/sh1ma/voicevoxcore.go"
 )
 
-func VoiceVoxCoreSynth(ttsText TtsText) (Audio, error) {
+func VoiceVoxCoreSynth(ttsText TtsText) ([]byte, error) {
 	core := voicevoxcorego.New()
 
 	//`VoiceVoxCore`の初期化オプションを生成する関数
@@ -16,7 +16,7 @@ func VoiceVoxCoreSynth(ttsText TtsText) (Audio, error) {
 	audioQueryOption := voicevoxcorego.NewVoicevoxAudioQueryOptions(kana)
 	audioQuery, err := core.AudioQuery(ttsText.Text, ttsText.SpeakerId, audioQueryOption)
 	if err != nil {
-		return Audio{}, err
+		return nil, err
 	}
 
 	//audioQuery調整
@@ -26,11 +26,8 @@ func VoiceVoxCoreSynth(ttsText TtsText) (Audio, error) {
 	synthesisOption := voicevoxcorego.NewVoicevoxSynthesisOptions(enableInterrogativeUpspeak)
 	result, err := core.Synthesis(audioQuery, int(ttsText.SpeakerId), synthesisOption)
 	if err != nil {
-		return Audio{}, nil
+		return nil, nil
 	}
 
-	return Audio{
-		Audiobytes: result,
-		TtsText:    ttsText,
-	}, nil
+	return result, nil
 }
