@@ -113,7 +113,7 @@ ws://go-server-xrfznls4va-uc.a.run.app/ws
 ```
 ### その他
 一文ずつ送信するwebsocketに対し、全文を一気に音声合成して一つのレスポンスとして返すAPIも実装済み  
-エンドポイント: `\message`  
+エンドポイント: `/message`  
 メソッド: `POST`  
 ### リクエスト
 ```
