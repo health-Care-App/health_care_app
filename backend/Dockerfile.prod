@@ -17,7 +17,7 @@ RUN cp /app/voicevox_core/libvoicevox_core.so /usr/lib/ \
 
 RUN go build -ldflags="-s -w" -trimpath -o /app/run 
 
-FROM debian:bookworm
+FROM buildpack-deps:bookworm-scm
 WORKDIR /app/
 
 COPY --from=0 /app/run /app/
