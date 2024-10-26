@@ -29,7 +29,7 @@ class ChatWebsocket {
   }
 
   //WebSocket通信を開始
-  Future<void> wsStart() async {
+  Future<void> wsStart(void Function(String, String, int) callback) async {
     //idtoken取得
     String idToken;
     try {
@@ -108,18 +108,16 @@ void callback(String base64Data, String text, int speakerId) {
   print(speakerId);
 }
 
-/*
-利用例
+// 利用例
 
-void main() async {
-  ChatWebsocket socket = ChatWebsocket();
-  await socket.wsStart();
+// void main() async {
+//   ChatWebsocket socket = ChatWebsocket();
+//   await socket.wsStart(callback);
 
-  //データを送信
-  socket.wsSend("眠いです", 0, 0, true);
+//   //データを送信
+//   socket.wsSend("眠いです", 0, 0, true);
 
-  //通信が終了するのを待ってからclose
-  await Future.delayed(Duration(seconds: 20));
-  socket.wsClose();
-}
-*/
+//   //通信が終了するのを待ってからclose
+//   await Future.delayed(Duration(seconds: 20));
+//   socket.wsClose();
+// }
