@@ -63,7 +63,7 @@ class ChatWebsocket {
     );
   }
 
-  //chatを開始
+  //messageを送信
   void wsSend(String question, int chatModel, int synthModel, bool isSynth) {
     if (_channel == null) {
       print("wsSend: _channel was null");
