@@ -17,10 +17,9 @@ class ChatWebsocket {
 
   ChatWebsocket._internal();
 
-  //_nowRecieveingのゲッターとセッター
   //送信してから受信が終わったかを確認する処理にゲッターを利用する想定
   getNowRecieving() => _nowRecieving;
-  void setNowRecieving(bool newStatus) {
+  void _setNowRecieving(bool newStatus) {
     if (_channel != null) {
       _nowRecieving = newStatus;
     } else {
@@ -50,10 +49,12 @@ class ChatWebsocket {
     _channel!.stream.listen(
       (response) {
         final jsonResponse = WsMessageResponse.fromJson(json.decode(response));
+        //空データの場合,すぐにreturn
         if (jsonResponse.base64Data.isEmpty &&
             jsonResponse.text.isEmpty &&
             (jsonResponse.speakerId == 0)) {
-          setNowRecieving(false);
+          _setNowRecieving(false);
+          print("wsStart: all messages was recieved");
           return;
         }
         //空データでない場合,引数で受け取ったcallback関数でデータを処理
@@ -71,6 +72,7 @@ class ChatWebsocket {
     }
     if (getNowRecieving()) {
       print("wsSend: receiving other messages");
+      return;
     }
 
     final request = WsMessageRequest(
@@ -79,9 +81,10 @@ class ChatWebsocket {
         synthModel: synthModel,
         isSynth: isSynth);
     final requestJson = json.encode(request.toJson());
+
     //サーバーにデータを送信
     _channel!.sink.add(requestJson);
-    setNowRecieving(true);
+    _setNowRecieving(true);
   }
 
   //Websocketを終了
