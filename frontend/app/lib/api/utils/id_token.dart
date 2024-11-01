@@ -9,7 +9,7 @@ import 'export.dart';
 // google認証が有効になったらそれを使ったidtoken取得処理を追加してこれを消す予定
 Future<String> getIdToken() async {
   const endPoint =
-      "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCnrLRKRBpCDIi4-yhC8QebKVvyPmtvXMk";
+      "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCnrLRKRBpCDIi4-yhC8QebKVvyPmtvXMk";
   final url = Uri.parse(endPoint);
   final body = json.encode({
     "email": "user1@sample.com",

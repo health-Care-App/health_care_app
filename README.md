@@ -28,14 +28,23 @@ Go, Gin
 # 環境構築手順
 1. リポジトリのクローン  
 `git clone git@github.com:health-Care-App/health_care_app.git`
+
+2. /health_care_app/ 直下に .env ファイルを作成し、以下を指定
+```
+#　/health_care_app/.env
+
+OPENAI_TOKEN=YOUR_OPENAI_TOKEN   #ChatGPT APIトークン
+GEM_TOKEN=YOUR_GEM_TOKEN         #gemini APIトークン
+VOICEVOX_TOKEN=YOUR_VOICEVOX_TOKEN #voicevox APIトークン https://www.voicevox.su-shiki.com/
+```
   
-2. health_care_appディレクトリでイメージをビルドする(めっちゃ時間かかる。)  
+4. health_care_appディレクトリでイメージをビルドする(めっちゃ時間かかる。)  
 `docker compose build`
   
-3. コンテナ起動コマンド  
+5. コンテナ起動コマンド  
 `docker compose up -d`
 
-4. http://localhost:4000 にアクセスして正常に動作しているか確認  
+6. http://localhost:4000 にアクセスして正常に動作しているか確認  
 ## Flutterをホットリロードで開発したい場合
 1. flutterコンテナの中に入る  
 `docker compose exec flutter bash`
@@ -45,9 +54,10 @@ Go, Gin
 
 3. http://localhost:8888 にアクセスして正常に動作しているか確認
 
-# APIとwebsocket
-データの送受信は基本的にAPIとwebsocketを利用しています。  
-2つの方式どちらもリクエストのヘッダーパラメータ`Authorization`にfirebaseのユーザ別認証トークン`IdToken`を指定する必要があります。 
+# APIとWebSocket
+## 認証
+firebaseのユーザ認証トークン`idToken`をAPIの場合リクエストのヘッダーパラメータ`Authorization`に、WebSocketの場合QueryStringで`?idtoken='idToken'`と指定する必要があります。 
+### APIの場合
 ```
 "Authorization": "Bearer idToken"
 ```
@@ -55,14 +65,19 @@ Go, Gin
 ```
 "Authorization": "Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoic2hvZ28iLCJwaWN0dXJlIjoiIiwiZW1haWwiOiJzdWlzYW4wNzMxQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiYXV0aF90aW1lIjoxNzI2NTg5NjIxLCJ1c2VyX2lkIjoiSTBWc0k1Q3lvbENsT0Q0Zkxld1BZTldDUmxlcCIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsic3Vpc2FuMDczMUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3MjY1ODk2MjEsImV4cCI6MTcyNjU5MzIyMSwiYXVkIjoiaGVhbHRoLWNhcmUtYXBwLTNlMzMzIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2hlYWx0aC1jYXJlLWFwcC0zZTMzMyIsInN1YiI6IkkwVnNJNUN5b2xDbE9ENGZMZXdQWU5XQ1JsZXAifQ."
 ```
-Flutter(フロントエンド)でIdTokenを取得する方法はこちらの記事を参考にしてください。  
-- [Did anyone manage to get the id token from google sign in (Flutter)](https://stackoverflow.com/questions/52458968/did-anyone-manage-to-get-the-id-token-from-google-sign-in-flutter/66203310#66203310)
+### WebSocketの場合
+```
+ws://localhost:8080/ws?idtoken='idToken'
+```
+例:  
+```
+ws://localhost:8080/ws?idtoken=eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoic2hvZ28iLCJwaWN0dXJlIjoiIiwiZW1haWwiOiJzdWlzYW4wNzMxQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiYXV0aF90aW1lIjoxNzI2NTg5NjIxLCJ1c2VyX2lkIjoiSTBWc0k1Q3lvbENsT0Q0Zkxld1BZTldDUmxlcCIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsic3Vpc2FuMDczMUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3MjY1ODk2MjEsImV4cCI6MTcyNjU5MzIyMSwiYXVkIjoiaGVhbHRoLWNhcmUtYXBwLTNlMzMzIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2hlYWx0aC1jYXJlLWFwcC0zZTMzMyIsInN1YiI6IkkwVnNJNUN5b2xDbE9ENGZMZXdQWU5XQ1JsZXAifQ."
+```
 
-
-## API
+## APIの詳細
 Swaggerを参照。  
 https://app.swaggerhub.com/apis/SUISAN0731_1/healthCareAppApi/1.0.0
-## websocket
+## WebSocketの詳細
 音声合成のみwebsocketを利用しています。  
 リクエストはJSON形式、レスポンスは一文で区切った音声データをbase64形式で返します。返答が2文以上ある場合その数と同数のデータを返します。  
   
@@ -77,19 +92,57 @@ ws://go-server-xrfznls4va-uc.a.run.app/ws
 ```    
 ### リクエスト
 ```
-# question: 質問文を指定
-# model: ずんだもんの場合0, 春日つむぎの場合1を指定
-
+# json形式
 {
-  "question": "質問"
-  "model": 0
+  "question": "質問",    # 質問文を指定
+  "chatModel": 0,    # ずんだもんの場合0, 春日つむぎの場合1を指定
+  "synthModel": 0,    # chatGPTの場合0, geminiの場合1
+  "isSynth": true    #bool値。音声合成を行う場合trueを指定。falseの場合レスポンスのbase64_dataフィールドが空文字で返される
 }
 ```
 ### レスポンス
 ```
-# base64形式
-
-"UklGRiRWAgBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQBWAgAAAA ... AAA///9//r/+v/6//v/+//5//n/+v/6//v/+//7//r/+f/5//n/+f/5//f/"
+# json形式
+{
+    "base64Data": "UklGRiR+AQBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQB+AQAgAC ... AMAAwADAAMAAgAEAAQAAgACAAEA", # base64
+    "text": "それは心配なのだー。",
+    "speakerId": 1
+}
+```
+一つの質問に対する回答の送信が終わったことときにそれ知らせる空データを送信します
+```
+# json形式
+# 空データ
+{
+    "base64Data": "",
+    "text": "",
+    "speakerId": 0
+}
+```
+### その他
+一文ずつ送信するwebsocketに対し、全文を一気に音声合成して一つのレスポンスとして返すAPIも実装済み  
+エンドポイント: `/message`  
+メソッド: `POST`  
+### リクエスト
+```
+# json形式
+# websocketの時と同様
+{
+  "question": "質問",    # 質問文を指定
+  "chatModel": 0,    # ずんだもんの場合0, 春日つむぎの場合1を指定
+  "synthModel": 0,    # chatGPTの場合0, geminiの場合1
+  "isSynth": true    #bool値。音声合成を行う場合trueを指定。falseの場合レスポンスのbase64_dataフィールドが空文字で返される
+}
+```
+### レスポンス
+```
+# json形式
+# websocketの時と形式は同様だが、全文のテキスト及びそれを音声合成したbase64データを返し空データは返さない
+{
+    "base64Data": "UklGRiR+AQBXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQB+AQAgAC ... AMAAwADAAMAAgAEAAQAAgACAAEA", # base64
+    "text": "それは心配なのだー。",
+    "speakerId": 1
+}
 ```
 # 日付時間の形式
 バックエンド・フロントエンドどちらも`RFC3339`形式で統一
