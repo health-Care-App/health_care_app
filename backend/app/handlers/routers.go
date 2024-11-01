@@ -39,8 +39,19 @@ func Init() {
 	r.ForwardedByClientIP = true
 	r.SetTrustedProxies(trustedProxiesAdress)
 
+	authorized := r.Group(rootPath)
+	authorized.Use(middleware.Authorized())
+	{
+		authorized.GET(healthPath, gethealthHandler)
+		authorized.POST(healthPath, postHealthHandler)
+		authorized.GET(sleepTimePath, getSleepTimeHandler)
+		authorized.POST(sleepTimePath, postSleepTimeHandler)
+		authorized.GET(messagePath, getMessageHandler)
+		authorized.POST(messagePath, postMessageHandler)
+	}
+
 	// CORS対策
-	r.Use(cors.New(cors.Config{
+	authorized.Use(cors.New(cors.Config{
 		AllowOrigins: allowedOrigins,
 		AllowMethods: allowedMethods,
 		AllowHeaders: allowedHeaders,
@@ -52,16 +63,11 @@ func Init() {
 		MaxAge: cookieExpire,
 	}))
 
-	authorized := r.Group(rootPath)
-	authorized.Use(middleware.Authorized())
+	//wsの認証は別に仕組みを持つ
+	wsAuthorized := r.Group(rootPath)
+	wsAuthorized.Use(middleware.WsAuthorized())
 	{
-		authorized.GET(healthPath, gethealthHandler)
-		authorized.POST(healthPath, postHealthHandler)
-		authorized.GET(sleepTimePath, getSleepTimeHandler)
-		authorized.POST(sleepTimePath, postSleepTimeHandler)
-		authorized.GET(messagePath, getMessageHandler)
-		authorized.GET(wsPath, ws.Wshandler)
-		authorized.POST(messagePath, postMessageHandler)
+		wsAuthorized.GET(wsPath, ws.Wshandler)
 	}
 	r.Run(port)
 }

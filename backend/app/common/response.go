@@ -5,7 +5,7 @@ import "time"
 type (
 	Healths struct {
 		Id     string    `json:"id" validate:"required"`
-		Date   time.Time `json:"Date" validate:"required"`
+		Date   time.Time `json:"dateTime" validate:"required"`
 		Health int       `json:"health" validate:"min=1,max=10"`
 	}
 
@@ -19,17 +19,17 @@ type (
 
 	SleepTimes struct {
 		Id        string    `json:"id" validate:"required"`
-		Date      time.Time `json:"Date" validate:"required"`
-		SleepTime int       `json:"sleep_time" validate:"min=0,max=24"`
+		Date      time.Time `json:"dateTime" validate:"required"`
+		SleepTime int       `json:"sleepTime" validate:"min=0,max=24"`
 	}
 
 	SleepTimeGetResponse struct {
-		SleepTimes []SleepTimes `json:"sleep_times" validate:"required"`
+		SleepTimes []SleepTimes `json:"sleepTimes" validate:"required"`
 	}
 
 	Messages struct {
 		Id       string    `json:"id" validate:"required"`
-		Date     time.Time `json:"Date" validate:"required"`
+		Date     time.Time `json:"dateTime" validate:"required"`
 		Question string    `json:"question" validate:"required"`
 		Answer   string    `json:"answer" validate:"required"`
 	}
@@ -39,9 +39,9 @@ type (
 	}
 
 	WsResponse struct {
-		Base64Data string `json:"base64_data" validate:"omitempty"`
+		Base64Data string `json:"base64Data" validate:"omitempty"`
 		Text       string `json:"text" validate:"omitempty"`
-		SpeakerId  uint   `json:"speaker_id" validate:"omitempty"`
+		SpeakerId  uint   `json:"speakerId" validate:"omitempty"`
 	}
 
 	ErrResponse struct {

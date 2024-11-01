@@ -32,3 +32,25 @@ func Authorized() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func WsAuthorized() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		client, err := firebaseinit.AuthInitializer()
+		if err != nil {
+			common.ErrorResponse(c, err, common.InternalErrCode)
+			c.Abort()
+			return
+		}
+
+		idToken := c.Query("idToken")
+		token, err := client.VerifyIDToken(context.Background(), idToken)
+		if err != nil {
+			common.ErrorResponse(c, err, common.ExternalErrCode)
+			c.Abort()
+			return
+		}
+
+		c.Set("userId", token.UID)
+		c.Next()
+	}
+}

@@ -7,6 +7,7 @@ import (
 	"app/validate"
 	"fmt"
 	"log"
+	"net/http"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -14,11 +15,13 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+	ReadBufferSize:  4096,
+	WriteBufferSize: 4096,
 }
 
 func Wshandler(c *gin.Context) {
+	//"websocket: request origin not allowed by Upgrader.CheckOrigin" 回避のため
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
