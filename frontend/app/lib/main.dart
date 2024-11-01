@@ -1,3 +1,4 @@
+import 'package:app/survey.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -86,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                       });
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
+                        MaterialPageRoute(builder: (context) => SurveyPage()),
                       );
                     } on FirebaseAuthException catch (e) {
                       setState(() {
@@ -102,7 +103,8 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const RegisterPage()),
                   );
                 },
                 child: const Text('新規登録はこちら'),
