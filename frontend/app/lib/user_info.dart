@@ -1,17 +1,17 @@
+import 'package:app/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'main.dart'; // main.dartをインポートしてLoginPageを参照
 
-class UserInfoPage extends StatelessWidget {
+class UserInfoScreen extends StatelessWidget {
   final String email;
 
-  UserInfoPage({required this.email});
+  UserInfoScreen({required this.email});
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginSample()), // LoginSampleに遷移
+      MaterialPageRoute(builder: (context) => LoginScreen()), // LoginSampleに遷移
       (route) => false,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:app/google_auth/auth.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 
@@ -30,15 +31,9 @@ class ChatWebsocket {
   //WebSocket通信を開始
   Future<void> wsStart(void Function(String, String, int) callback) async {
     //idtoken取得
-    String idToken;
-    try {
-      idToken = await getIdToken();
-    } on Exception catch (e) {
-      print("$idTokenException: $e");
-      rethrow;
-    }
+    final idToken = await Authentication.getIdToken();
 
-    final wsUrl = Uri.parse("$wsPath?idToken=$idToken");
+    final wsUrl = Uri.parse("$prodWsPath?idToken=$idToken");
     _channel = WebSocketChannel.connect(wsUrl);
     if (_channel != null) {
       await _channel!.ready;
@@ -67,8 +62,7 @@ class ChatWebsocket {
   //messageを送信
   void wsSend(String question, int chatModel, int synthModel, bool isSynth) {
     if (_channel == null) {
-      print("wsSend: _channel was null");
-      return;
+      throw Exception("wsSend: _channel was null");
     }
     if (getNowRecieving()) {
       print("wsSend: receiving other messages");
@@ -90,8 +84,7 @@ class ChatWebsocket {
   //Websocketを終了
   void wsClose() {
     if (_channel == null) {
-      print("wsDone: _channel was null");
-      return;
+      throw Exception("wsDone: _channel was null");
     }
     if (getNowRecieving()) {
       print("wsDone: receiving messages");
