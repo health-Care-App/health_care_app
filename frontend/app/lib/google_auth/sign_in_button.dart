@@ -50,7 +50,7 @@ class GoogleSignInButton extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const <Widget>[
                     Image(
-                      image: AssetImage("images/google_logo.png"),
+                      image: AssetImage("assets/images/google_logo.png"),
                       height: 35.0,
                     ),
                     Padding(
