@@ -1,7 +1,6 @@
-import 'package:app/chat_screen.dart';
+import 'package:app/chat/chat_screen.dart';
 import 'package:app/google_auth/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final isSignInProvider = StateProvider<bool>((ref) => false);
@@ -31,7 +30,7 @@ class GoogleSignInButton extends ConsumerWidget {
               onPressed: () async {
                 isSignIn.state = true;
 
-                User? user =
+                final user =
                     await Authentication.signInWithGoogle(context: context);
 
                 isSignIn.state = false;
@@ -51,7 +50,7 @@ class GoogleSignInButton extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const <Widget>[
                     Image(
-                      image: AssetImage("images/google_logo.png"),
+                      image: AssetImage("assets/images/google_logo.png"),
                       height: 35.0,
                     ),
                     Padding(

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'chat/chat_screen.dart';
 
-class SurveyPage extends StatefulWidget {
+class SurveyScreen extends StatefulWidget {
+  const SurveyScreen({super.key});
   @override
-  _SurveyPageState createState() => _SurveyPageState();
+  State<SurveyScreen> createState() => _SurveyScreenState();
 }
 
-class _SurveyPageState extends State<SurveyPage> {
+class _SurveyScreenState extends State<SurveyScreen> {
   String selectedSleepTime = '7'; // 初期値を設定
   String selectedCondition = '5'; // 初期値を設定
 
@@ -71,7 +72,7 @@ class _SurveyPageState extends State<SurveyPage> {
                 // 完了後、ホーム画面に遷移
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
+                  MaterialPageRoute(builder: (context) => ChatScreen()),
                 );
               },
             ),

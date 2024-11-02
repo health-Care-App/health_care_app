@@ -12,6 +12,9 @@ class ChatWebsocket {
   //データを送信し、空データが返ってくるまでtrue、それ以外の時はfalseのフィールド
   static bool _nowRecieving = false;
 
+  //websocket通信が開始されているかどうか
+  static bool isWsStart = false;
+
   factory ChatWebsocket() {
     return _instance;
   }
@@ -29,7 +32,9 @@ class ChatWebsocket {
   }
 
   //WebSocket通信を開始
-  Future<void> wsStart(void Function(String, String, int) callback) async {
+  Future<void> wsStart(
+      void Function(String, String, int) messageAcceptedCallback,
+      {void Function()? messageAcceptFinishCallback}) async {
     //idtoken取得
     final idToken = await Authentication.getIdToken();
 
@@ -41,25 +46,31 @@ class ChatWebsocket {
       throw Exception("wsStart: failed to connect WebScoket");
     }
 
+    isWsStart = true;
     _channel!.stream.listen(
       (response) {
         final jsonResponse = WsMessageResponse.fromJson(json.decode(response));
-        //空データの場合,すぐにreturn
+        //空データの場合
         if (jsonResponse.base64Data.isEmpty &&
             jsonResponse.text.isEmpty &&
             (jsonResponse.speakerId == 0)) {
           _setNowRecieving(false);
+
+          messageAcceptFinishCallback;
+
+          //debug log
           print("wsStart: all messages was recieved");
           return;
         }
-        //空データでない場合,引数で受け取ったcallback関数でデータを処理
-        callback(
+        print("text:${jsonResponse.text}");
+        //空データでない場合
+        messageAcceptedCallback(
             jsonResponse.base64Data, jsonResponse.text, jsonResponse.speakerId);
       },
     );
   }
 
-  //messageを送信
+  // messageを送信 メッセージ送信成功時にtrueを返し, 失敗時にfalseを返す
   void wsSend(String question, int chatModel, int synthModel, bool isSynth) {
     if (_channel == null) {
       throw Exception("wsSend: _channel was null");
@@ -93,6 +104,7 @@ class ChatWebsocket {
 
     _channel!.sink.close();
     print("wsDone: websocket closed");
+    isWsStart = false;
   }
 }
 

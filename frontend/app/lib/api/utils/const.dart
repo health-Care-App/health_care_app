@@ -7,7 +7,7 @@ const messagePath = "/message";
 
 //ws url
 const devWsPath = "ws://localhost:8080/ws";
-const prodWsPath = "ws://go-server-852613489557.us-central1.run.app/ws";
+const prodWsPath = "wss://go-server-852613489557.us-central1.run.app/ws";
 
 //exception message
 const healthScaleException = "health must be between 1 and 10";
