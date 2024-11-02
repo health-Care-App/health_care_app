@@ -1,4 +1,3 @@
-import 'package:app/api/message/ws/ws.dart';
 import 'package:app/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return  MaterialApp(
       title: 'Flutter AppRun Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
