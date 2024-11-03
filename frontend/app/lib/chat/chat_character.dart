@@ -1,8 +1,9 @@
-import 'package:app/provider/speak_provider.dart';
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:app/provider/speak_provider.dart';
 
 class ChatCharacter extends StatefulWidget {
   const ChatCharacter({super.key});
@@ -40,19 +41,16 @@ class _ChatCharacterState extends State<ChatCharacter> {
     return SizedBox(
       width: 700,
       child: Align(
-        alignment: Alignment.bottomCenter,
-        child: OverflowBox(
-          maxWidth: 1000,
-          maxHeight: 1000,
-          child: ClipRect(
-            child: Consumer<SpeakProvider>(
-              builder: (context, speakProvider, _) => Image.asset(
-                  _setImageUri(speakProvider.getSpeakerId),
-                  fit: BoxFit.contain),
-            ),
-          ),
-        ),
-      ),
+          alignment: Alignment.bottomCenter,
+          child: OverflowBox(
+              maxWidth: 1000,
+              maxHeight: 1000,
+              child: ClipRect(
+                  child: Consumer<SpeakProvider>(
+                builder: (context, speakProvider, _) => Image.asset(
+                    _setImageUri(speakProvider.getSpeakerId),
+                    fit: BoxFit.contain),
+              )))),
     );
   }
 }

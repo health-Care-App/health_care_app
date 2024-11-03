@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:app/chat/audio_queue.dart';
 import 'package:app/provider/message_provider.dart';
+import 'package:app/provider/speak_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -19,6 +20,7 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
   final SpeechToText _speechToText = SpeechToText();
   final AudioQueue _audioQueue = AudioQueue();
   MessageProvider? messageProvider;
+  SpeakProvider? speakProvider;
   bool _isListening = false;
   bool _speechEnabled = false;
   final speechListenOptions = SpeechListenOptions(partialResults: false);
@@ -78,6 +80,11 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
       }
     }
 
+    if (speakProvider != null) {
+      //speakerIdを更新
+      speakProvider?.setSpeakerId = newSpeakerId;
+    }
+
     //set character message
     messageProvider!.messages.add({"text": text, "isUser": false});
 
@@ -99,7 +106,8 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
   @override
   Widget build(BuildContext context) {
     messageProvider = context.watch<MessageProvider>();
-    print(_isListening);
+    speakProvider = context.watch<SpeakProvider>();
+
     return BottomAppBar(
         color: Colors.blueAccent,
         child: _isListening
