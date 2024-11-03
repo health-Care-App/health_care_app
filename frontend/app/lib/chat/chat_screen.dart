@@ -14,10 +14,6 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  // final socket = ChatWebsocket();
-  // final audioQueue = AudioQueue();
-  int speakerId = 1;
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

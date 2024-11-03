@@ -11,8 +11,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String infoText = '';
-  String email = '';
-  String password = '';
 
   @override
   Widget build(BuildContext context) {
