@@ -11,13 +11,16 @@ class MessageProvider with ChangeNotifier {
   MessageProvider()
       : _sendMessage = "",
         messages = [],
-        isTextSet = false;
+        isTextSet = false,
+        isWaitFirstMessage = false;
 
   //送信メッセージ
   String _sendMessage;
 
   //送信iconかマイクiconかを判断するのに利用
   bool isTextSet;
+
+  bool isWaitFirstMessage;
 
   //対話メッセージデータ
   List<Map<String, dynamic>> messages;
@@ -28,31 +31,39 @@ class MessageProvider with ChangeNotifier {
   //messageに変化があった際に呼び出される関数
   void textChangeHandler(String newSendMessage) {
     _sendMessage = newSendMessage;
-    isTextSet = _sendMessage.isNotEmpty;
 
-    notifyListeners();
+    if (isTextSet != _sendMessage.isNotEmpty) {
+      isTextSet = _sendMessage.isNotEmpty;
+      notifyListeners();
+    }
   }
 
   //message送信を処理する関数
   void sendMessageHandler(
       void Function(String, String, int) messageAcceptedCallback,
       {void Function()? messageAcceptFinishCallback}) async {
-    if (ChatWebsocket.isWsStart == false) {
-      await _socket.wsStart((String base64Data, String text, int newSpeakerId) {
-        messageAcceptedCallback(base64Data, text, newSpeakerId);
-        notifyListeners();
-      }, messageAcceptFinishCallback: messageAcceptFinishCallback);
-    }
-
-    ChatWebsocket.isWsStart = true;
-
+    //入力された文字がない場合はreturn
     if (_sendMessage.isEmpty) {
       return;
     }
 
+    //websocket通信が始まってない場合
+    if (ChatWebsocket.isWsStart == false) {
+      await _socket.wsStart((String base64Data, String text, int newSpeakerId) {
+        messageAcceptedCallback(base64Data, text, newSpeakerId);
+        notifyListeners();
+      }, messageAcceptFinishCallback: () {
+        messageAcceptFinishCallback;
+        notifyListeners();
+      });
+    }
+
+    ChatWebsocket.isWsStart = true;
+
     if (!_socket.getNowRecieving()) {
       _socket.wsSend(_sendMessage, 0, 0, true);
       messages.add({"text": _sendMessage, "isUser": true});
+      isWaitFirstMessage = true;
     }
 
     //textFieldをクリア
