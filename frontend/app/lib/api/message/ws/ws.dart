@@ -22,13 +22,17 @@ class ChatWebsocket {
   ChatWebsocket._internal();
 
   //送信してから受信が終わったかを確認する処理にゲッターを利用する想定
-  getNowRecieving() => _nowRecieving;
+  bool getNowRecieving() {
+    print("call getNowRecieving: $_nowRecieving");
+    return _nowRecieving;
+  }
+
   void _setNowRecieving(bool newStatus) {
-    if (_channel != null) {
-      _nowRecieving = newStatus;
-    } else {
+    print("call setNoewReciving: $newStatus");
+    if (_channel == null) {
       _nowRecieving = false;
     }
+    _nowRecieving = newStatus;
   }
 
   //WebSocket通信を開始
@@ -107,25 +111,3 @@ class ChatWebsocket {
     isWsStart = false;
   }
 }
-
-//サンプルコールバック関数
-//ここでWebSocket内で受け取ったデータで必要に応じてステートの変更などを処理する
-void callback(String base64Data, String text, int speakerId) {
-  print(base64Data);
-  print(text);
-  print(speakerId);
-}
-
-// 利用例
-
-// void main() async {
-//   ChatWebsocket socket = ChatWebsocket();
-//   await socket.wsStart(callback);
-
-//   //データを送信
-//   socket.wsSend("眠いです", 0, 0, true);
-
-//   //通信が終了するのを待ってからclose
-//   await Future.delayed(Duration(seconds: 20));
-//   socket.wsClose();
-// }

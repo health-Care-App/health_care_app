@@ -1,15 +1,18 @@
+import 'package:app/provider/speak_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:provider/provider.dart';
+
 class ChatCharacter extends StatefulWidget {
-  final int speakerId;
-  const ChatCharacter({super.key, required this.speakerId});
+  const ChatCharacter({super.key});
 
   @override
   State<ChatCharacter> createState() => _ChatCharacterState();
 }
 
 class _ChatCharacterState extends State<ChatCharacter> {
+  SpeakProvider? speakProvider;
   static final imagesRoot = "assets/images/";
   static final defaultUri = "$imagesRoot/default_upper.gif";
   static final sadHandUri = "$imagesRoot/sad_upper_hand.gif";
@@ -36,7 +39,20 @@ class _ChatCharacterState extends State<ChatCharacter> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 700,
-      child: Image.asset(_setImageUri(widget.speakerId), fit: BoxFit.contain),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: OverflowBox(
+          maxWidth: 1000,
+          maxHeight: 1000,
+          child: ClipRect(
+            child: Consumer<SpeakProvider>(
+              builder: (context, speakProvider, _) => Image.asset(
+                  _setImageUri(speakProvider.getSpeakerId),
+                  fit: BoxFit.contain),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

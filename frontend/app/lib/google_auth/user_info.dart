@@ -5,8 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
 
 class UserInfoScreen extends StatefulWidget {
-  const UserInfoScreen({super.key, required User user})
-      : _user = user;
+  const UserInfoScreen({super.key, required User user}) : _user = user;
 
   final User _user;
 
