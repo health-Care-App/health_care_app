@@ -23,12 +23,10 @@ class ChatWebsocket {
 
   //送信してから受信が終わったかを確認する処理にゲッターを利用する想定
   bool getNowRecieving() {
-    print("call getNowRecieving: $_nowRecieving");
     return _nowRecieving;
   }
 
   void _setNowRecieving(bool newStatus) {
-    print("call setNoewReciving: $newStatus");
     if (_channel == null) {
       _nowRecieving = false;
     }

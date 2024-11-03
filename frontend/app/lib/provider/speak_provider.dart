@@ -7,5 +7,6 @@ class SpeakProvider with ChangeNotifier {
   int get getSpeakerId => _speakerId;
   set setSpeakerId(int newSpeakerId) {
     _speakerId = newSpeakerId;
+    notifyListeners();
   }
 }

@@ -20,6 +20,7 @@ class MessageProvider with ChangeNotifier {
   //送信iconかマイクiconかを判断するのに利用
   bool isTextSet;
 
+  //メッセージを送信してから初めてメッセージを受け取るまでtrue
   bool isWaitFirstMessage;
 
   //対話メッセージデータ
