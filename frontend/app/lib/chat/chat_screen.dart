@@ -7,6 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../user_info.dart';
 
+const double userIconSize = 35;
+const double usrIconMarginSize = 10;
+
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
   @override
@@ -14,6 +17,8 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final User? user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -28,21 +33,23 @@ class _ChatScreenState extends State<ChatScreen> {
           appBar: AppBar(
             title: Text("チャット画面"),
             actions: [
-              IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {
-                  final User? user = FirebaseAuth.instance.currentUser;
-                  final String email = user?.email ?? "メールアドレスがありません";
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            // ログイン中のメールアドレスを渡す
-                            UserInfoScreen(email: email)),
-                  );
-                },
-              ),
+              //ユーザーアイコン
+              Container(
+                  height: userIconSize,
+                  width: userIconSize,
+                  margin: EdgeInsets.all(usrIconMarginSize),
+                  child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserInfoScreen()),
+                        );
+                      },
+                      //ユーザーアイコン取得失敗時にperson icon表示
+                      child: user != null
+                          ? ClipOval(child: Image.network(user!.photoURL!))
+                          : ClipOval(child: Icon(Icons.person))))
             ],
           ),
           body: ChatScreenBody(),

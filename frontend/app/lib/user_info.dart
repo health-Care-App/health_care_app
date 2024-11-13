@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserInfoScreen extends StatelessWidget {
-  final String email;
+  final User? user = FirebaseAuth.instance.currentUser;
 
-  UserInfoScreen({required this.email});
+  UserInfoScreen({super.key});
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -18,6 +18,8 @@ class UserInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? email = user?.email ?? "メールアドレスがありません";
+
     return Scaffold(
       appBar: AppBar(
         title: Text("ユーザー情報"),

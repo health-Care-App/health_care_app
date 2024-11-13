@@ -1,3 +1,4 @@
+import 'package:app/google_auth/auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -14,7 +15,7 @@ Future<PostSleepTimeResponse> postSleepTime(int sleepTime) async {
   //idtoken取得してheaderにidToken追加
   String idToken;
   try {
-    idToken = await getIdToken();
+    idToken = await Authentication.getIdToken();
   } on Exception catch (e) {
     print("$idTokenException: $e");
     rethrow;
