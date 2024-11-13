@@ -19,19 +19,24 @@ class _ChatCharacterState extends State<ChatCharacter> {
   static final sadHandUri = "$imagesRoot/sad_upper_hand.gif";
   static final sadUri = "$imagesRoot/sad_upper.gif";
   static final sasayakiUri = "$imagesRoot/sasayaki_upper.gif";
-  String imageUri = defaultUri; //初期値
 
-  String _setImageUri(int speakerId) {
+  //画像をあらかじめ読み込み
+  final defaultImage = Image.asset(defaultUri, fit: BoxFit.contain);
+  final sadHandImage = Image.asset(sadUri, fit: BoxFit.contain);
+  final sadImage = Image.asset(sadHandUri, fit: BoxFit.contain);
+  final sasayakiImage = Image.asset(sasayakiUri, fit: BoxFit.contain);
+
+  Image _setImage(int speakerId) {
     switch (speakerId) {
       case 1 || 3 || 5:
-        return defaultUri;
+        return defaultImage;
       case 76:
         final random = math.Random();
         //trueかfalseかをランダムに発生させる
-        if (random.nextBool()) return sadUri;
-        return sadHandUri;
+        if (random.nextBool()) return sadImage;
+        return sadHandImage;
       case 22 || 38:
-        return sasayakiUri;
+        return sasayakiImage;
     }
     throw Exception("accepted speakerId '$speakerId' from server is invalid");
   }
@@ -41,16 +46,18 @@ class _ChatCharacterState extends State<ChatCharacter> {
     return SizedBox(
       width: 700,
       child: Align(
-          alignment: Alignment.bottomCenter,
-          child: OverflowBox(
-              maxWidth: 1000,
-              maxHeight: 1000,
-              child: ClipRect(
-                  child: Consumer<SpeakProvider>(
-                builder: (context, speakProvider, _) => Image.asset(
-                    _setImageUri(speakProvider.getSpeakerId),
-                    fit: BoxFit.contain),
-              )))),
+        alignment: Alignment.bottomCenter,
+        child: OverflowBox(
+          maxWidth: 1000,
+          maxHeight: 1000,
+          child: ClipRect(
+            child: Consumer<SpeakProvider>(
+              builder: (context, speakProvider, _) =>
+                  _setImage(speakProvider.getSpeakerId),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
