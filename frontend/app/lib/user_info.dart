@@ -1,4 +1,5 @@
 import 'package:app/login.dart';
+import 'package:app/survey.dart'; // survey.dart をインポート
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -51,6 +52,20 @@ class UserInfoScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => _logout(context),
                 child: Text("ログアウト"),
+              ),
+            ),
+            SizedBox(height: 20), // ログアウトボタンとの間にスペースを追加
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            SurveyScreen()), // SurveyScreenに遷移
+                  );
+                },
+                child: Text("アンケートへ進む"),
               ),
             ),
           ],

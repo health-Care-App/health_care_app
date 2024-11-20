@@ -23,7 +23,7 @@ Future<PostHealthResponse> postHealth(int health) async {
   headers["Authorization"] = "Bearer $idToken";
 
   //url
-  const endPoint = "$devApiUrl$healthPath";
+  const endPoint = "$prodApiUrl$healthPath";
   final url = Uri.parse(endPoint);
 
   //body
