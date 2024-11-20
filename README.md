@@ -50,9 +50,11 @@ VOICEVOX_TOKEN=YOUR_VOICEVOX_TOKEN #voicevox APIトークン https://www.voicevo
 `docker compose exec flutter bash`
 
 2. flutterを起動  
-`flutter clean && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8888`
+```
+flutter clean && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8888
+```
 
-3. http://localhost:8888 にアクセスして正常に動作しているか確認
+4. http://localhost:8888 にアクセスして正常に動作しているか確認
 
 # APIとWebSocket
 ## 認証
