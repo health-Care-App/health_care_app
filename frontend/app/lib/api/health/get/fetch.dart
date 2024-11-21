@@ -25,7 +25,8 @@ Future<GetHealthResponse> getHealth({DateTime? oldDateTime}) async {
   headers["Authorization"] = "Bearer $idToken";
 
   //url
-  final endPoint = "$devApiUrl$healthPath?oldDateAt=$utcDateTime";
+  final rootApiUrl = getRootApiUrl();
+  final endPoint = "$rootApiUrl$healthPath?oldDateAt=$utcDateTime";
   final url = Uri.parse(endPoint);
 
   //call api

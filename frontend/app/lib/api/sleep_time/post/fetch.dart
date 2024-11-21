@@ -23,7 +23,8 @@ Future<PostSleepTimeResponse> postSleepTime(int sleepTime) async {
   headers["Authorization"] = "Bearer $idToken";
 
   //url
-  const endPoint = "$devApiUrl$sleepTimePath";
+  final rootApiUrl = getRootApiUrl();
+  final endPoint = "$rootApiUrl$sleepTimePath";
   final url = Uri.parse(endPoint);
 
   //body
