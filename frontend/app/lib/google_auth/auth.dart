@@ -39,7 +39,7 @@ class Authentication {
           await googleSignInAccount.authentication;
 
       // Firebase用の資格情報を作成
-      final AuthCredential credential;
+      AuthCredential credential;
       if (kDebugMode) {
         credential = GoogleAuthProvider.credential(
           idToken: googleSignInAuthentication.idToken,
