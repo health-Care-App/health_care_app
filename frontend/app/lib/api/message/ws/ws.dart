@@ -1,4 +1,5 @@
 import 'package:app/google_auth/auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 
@@ -40,7 +41,15 @@ class ChatWebsocket {
     //idtoken取得
     final idToken = await Authentication.getIdToken();
 
-    final wsUrl = Uri.parse("$prodWsPath?idToken=$idToken");
+    //環境によってwebsocketにアクセスするurlを変える
+    String rootWsUrl;
+    if (kDebugMode) {
+      rootWsUrl = devWsPath;
+    } else {
+      rootWsUrl = prodWsPath;
+    }
+
+    final wsUrl = Uri.parse("$rootWsUrl?idToken=$idToken");
     _channel = WebSocketChannel.connect(wsUrl);
     if (_channel != null) {
       await _channel!.ready;

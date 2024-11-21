@@ -30,7 +30,8 @@ class Authentication {
     final GoogleSignIn googleSignIn = GoogleSignIn();
 
     //認証 & 認可
-    GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+    GoogleSignInAccount? googleSignInAccount =
+        await googleSignIn.signInSilently();
 
     if (googleSignInAccount != null) {
       // Googleの認証情報を取得
@@ -38,10 +39,17 @@ class Authentication {
           await googleSignInAccount.authentication;
 
       // Firebase用の資格情報を作成
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
+      AuthCredential credential;
+      if (kDebugMode) {
+        credential = GoogleAuthProvider.credential(
+          idToken: googleSignInAuthentication.idToken,
+        );
+      } else {
+        credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+      }
 
       // Firebaseに認証情報を登録
       try {

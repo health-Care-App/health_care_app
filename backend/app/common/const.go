@@ -8,8 +8,6 @@ const (
 	LineTextPattern = `<m(\d+)>(.+)<\/m(\d+)>`
 	MaxTokensLength = 500
 	AddStep         = 1
-	InternalErrCode = 500
-	ExternalErrCode = 401
 )
 
 // firestore

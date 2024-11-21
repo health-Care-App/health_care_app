@@ -25,7 +25,8 @@ Future<GetMessageResponse> getMessage({DateTime? oldDateTime}) async {
   headers["Authorization"] = "Bearer $idToken";
 
   //url
-  final endPoint = "$devApiUrl$messagePath?oldDateAt=$utcDateTime";
+  final rootApiUrl = getRootApiUrl();
+  final endPoint = "$rootApiUrl$messagePath?oldDateAt=$utcDateTime";
   final url = Uri.parse(endPoint);
 
   //call api

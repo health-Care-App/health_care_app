@@ -4,6 +4,7 @@ import (
 	"app/common"
 	"app/firebaseinit"
 	"context"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,7 @@ func Authorized() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		client, err := firebaseinit.AuthInitializer()
 		if err != nil {
-			common.ErrorResponse(c, err, common.InternalErrCode)
+			common.ErrorResponse(c, err, http.StatusInternalServerError)
 			c.Abort()
 			return
 		}
@@ -23,7 +24,7 @@ func Authorized() gin.HandlerFunc {
 
 		token, err := client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			common.ErrorResponse(c, err, common.ExternalErrCode)
+			common.ErrorResponse(c, err, http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
@@ -37,7 +38,7 @@ func WsAuthorized() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		client, err := firebaseinit.AuthInitializer()
 		if err != nil {
-			common.ErrorResponse(c, err, common.InternalErrCode)
+			common.ErrorResponse(c, err, http.StatusInternalServerError)
 			c.Abort()
 			return
 		}
@@ -45,7 +46,7 @@ func WsAuthorized() gin.HandlerFunc {
 		idToken := c.Query("idToken")
 		token, err := client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			common.ErrorResponse(c, err, common.ExternalErrCode)
+			common.ErrorResponse(c, err, http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
