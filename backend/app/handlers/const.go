@@ -17,5 +17,4 @@ const (
 	cookieExpire   = 24 * time.Hour
 
 	port = ":8080"
-	successCode = 200
 )

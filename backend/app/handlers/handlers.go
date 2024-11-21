@@ -6,6 +6,9 @@ import (
 	"app/synth"
 	"app/validate"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +25,7 @@ func postHealthHandler(c *gin.Context) {
 
 	body := common.HealthPostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -34,17 +37,17 @@ func postHealthHandler(c *gin.Context) {
 
 	//データが正しいか検証
 	if err := validate.Validation(queryData); err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	response, err := common.PostHelthData(userId, queryData)
 	if err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(successCode, response)
+	c.JSON(http.StatusOK, response)
 }
 
 // 睡眠時間を取得する関数
@@ -58,7 +61,7 @@ func postSleepTimeHandler(c *gin.Context) {
 
 	body := common.SleepTimePostRequestBody{}
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -70,16 +73,16 @@ func postSleepTimeHandler(c *gin.Context) {
 
 	//データが正しいか検証
 	if err := validate.Validation(queryData); err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	response, err := common.PostSleepTimeData(userId, queryData)
 	if err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
-	c.JSON(successCode, response)
+	c.JSON(http.StatusOK, response)
 }
 
 // メッセージを取得する関数
@@ -96,17 +99,17 @@ func getHandler[T common.HealthGetResponse | common.SleepTimeGetResponse | commo
 	oldDateAt := c.DefaultQuery(oldDateAtParam, defaultDate)
 	ParsedOldDateAt, err := time.Parse(common.Layout, oldDateAt)
 	if err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	response, err := getData(userId, ParsedOldDateAt)
 	if err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(successCode, response)
+	c.JSON(http.StatusOK, response)
 }
 
 func postMessageHandler(c *gin.Context) {
@@ -114,7 +117,7 @@ func postMessageHandler(c *gin.Context) {
 	body := common.Message{}
 
 	if err := c.ShouldBind(&body); err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -130,13 +133,13 @@ func postMessageHandler(c *gin.Context) {
 		ttsText, err = chat.GeminiChatApi(body, userId)
 	}
 	if err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	base64Data, err := synth.TextToBase64(body.IsSynth, ttsText)
 	if err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -148,9 +151,27 @@ func postMessageHandler(c *gin.Context) {
 
 	//データが正しいか検証
 	if err := validate.Validation(response); err != nil {
-		common.ErrorResponse(c, err, common.InternalErrCode)
+		common.ErrorResponse(c, err, http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(successCode, response)
+	c.JSON(http.StatusOK, response)
+}
+
+func optionsHander(c *gin.Context) {
+	//許可されているオリジンかどうか検査
+	origin := c.GetHeader("Origin")
+	for _, allowedHeader := range allowedHeaders {
+		if allowedHeader == origin {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Access-Control-Allow-Methods", strings.Join(allowedMethods, ", "))
+			c.Header("Access-Control-Allow-Headers", strings.Join(allowedHeaders, ", "))
+			c.Header("Access-Control-Allow-Credentials", strconv.FormatBool(isAllowdCookie))
+			c.Header("Access-Control-Max-Age", strconv.Itoa(int(cookieExpire)))
+			c.JSON(http.StatusNoContent, nil) //204を返す
+		}
+	}
+
+	//許可されていないオリジンの場合ステータスコード400を返す
+	c.JSON(http.StatusBadRequest, nil)
 }
