@@ -22,42 +22,43 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-            create: (BuildContext context) => MessageProvider()),
-        ChangeNotifierProvider(
-            create: (BuildContext context) => SpeakProvider()),
-      ],
-      builder: (context, child) => MaterialApp(
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text("チャット画面"),
-            actions: [
-              //ユーザーアイコン
-              Container(
-                  height: userIconSize,
-                  width: userIconSize,
-                  margin: EdgeInsets.all(usrIconMarginSize),
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => UserInfoScreen()),
-                        );
-                      },
-                      //ユーザーアイコン取得失敗時にperson icon表示
-                      child: user != null
-                          ? ClipOval(child: Image.network(user!.photoURL!))
-                          : ClipOval(child: Icon(Icons.person))))
-            ],
-          ),
-          body: ChatScreenBody(),
+        providers: [
+          ChangeNotifierProvider(
+              create: (BuildContext context) => MessageProvider()),
+          ChangeNotifierProvider(
+              create: (BuildContext context) => SpeakProvider()),
+        ],
+        builder: (context, child) => MaterialApp(
+              home: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.white.withAlpha(0),
+                  title: Text("チャット画面"),
+                  actions: [
+                    //ユーザーアイコン
+                    Container(
+                        height: userIconSize,
+                        width: userIconSize,
+                        margin: EdgeInsets.all(usrIconMarginSize),
+                        child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => UserInfoScreen()),
+                              );
+                            },
+                            //ユーザーアイコン取得失敗時にperson icon表示
+                            child: user != null
+                                ? ClipOval(
+                                    child: Image.network(user!.photoURL!))
+                                : ClipOval(child: Icon(Icons.person))))
+                  ],
+                ),
+                body: ChatScreenBody(),
 
-          // display textField
-          bottomNavigationBar: ChatBottomAppBar(),
-        ),
-      ),
-    );
+                // display textField
+                bottomNavigationBar: ChatBottomAppBar(),
+              ),
+            ));
   }
 }

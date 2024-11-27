@@ -43,19 +43,17 @@ class _ChatCharacterState extends State<ChatCharacter> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 700,
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: OverflowBox(
-          maxWidth: 1000,
-          maxHeight: 1000,
-          child: ClipRect(
-            child: Consumer<SpeakProvider>(
-              builder: (context, speakProvider, _) =>
-                  _setImage(speakProvider.getSpeakerId),
-            ),
-          ),
+    //デバイスの画面サイズを取得
+    final Size deviceSize = MediaQuery.of(context).size;
+
+    return OverflowBox(
+      maxWidth: 1000,
+      maxHeight: deviceSize.height,
+      child: ClipRect(
+        child: Consumer<SpeakProvider>(
+          builder: (context, speakProvider, _) => Container(
+              alignment: Alignment.bottomCenter,
+              child: _setImage(speakProvider.getSpeakerId)),
         ),
       ),
     );
