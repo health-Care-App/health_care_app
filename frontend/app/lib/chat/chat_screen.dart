@@ -1,6 +1,7 @@
-import 'package:app/chat/chat_bottom.dart';
+import 'package:app/chat/chat_bar_selector.dart';
 import 'package:app/chat/chat_screen_body.dart';
 import 'package:app/provider/message_provider.dart';
+import 'package:app/provider/socket_state_provider.dart';
 import 'package:app/provider/speak_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,12 +28,17 @@ class _ChatScreenState extends State<ChatScreen> {
               create: (BuildContext context) => MessageProvider()),
           ChangeNotifierProvider(
               create: (BuildContext context) => SpeakProvider()),
+          ChangeNotifierProvider(
+              create: (BuildContext context) => SocketStateProvider()),
         ],
         builder: (context, child) => MaterialApp(
               home: Scaffold(
+                resizeToAvoidBottomInset: false,
+                backgroundColor: Colors.white,
                 appBar: AppBar(
-                  backgroundColor: Colors.white.withAlpha(0),
-                  title: Text("チャット画面"),
+                  backgroundColor: const Color.fromARGB(186, 189, 224, 254),
+                  leadingWidth: 500, //プルダウンが表示できるくらいの余裕を持たせる
+                  leading: ChatBarSelector(),
                   actions: [
                     //ユーザーアイコン
                     Container(
@@ -55,9 +61,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   ],
                 ),
                 body: ChatScreenBody(),
-
-                // display textField
-                bottomNavigationBar: ChatBottomAppBar(),
               ),
             ));
   }
