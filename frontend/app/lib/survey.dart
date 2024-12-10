@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:app/api/sleep_time/post/fetch.dart';
+import 'package:app/api/health/post/fetch.dart';
 import 'chat/chat_screen.dart';
 
 class SurveyScreen extends StatefulWidget {
@@ -10,6 +12,28 @@ class SurveyScreen extends StatefulWidget {
 class _SurveyScreenState extends State<SurveyScreen> {
   String selectedSleepTime = '7'; // 初期値を設定
   String selectedCondition = '5'; // 初期値を設定
+
+  Future<void> _submitSurvey() async {
+    try {
+      int sleepTime = int.parse(selectedSleepTime);
+      int healthCondition = int.parse(selectedCondition);
+
+      // データベースにPOST
+      await postSleepTime(sleepTime);
+      await postHealth(healthCondition);
+
+      // 成功したらホーム画面に遷移
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ChatScreen()),
+      );
+    } catch (e) {
+      // エラー処理
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("送信中にエラーが発生しました: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,13 +92,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               child: const Text('完了'),
-              onPressed: () {
-                // 完了後、ホーム画面に遷移
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => ChatScreen()),
-                );
-              },
+              onPressed: _submitSurvey,
             ),
           ],
         ),
