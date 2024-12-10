@@ -40,9 +40,6 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
                 : SizedBox(), //空要素
       ),
 
-      //aiとキャラクターの選択ボックス表示
-      // Positioned(top: 0, child: ChatSelector()),
-
       Positioned(
         top: deviceSize.width > mobileWidth
             ? textAreaPCOffset

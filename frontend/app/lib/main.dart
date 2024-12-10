@@ -1,4 +1,4 @@
-import 'package:app/login.dart';
+import 'package:app/sign_in/sign_in_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,7 +24,23 @@ void main() async {
 
   runApp(
     ProviderScope(
-      child: MyApp(),
+      //背景をグラデーションするため、アプリをcontainerでラップ
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              // グラデーションの色を設定
+              Color(0xffCDB4DB),
+              Color(0xffBDE0FE),
+              Colors.white,
+              Colors.white,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -39,7 +55,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(),
+      home: SignInScreen(),
     );
   }
 }

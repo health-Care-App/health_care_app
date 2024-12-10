@@ -34,9 +34,9 @@ class _ChatScreenState extends State<ChatScreen> {
         builder: (context, child) => MaterialApp(
               home: Scaffold(
                 resizeToAvoidBottomInset: false,
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.transparent,
                 appBar: AppBar(
-                  backgroundColor: const Color.fromARGB(186, 189, 224, 254),
+                  backgroundColor: Color(0xffBDE0FE),
                   leadingWidth: 500, //プルダウンが表示できるくらいの余裕を持たせる
                   leading: ChatBarSelector(),
                   actions: [
