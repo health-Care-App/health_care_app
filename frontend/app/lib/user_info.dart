@@ -101,6 +101,20 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 ],
               ),
             ),
+            SizedBox(height: 20), // ログアウトボタンとの間にスペースを追加
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            SurveyScreen()), // SurveyScreenに遷移
+                  );
+                },
+                child: Text("アンケートへ進む"),
+              ),
+            ),
           ],
         ),
       ),
