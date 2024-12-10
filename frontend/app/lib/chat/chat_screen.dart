@@ -36,6 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 resizeToAvoidBottomInset: false,
                 backgroundColor: Colors.transparent,
                 appBar: AppBar(
+                  elevation: 0,
                   backgroundColor: Color(0xffBDE0FE),
                   leadingWidth: 500, //プルダウンが表示できるくらいの余裕を持たせる
                   leading: ChatBarSelector(),

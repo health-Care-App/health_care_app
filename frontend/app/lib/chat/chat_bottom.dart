@@ -11,8 +11,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 // テキストボックスのパディング
-const double paddingY = 15;
-const double paddingX = 10;
+const double marginX = 15;
 
 //アイコンサイズ
 const double iconSize = 27;
@@ -34,7 +33,7 @@ const borderColor = baseColor;
 const borderWidth = 3.0;
 
 //テキストフィールドの高さ
-const textFieldHeight = 75.0;
+const textFieldHeight = 95.0;
 
 //テキストフィールドの中の色
 const fillColor = Color.fromARGB(220, 255, 255, 255);
@@ -150,85 +149,101 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
     final Size deviceSize = MediaQuery.of(context).size;
 
     return Container(
-        width: deviceSize.width,
-        height: textFieldHeight,
-        padding: EdgeInsets.only(
-            top: paddingY, right: paddingX, bottom: paddingY, left: paddingX),
-        color: Color.fromARGB(0, 0, 0, 0),
-        child: _isListening
-            ? IconButton(
-                tooltip: '対話停止',
-                icon: const Icon(Icons.stop_circle),
-                onPressed: _stopVoiceRecognitionHandler,
-                color: baseColor,
-                iconSize: stopIconSize,
-              )
-            : Row(children: [
-                Flexible(
-                  child: TextField(
-                    controller: messageProvider!.controller,
+      width: deviceSize.width,
+      height: textFieldHeight,
+      alignment: Alignment.center,
+      child: _isListening
+          ? IconButton(
+              tooltip: '対話停止',
+              icon: const Icon(Icons.stop_circle),
+              onPressed: _stopVoiceRecognitionHandler,
+              color: baseColor,
+              iconSize: stopIconSize,
+            )
+          : Row(children: [
+              //テキストボックス
+              Flexible(
+                  child: Container(
+                margin: EdgeInsets.fromLTRB(marginX, 0, 0, 0),
+                //テキストボックスの影
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromARGB(255, 221, 221, 221),
+                      spreadRadius: 3,
+                      blurRadius: 5,
+                      offset: Offset(1, 1),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                child: TextField(
+                  controller: messageProvider!.controller,
 
-                    //input text color
-                    style: TextStyle(
-                        color: inputFontColor, fontWeight: FontWeight.w600),
+                  //input text color
+                  style: TextStyle(
+                      color: inputFontColor, fontWeight: FontWeight.w600),
 
-                    //corsur color
-                    cursorColor: inputFontColor,
-                    decoration: InputDecoration(
-                      hintText: "メッセージを入力",
+                  //corsur color
+                  cursorColor: inputFontColor,
+                  decoration: InputDecoration(
+                    hintText: "メッセージを入力",
 
-                      //入力部分の背景色
-                      filled: true,
-                      fillColor: fillColor,
-                      hoverColor: Colors.transparent,
-                      focusColor: Colors.transparent,
+                    //入力部分の背景色
+                    filled: true,
+                    fillColor: fillColor,
+                    hoverColor: Colors.transparent,
+                    focusColor: Colors.transparent,
 
-                      //hint text color
-                      hintStyle: TextStyle(
-                          color: hintFontColor, fontWeight: FontWeight.w600),
+                    //hint text color
+                    hintStyle: TextStyle(
+                        color: hintFontColor, fontWeight: FontWeight.w600),
 
-                      //border style
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide(
-                          width: borderWidth,
-                          color: borderColor,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide(
-                          width: borderWidth,
-                          color: borderColor,
-                        ),
+                    //border style
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide(
+                        width: borderWidth,
+                        color: borderColor,
                       ),
                     ),
-                    onChanged: messageProvider!.textChangeHandler,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide(
+                        width: borderWidth,
+                        color: borderColor,
+                      ),
+                    ),
                   ),
+                  onChanged: messageProvider!.textChangeHandler,
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 7),
-                  child: messageProvider!.isTextSet
-                      ? IconButton(
-                          tooltip: '送信',
-                          icon: const Icon(Icons.send_rounded),
-                          iconSize: iconSize,
-                          onPressed: () {
-                            messageProvider!.sendMessageHandler(
-                                _messageAcceptedCallback,
-                                socketStateProvider!.getChatModel,
-                                socketStateProvider!.getSynthModel);
-                          },
-                          color: baseColor,
-                        )
-                      : IconButton(
-                          tooltip: 'マイク',
-                          icon: const Icon(Icons.mic),
-                          iconSize: iconSize,
-                          onPressed: _startVoiceRecognitionHandler,
-                          color: baseColor,
-                        ),
-                )
-              ]));
+              )),
+
+              //テキストボックスの左のアイコン(送信, マイクアイコン)
+              Container(
+                margin: EdgeInsets.fromLTRB(marginX, 0, marginX, 0),
+                child: messageProvider!.isTextSet
+                    ? IconButton(
+                        tooltip: '送信',
+                        icon: const Icon(Icons.send_rounded),
+                        iconSize: iconSize,
+                        onPressed: () {
+                          messageProvider!.sendMessageHandler(
+                              _messageAcceptedCallback,
+                              socketStateProvider!.getChatModel,
+                              socketStateProvider!.getSynthModel);
+                        },
+                        color: baseColor,
+                      )
+                    : IconButton(
+                        tooltip: 'マイク',
+                        icon: const Icon(Icons.mic),
+                        iconSize: iconSize,
+                        onPressed: _startVoiceRecognitionHandler,
+                        color: baseColor,
+                      ),
+              )
+            ]),
+    );
   }
 }
