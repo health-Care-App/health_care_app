@@ -42,6 +42,8 @@ class MessageProvider with ChangeNotifier {
   //message送信を処理する関数
   void sendMessageHandler(
       void Function(String, String, int) messageAcceptedCallback,
+      chatModel,
+      synthModel,
       {void Function()? messageAcceptFinishCallback}) async {
     //入力された文字がない場合はreturn
     if (_sendMessage.isEmpty) {
@@ -62,7 +64,7 @@ class MessageProvider with ChangeNotifier {
     ChatWebsocket.isWsStart = true;
 
     if (!_socket.getNowRecieving()) {
-      _socket.wsSend(_sendMessage, 0, 0, true);
+      _socket.wsSend(_sendMessage, chatModel, synthModel, true);
       messages.add({"text": _sendMessage, "isUser": true});
       isWaitFirstMessage = true;
     }
