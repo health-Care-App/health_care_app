@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:app/api/sleep_time/get/fetch.dart';
 import 'package:app/api/health/get/fetch.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 
 class UserInfoScreen extends StatefulWidget {
   const UserInfoScreen({super.key});
@@ -18,6 +19,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
 
   List<int> sleepData = List.filled(7, 0);
   List<int> healthData = List.filled(7, 1);
+  List<String> dates = List.filled(7, "");
 
   @override
   void initState() {
@@ -36,8 +38,11 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
         final recentSleepTimes = response.sleepTimes!.take(7).toList();
         setState(() {
           sleepData = List<int>.filled(7, 0);
+          dates = List<String>.filled(7, "");
           for (int i = 0; i < recentSleepTimes.length; i++) {
             sleepData[6 - i] = recentSleepTimes[i].sleepTime;
+            dates[6 - i] =
+                DateFormat('MM/dd').format(recentSleepTimes[i].dateTime);
           }
         });
       } else {
@@ -113,16 +118,24 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   maxY: 12,
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: true, interval: 2),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 1,
                         getTitlesWidget: (value, _) {
-                          if (value.toInt() >= 0 && value.toInt() < 7) {
+                          if (value.toInt() >= 0 &&
+                              value.toInt() < 7 &&
+                              dates[value.toInt()].isNotEmpty) {
                             return Text(
-                              'Day ${(value.toInt() + 1)}',
+                              dates[value.toInt()],
                               style:
                                   TextStyle(fontSize: 12, color: Colors.black),
                             );
@@ -165,16 +178,24 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   maxY: 10,
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: true, interval: 2),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 1,
                         getTitlesWidget: (value, _) {
-                          if (value.toInt() >= 0 && value.toInt() < 7) {
+                          if (value.toInt() >= 0 &&
+                              value.toInt() < 7 &&
+                              dates[value.toInt()].isNotEmpty) {
                             return Text(
-                              'Day ${(value.toInt() + 1)}',
+                              dates[value.toInt()],
                               style:
                                   TextStyle(fontSize: 12, color: Colors.black),
                             );
