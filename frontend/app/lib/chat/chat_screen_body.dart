@@ -44,21 +44,19 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
         top: deviceSize.width > mobileWidth
             ? textAreaPCOffset
             : textAreaMobileOffset,
-        child: Column(
-          children: [
-            SizedBox(
-                //会話ボックスの位置調整
-                height: deviceSize.height -
-                    (deviceSize.width > mobileWidth
-                        ? textAreaPCOffset
-                        : textAreaMobileOffset) -
-                    textFieldHeight -
-                    50, //50分はappBar?
-                width: deviceSize.width,
-                child: Expanded(child: ChatText())),
-          ],
+        child: SizedBox(
+          //会話ボックスの位置調整
+          height: deviceSize.height -
+              (deviceSize.width > mobileWidth
+                  ? textAreaPCOffset
+                  : textAreaMobileOffset) -
+              textFieldHeight -
+              50, //50分はappBar?
+          width: deviceSize.width,
+          child: ChatText(),
         ),
       ),
+
       Positioned(
           top: deviceSize.height - textFieldHeight - 50, //50分はappBar?
           child: ChatBottomAppBar())
