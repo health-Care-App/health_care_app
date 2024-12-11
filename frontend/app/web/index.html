@@ -20,6 +20,9 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
 
+  <!--client id -->
+  <meta name="google-signin-client_id" content="852613489557-15sfd1810596d8pbi3egco2b5gobfjjt.apps.googleusercontent.com">
+
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -34,5 +37,12 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+  
+  <!--debug modeで実行すると下に邪魔なバナーが表示されるのでスタイルで無効化-->
+  <style>
+    .firebase-emulator-warning {
+      display: none;
+    }
+  </style>
 </body>
 </html>

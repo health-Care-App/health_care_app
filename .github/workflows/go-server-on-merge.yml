@@ -34,7 +34,7 @@ jobs:
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build
-        run: docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG ./backend
+        run: docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG -f ./backend/Dockerfile.prod  ./backend
 
       - name: Push
         run: docker push us-central1-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$IMAGE:$TAG

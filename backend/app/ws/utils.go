@@ -1,51 +1,38 @@
 package ws
 
 import (
-	"app/gpt"
+	"app/common"
+	"app/synth"
 	"app/validate"
-	"app/voicevox"
-	"encoding/base64"
 	"fmt"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
 
-func writeJson(audioStatus voicevox.Audio, conn *websocket.Conn, audioSendNumber *int) {
-	base64Data := base64.StdEncoding.EncodeToString(audioStatus.Audiobytes)
-	wsResponse := WsResponse{
+func sendJson(isSynth bool, ttsText synth.TtsText, wg *sync.WaitGroup, conn *websocket.Conn, errCh chan<- error) {
+	base64Data, err := synth.TextToBase64(isSynth, ttsText)
+	if err != nil {
+		errCh <- err
+	}
+	wg.Done()
+
+	wsResponse := common.WsResponse{
 		Base64Data: base64Data,
-		Text:       audioStatus.Text,
+		Text:       ttsText.Text,
+		SpeakerId:  ttsText.SpeakerId,
 	}
+
+	if err := validate.Validation(wsResponse); err != nil {
+		errCh <- err
+		return
+	}
+
 	conn.WriteJSON(wsResponse)
-	*audioSendNumber++
 }
 
-func sendJson(audioStatus voicevox.Audio, audioBuffer *[]voicevox.Audio, audioSendNumber *int, conn *websocket.Conn) {
-	fmt.Printf("audioStatus.Number: %d\n", audioStatus.Number)
-	for len(*audioBuffer) > 0 {
-		isPopped := false
-		for i, bufferAudioStatus := range *audioBuffer {
-			if *audioSendNumber == bufferAudioStatus.Number {
-				writeJson(bufferAudioStatus, conn, audioSendNumber)
-				*audioBuffer = append((*audioBuffer)[:i], (*audioBuffer)[i+1:]...)
-				isPopped = true
-				break
-			}
-		}
-		if !isPopped {
-			break
-		}
-	}
-
-	if *audioSendNumber == audioStatus.Number {
-		writeJson(audioStatus, conn, audioSendNumber)
-	} else {
-		*audioBuffer = append(*audioBuffer, audioStatus)
-	}
-}
-
-func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- gpt.Message, errCh chan<- error) {
-	var message gpt.Message
+func readJson(isProcessing *bool, conn *websocket.Conn, messageCh chan<- common.Message, errCh chan<- error) {
+	var message common.Message
 	for {
 		if err := conn.ReadJSON(&message); err != nil {
 			errCh <- err

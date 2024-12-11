@@ -1,10 +1,13 @@
 package ws
 
 import (
+	"app/chat"
 	"app/common"
-	"app/gpt"
-	"app/voicevox"
+	"app/synth"
+	"app/validate"
+	"fmt"
 	"log"
+	"net/http"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -12,11 +15,13 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+	ReadBufferSize:  4096,
+	WriteBufferSize: 4096,
 }
 
 func Wshandler(c *gin.Context) {
+	//"websocket: request origin not allowed by Upgrader.CheckOrigin" 回避のため
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
@@ -25,37 +30,59 @@ func Wshandler(c *gin.Context) {
 
 	defer conn.Close()
 
-	messageCh := make(chan gpt.Message, messageChLength)
-	audioCh := make(chan voicevox.Audio, audioChLength)
+	messageCh := make(chan common.Message, messageChLength)
+	ttsTextCh := make(chan synth.TtsText, ttsTextChLength)
 	errCh := make(chan error, errChLength)
 	doneCh := make(chan bool, doneChLength)
 	defer close(messageCh)
-	defer close(audioCh)
+	defer close(ttsTextCh)
 	defer close(errCh)
 	defer close(doneCh)
 
 	userId := common.NewUserId(c)
-	audioSendNumber := 1
+	var wg sync.WaitGroup
+	var isSynth bool
 	isProcessing := false
-	var audioBuffer []voicevox.Audio
 
 	go readJson(&isProcessing, conn, messageCh, errCh)
 	for {
 		select {
-		case message := <-messageCh:
-			var wg sync.WaitGroup
-
-			go gpt.CreateChatStream(message, audioCh, errCh, doneCh, &wg, userId)
-		case audioStatus, ok := <-audioCh:
+		case message, ok := <-messageCh:
 			if ok {
-				sendJson(audioStatus, &audioBuffer, &audioSendNumber, conn)
+				isSynth = message.IsSynth
+				if message.ChatModel == 0 {
+					//Gptで会話
+					fmt.Println("Gpt called")
+					go chat.GptChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				} else {
+					//Geminiで会話
+					fmt.Println("Gemini called")
+					go chat.GemChatStream(message, ttsTextCh, errCh, doneCh, &wg, userId)
+				}
 			}
+
+		case ttsText, ok := <-ttsTextCh:
+			if ok {
+				sendJson(isSynth, ttsText, &wg, conn, errCh)
+			}
+
 		case done, ok := <-doneCh:
 			if done && ok {
-				audioSendNumber = 1
 				isProcessing = false
-				audioBuffer = []voicevox.Audio{}
+
+				//送信終了を知らせる空データ
+				wsResponse := common.WsResponse{
+					Base64Data: "",
+					Text:       "",
+					SpeakerId:  0,
+				}
+				if err := validate.Validation(wsResponse); err != nil {
+					log.Println(err)
+					return
+				}
+				conn.WriteJSON(wsResponse)
 			}
+
 		case err, notOk := <-errCh:
 			if notOk {
 				log.Println(err)
