@@ -118,7 +118,16 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   maxY: 12,
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 6,
+                        getTitlesWidget: (value, _) {
+                          if (value == 0 || value == 6 || value == 12) {
+                            return Text(value.toInt().toString());
+                          }
+                          return Text('');
+                        },
+                      ),
                     ),
                     rightTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
@@ -178,7 +187,19 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   maxY: 10,
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 1,
+                        getTitlesWidget: (value, _) {
+                          if (value == 1 ||
+                              value == 4 ||
+                              value == 7 ||
+                              value == 10) {
+                            return Text(value.toInt().toString());
+                          }
+                          return Text('');
+                        },
+                      ),
                     ),
                     rightTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
