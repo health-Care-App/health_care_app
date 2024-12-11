@@ -162,7 +162,7 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
             )
           : Row(children: [
               //テキストボックス
-              Flexible(
+              Expanded(
                   child: Container(
                 margin: EdgeInsets.fromLTRB(marginX, 0, 0, 0),
                 //テキストボックスの影
@@ -179,6 +179,14 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
                 ),
                 child: TextField(
                   controller: messageProvider!.controller,
+
+                  //Enter押したときに送信
+                  onSubmitted: (String? _) {
+                    messageProvider!.sendMessageHandler(
+                        _messageAcceptedCallback,
+                        socketStateProvider!.getChatModel,
+                        socketStateProvider!.getSynthModel);
+                  },
 
                   //input text color
                   style: TextStyle(
