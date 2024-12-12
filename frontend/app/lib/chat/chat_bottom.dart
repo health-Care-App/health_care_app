@@ -128,12 +128,18 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
       alignment: Alignment.center,
       child: _isListening
           ? IconButton(
+              alignment: Alignment.bottomCenter,
               tooltip: '対話停止',
-              icon: const Icon(Icons.stop_circle),
               onPressed: _stopVoiceRecognitionHandler,
-              color: baseColor,
-              iconSize: stopIconSize,
-            )
+              icon: CircleAvatar(
+                radius: stopIconCircleR,
+                backgroundColor: baseColor,
+                child: Icon(
+                  size: stopIconSize,
+                  Icons.stop_circle,
+                  color: Colors.white,
+                ),
+              ))
           : Row(children: [
               Expanded(
                   //テキストボックス
@@ -183,31 +189,34 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
               //テキストボックスの左のアイコン(送信, マイクアイコン)
               Container(
                 margin: EdgeInsets.fromLTRB(marginX, 0, marginX, 0),
-                child: CircleAvatar(
-                  radius: 22,
-                  backgroundColor: baseColor,
-                  child: messageProvider!.isTextSet
-                      ? IconButton(
-                          tooltip: '送信',
-                          icon: const Icon(Icons.send_rounded),
-                          iconSize: iconSize,
-                          onPressed: () {
-                            messageProvider!.sendMessageHandler(
-                                _messageAcceptedCallback,
-                                socketStateProvider!.getChatModel,
-                                socketStateProvider!.getSynthModel);
-                          },
-                          color: Colors.white,
-                        )
-                      : IconButton(
-                          tooltip: 'マイク',
-                          icon: const Icon(Icons.mic),
-                          iconSize: iconSize,
-                          onPressed: _startVoiceRecognitionHandler,
-                          color: Colors.white,
-                        ),
-                ),
-              )
+                child: messageProvider!.isTextSet
+                    ? IconButton(
+                        tooltip: '送信',
+                        icon: CircleAvatar(
+                            radius: iconCircleR,
+                            backgroundColor: baseColor,
+                            child: Icon(
+                              Icons.send_rounded,
+                              size: iconSize,
+                              color: Colors.white,
+                            )),
+                        onPressed: () {
+                          messageProvider!.sendMessageHandler(
+                              _messageAcceptedCallback,
+                              socketStateProvider!.getChatModel,
+                              socketStateProvider!.getSynthModel);
+                        },
+                      )
+                    : IconButton(
+                        tooltip: 'マイク',
+                        icon: CircleAvatar(
+                            radius: iconCircleR,
+                            backgroundColor: baseColor,
+                            child: Icon(Icons.mic,
+                                size: iconSize, color: Colors.white)),
+                        onPressed: _startVoiceRecognitionHandler,
+                      ),
+              ),
             ]),
     );
   }

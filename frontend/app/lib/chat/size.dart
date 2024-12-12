@@ -19,9 +19,15 @@ const double textAreaMobileOffset = 330.0;
 // テキストボックスのパディング
 const double marginX = 20;
 
-//アイコンサイズ
+//送信・マイクアイコンサイズ
 const double iconSize = 26;
-const double stopIconSize = 50;
+const double iconCircleR = 22;
+
+//マイクストップアイコンサイズ
+const double stopIconSize = 60;
+const double stopIconCircleR = 35;
+
+//userアイコンサイズ等
 const double userIconSize = 35;
 const double usrIconMarginSize = 10;
 
