@@ -1,5 +1,7 @@
 import 'package:app/chat/chat_bar_selector.dart';
 import 'package:app/chat/chat_screen_body.dart';
+import 'package:app/chat/size.dart';
+import 'package:app/color.dart';
 import 'package:app/provider/message_provider.dart';
 import 'package:app/provider/socket_state_provider.dart';
 import 'package:app/provider/speak_provider.dart';
@@ -7,9 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../user_info.dart';
-
-const double userIconSize = 35;
-const double usrIconMarginSize = 10;
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -36,8 +35,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 resizeToAvoidBottomInset: false,
                 backgroundColor: Colors.transparent,
                 appBar: AppBar(
+                  //上のバーの高さ
+                  toolbarHeight: appBarHeight,
                   elevation: 0,
-                  backgroundColor: Color(0xffBDE0FE),
+                  backgroundColor: baseColor,
                   leadingWidth: 500, //プルダウンが表示できるくらいの余裕を持たせる
                   leading: ChatBarSelector(),
                   actions: [

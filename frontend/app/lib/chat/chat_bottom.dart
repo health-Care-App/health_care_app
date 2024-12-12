@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:app/chat/audio_queue.dart';
+import 'package:app/chat/color.dart';
+import 'package:app/chat/size.dart';
+import 'package:app/color.dart';
 import 'package:app/provider/message_provider.dart';
 import 'package:app/provider/socket_state_provider.dart';
 import 'package:app/provider/speak_provider.dart';
@@ -9,34 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-
-// テキストボックスのパディング
-const double marginX = 15;
-
-//アイコンサイズ
-const double iconSize = 27;
-const double stopIconSize = 50;
-
-//テキストフィールドのベース色
-const baseColor = Color(0xffA2D2FF);
-
-//テキストフィールドの初期値文字色
-const hintFontColor = Color.fromARGB(255, 175, 175, 175);
-
-//テキストフィールドのユーザーが入力する文字色
-const inputFontColor = Color.fromARGB(255, 76, 76, 76);
-
-//テキストフィールドのボーダーの色
-const borderColor = baseColor;
-
-//テキストフィールドのボーダの太さ
-const borderWidth = 3.0;
-
-//テキストフィールドの高さ
-const textFieldHeight = 95.0;
-
-//テキストフィールドの中の色
-const fillColor = Color.fromARGB(220, 255, 255, 255);
 
 class ChatBottomAppBar extends StatefulWidget {
   const ChatBottomAppBar({super.key});
@@ -154,29 +129,29 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
       alignment: Alignment.center,
       child: _isListening
           ? IconButton(
+              alignment: Alignment.bottomCenter,
               tooltip: '対話停止',
-              icon: const Icon(Icons.stop_circle),
               onPressed: _stopVoiceRecognitionHandler,
-              color: baseColor,
-              iconSize: stopIconSize,
-            )
+              icon: CircleAvatar(
+                radius: stopIconCircleR,
+                backgroundColor: baseColor,
+                child: Icon(
+                  size: stopIconSize,
+                  Icons.stop_circle,
+                  color: Colors.white,
+                ),
+              ))
           : Row(children: [
-              //テキストボックス
               Expanded(
+                  //テキストボックス
                   child: Container(
                 margin: EdgeInsets.fromLTRB(marginX, 0, 0, 0),
-                //テキストボックスの影
+
+                //テキストボックスの角を丸くする
                 decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color.fromARGB(255, 221, 221, 221),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(1, 1),
-                    ),
-                  ],
                   borderRadius: BorderRadius.circular(30.0),
                 ),
+
                 child: TextField(
                   controller: messageProvider!.controller,
 
@@ -195,33 +170,18 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
                   //corsur color
                   cursorColor: inputFontColor,
                   decoration: InputDecoration(
-                    hintText: "メッセージを入力",
+                    border: InputBorder.none,
+                    hintText: "メッセージを入力...",
 
                     //入力部分の背景色
                     filled: true,
-                    fillColor: fillColor,
+                    fillColor: whiteTransparentColor,
                     hoverColor: Colors.transparent,
                     focusColor: Colors.transparent,
 
                     //hint text color
                     hintStyle: TextStyle(
                         color: hintFontColor, fontWeight: FontWeight.w600),
-
-                    //border style
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide(
-                        width: borderWidth,
-                        color: borderColor,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide(
-                        width: borderWidth,
-                        color: borderColor,
-                      ),
-                    ),
                   ),
                   onChanged: messageProvider!.textChangeHandler,
                 ),
@@ -233,24 +193,31 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
                 child: messageProvider!.isTextSet
                     ? IconButton(
                         tooltip: '送信',
-                        icon: const Icon(Icons.send_rounded),
-                        iconSize: iconSize,
+                        icon: CircleAvatar(
+                            radius: iconCircleR,
+                            backgroundColor: baseColor,
+                            child: Icon(
+                              Icons.send_rounded,
+                              size: iconSize,
+                              color: Colors.white,
+                            )),
                         onPressed: () {
                           messageProvider!.sendMessageHandler(
                               _messageAcceptedCallback,
                               socketStateProvider!.getChatModel,
                               socketStateProvider!.getSynthModel);
                         },
-                        color: baseColor,
                       )
                     : IconButton(
                         tooltip: 'マイク',
-                        icon: const Icon(Icons.mic),
-                        iconSize: iconSize,
+                        icon: CircleAvatar(
+                            radius: iconCircleR,
+                            backgroundColor: baseColor,
+                            child: Icon(Icons.mic,
+                                size: iconSize, color: Colors.white)),
                         onPressed: _startVoiceRecognitionHandler,
-                        color: baseColor,
                       ),
-              )
+              ),
             ]),
     );
   }
