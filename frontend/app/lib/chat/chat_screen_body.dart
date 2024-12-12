@@ -1,13 +1,10 @@
 import 'package:app/chat/chat_bottom.dart';
 import 'package:app/chat/chat_character.dart';
 import 'package:app/chat/chat_text.dart';
+import 'package:app/chat/size.dart';
 import 'package:app/provider/message_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-const textAreaPCOffset = 180.0;
-const textAreaMobileOffset = 330.0;
-const mobileWidth = 450; //これより大きい幅の場合をPC端末とする
 
 class ChatScreenBody extends StatefulWidget {
   const ChatScreenBody({super.key});
@@ -31,7 +28,7 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
         builder: (context, messageProvider, _) =>
             messageProvider.isWaitFirstMessage
                 ? SizedBox(
-                    width: 700,
+                    width: double.infinity,
                     child: Align(
                         alignment: Alignment.center,
                         child: CircularProgressIndicator(
@@ -51,14 +48,14 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
                   ? textAreaPCOffset
                   : textAreaMobileOffset) -
               textFieldHeight -
-              50, //50分はappBar?
+              appBarHeight,
           width: deviceSize.width,
           child: ChatText(),
         ),
       ),
 
       Positioned(
-          top: deviceSize.height - textFieldHeight - 50, //50分はappBar?
+          top: deviceSize.height - textFieldHeight - appBarHeight,
           child: ChatBottomAppBar())
     ]);
   }

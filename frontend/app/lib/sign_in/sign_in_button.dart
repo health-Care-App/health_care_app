@@ -1,5 +1,6 @@
 import 'package:app/chat/chat_screen.dart';
 import 'package:app/google_auth/auth.dart';
+import 'package:app/sign_in/color.dart';
 import 'package:flutter/material.dart';
 
 class SignInButton extends StatelessWidget {
@@ -50,7 +51,7 @@ class SignInButton extends StatelessWidget {
                   'Googleでサインイン',
                   style: TextStyle(
                     fontSize: 20,
-                    color: Colors.black54,
+                    color: textColor,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

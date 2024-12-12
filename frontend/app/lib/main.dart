@@ -24,23 +24,7 @@ void main() async {
 
   runApp(
     ProviderScope(
-      //背景をグラデーションするため、アプリをcontainerでラップ
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              // グラデーションの色を設定
-              Color(0xffCDB4DB),
-              Color(0xffBDE0FE),
-              Colors.white,
-              Colors.white,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: MyApp(),
-      ),
+      child: MyApp(),
     ),
   );
 }

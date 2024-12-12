@@ -1,4 +1,5 @@
 import 'package:app/google_auth/auth.dart';
+import 'package:app/sign_in/color.dart';
 import 'package:app/sign_in/sign_in_button.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color(0xff42BFDD),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -23,7 +24,7 @@ class _SignInScreenState extends State<SignInScreen> {
             Expanded(
               child: Image.asset(
                 "assets/images/logo.png",
-                width: 300,
+                width: 400,
               ),
             ),
 
@@ -33,7 +34,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 signInText,
                 style: TextStyle(
                   fontSize: 20,
-                  color: const Color.fromARGB(255, 112, 112, 112),
+                  color: textColor,
                   fontWeight: FontWeight.w900,
                 ),
               ),

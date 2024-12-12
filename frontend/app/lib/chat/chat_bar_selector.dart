@@ -1,3 +1,4 @@
+import 'package:app/chat/size.dart';
 import 'package:app/provider/socket_state_provider.dart';
 import 'package:app/provider/speak_provider.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,6 @@ class ChatBarSelector extends StatefulWidget {
   @override
   State<ChatBarSelector> createState() => _ChatBarSelectorState();
 }
-
-//ドロップダウンに使うアイコンのサイズ
-const dropDownIconSize = 17.0;
 
 class _ChatBarSelectorState extends State<ChatBarSelector> {
   @override
