@@ -1,3 +1,4 @@
+import 'package:app/color.dart';
 import 'package:app/google_auth/auth.dart';
 import 'package:app/sign_in/color.dart';
 import 'package:app/sign_in/sign_in_button.dart';
@@ -16,7 +17,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff42BFDD),
+      backgroundColor: baseColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:app/chat/audio_queue.dart';
 import 'package:app/chat/color.dart';
 import 'package:app/chat/size.dart';
+import 'package:app/color.dart';
 import 'package:app/provider/message_provider.dart';
 import 'package:app/provider/socket_state_provider.dart';
 import 'package:app/provider/speak_provider.dart';

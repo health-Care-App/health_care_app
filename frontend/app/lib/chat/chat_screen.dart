@@ -1,6 +1,7 @@
 import 'package:app/chat/chat_bar_selector.dart';
 import 'package:app/chat/chat_screen_body.dart';
 import 'package:app/chat/size.dart';
+import 'package:app/color.dart';
 import 'package:app/provider/message_provider.dart';
 import 'package:app/provider/socket_state_provider.dart';
 import 'package:app/provider/speak_provider.dart';
@@ -37,7 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   //上のバーの高さ
                   toolbarHeight: appBarHeight,
                   elevation: 0,
-                  backgroundColor: Color(0xff42BFDD),
+                  backgroundColor: baseColor,
                   leadingWidth: 500, //プルダウンが表示できるくらいの余裕を持たせる
                   leading: ChatBarSelector(),
                   actions: [
