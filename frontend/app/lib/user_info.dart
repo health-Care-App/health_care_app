@@ -1,3 +1,4 @@
+import 'package:app/google_auth/auth.dart';
 import 'package:app/sign_in/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +9,7 @@ class UserInfoScreen extends StatelessWidget {
   UserInfoScreen({super.key});
 
   Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
+    Authentication.signOut(context: context);
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => SignInScreen()), // LoginSampleに遷移

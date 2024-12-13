@@ -62,14 +62,13 @@ class _ChatTextState extends State<ChatText> {
 
     //デバイスの画面サイズを取得
     final Size deviceSize = MediaQuery.of(context).size;
-    return Consumer<MessageProvider>(
-        builder: (context, messageProvider, _) => Column(
+    return Column(
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: messageProvider.getCoversationHistory.length,
+                    itemCount: messageProvider!.getCoversationHistory.length,
                     itemBuilder: (context, index) {
-                      bool isUserMessage = messageProvider
+                      bool isUserMessage = messageProvider!
                           .getCoversationHistory[index]["isUser"];
                       return Align(
                           alignment: isUserMessage
@@ -90,7 +89,7 @@ class _ChatTextState extends State<ChatText> {
                                     : whiteTransparentColor,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: Text(messageProvider
+                              child: Text(messageProvider!
                                   .getCoversationHistory[index]["text"]),
                             ),
                           ));
@@ -98,6 +97,6 @@ class _ChatTextState extends State<ChatText> {
                   ),
                 )
               ],
-            ));
+            );
   }
 }
