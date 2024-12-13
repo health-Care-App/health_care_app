@@ -99,11 +99,10 @@ class Authentication {
     final GoogleSignIn googleSignIn = GoogleSignIn();
 
     try {
-      // if (!kIsWeb) {
-      //   await googleSignIn.signOut();
-      // }
-      // await FirebaseAuth.instance.signOut();
-      await googleSignIn.signOut();
+      if (!kIsWeb) {
+        await googleSignIn.signOut();
+      }
+      await FirebaseAuth.instance.signOut();
     } catch (e) {
       //描画されていない場合は処理を中断
       //これがないと青い警告が出る
