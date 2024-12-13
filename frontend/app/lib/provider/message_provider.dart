@@ -62,8 +62,10 @@ class MessageProvider with ChangeNotifier {
       await _socket.wsStart((String base64Data, String text, int newSpeakerId) {
         messageAcceptedCallback(base64Data, text, newSpeakerId);
         notifyListeners();
-      }, messageAcceptFinishCallback: () {
-        messageAcceptFinishCallback;
+      }, () {
+        if (messageAcceptFinishCallback != null) {
+          messageAcceptFinishCallback();
+        }
         notifyListeners();
       });
     }

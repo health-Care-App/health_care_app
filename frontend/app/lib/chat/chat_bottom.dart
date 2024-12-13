@@ -26,11 +26,14 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
   MessageProvider? messageProvider;
   SpeakProvider? speakProvider;
   SocketStateProvider? socketStateProvider;
-  bool _isListening = false;
+  bool _isRecognition = false;
   bool _speechEnabled = false;
   final speechListenOptions = SpeechListenOptions(partialResults: false);
 
   void _onSpeechResult(SpeechRecognitionResult result) {
+    //メッセージ送信時に音声認識をストップ
+    _speechToText.stop();
+
     if (messageProvider == null) {
       throw Exception("_onSpeechResult: messageProvider is null");
     }
@@ -43,7 +46,7 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
     messageProvider!.textChangeHandler(result.recognizedWords);
 
     //送信
-    messageProvider!.sendMessageHandler(_sttMessageAcceptedCallback,
+    messageProvider!.sendMessageHandler(_messageAcceptedCallback,
         socketStateProvider!.getChatModel, socketStateProvider!.getSynthModel,
         messageAcceptFinishCallback: _sttMessageAcceptFinishCallback);
   }
@@ -52,11 +55,11 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
   void _onSpeechStatus(String? status) {
     if (status == "listening") {
       setState(() {
-        _isListening = true;
+        _isRecognition = true;
       });
     } else if (status == "notListening") {
       setState(() {
-        _isListening = false;
+        _isRecognition = false;
       });
     }
   }
@@ -74,11 +77,11 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
 
   void _sttMessageAcceptFinishCallback() {
     //音声認識を再開
-    // _startVoiceRecognitionHandler();
+    _startVoiceRecognitionHandler();
   }
 
   void _stopVoiceRecognitionHandler() async {
-    await _speechToText.stop();
+    _speechToText.stop();
     setState(() {});
   }
 
@@ -106,14 +109,6 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
     _audioQueue.add(decodedAudio);
   }
 
-  void _sttMessageAcceptedCallback(
-      String base64Data, String text, int newSpeakerId) async {
-    _messageAcceptedCallback(base64Data, text, newSpeakerId);
-
-    //メッセージを受け取ってる間は音声認識をストップ
-    _speechToText.stop();
-  }
-
   @override
   Widget build(BuildContext context) {
     messageProvider = context.watch<MessageProvider>();
@@ -127,7 +122,7 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
       width: deviceSize.width,
       height: textFieldHeight,
       alignment: Alignment.center,
-      child: _isListening
+      child: _isRecognition
           ? IconButton(
               alignment: Alignment.bottomCenter,
               tooltip: '対話停止',
