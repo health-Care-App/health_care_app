@@ -97,7 +97,7 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
     }
 
     //set character message
-    messageProvider!.messages.add({"text": text, "isUser": false});
+    messageProvider!.setConversationHistory(text, false);
 
     //audio data decode
     Uint8List decodedAudio = base64Decode(base64Data);
