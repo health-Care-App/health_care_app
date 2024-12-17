@@ -1,8 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:app/api/message/ws/ws.dart';
 import 'package:app/chat/audio_queue.dart';
+import 'package:app/chat/color.dart';
+import 'package:app/chat/size.dart';
+import 'package:app/color.dart';
 import 'package:app/provider/message_provider.dart';
+import 'package:app/provider/socket_state_provider.dart';
 import 'package:app/provider/speak_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,21 +24,32 @@ class ChatBottomAppBar extends StatefulWidget {
 class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
   final SpeechToText _speechToText = SpeechToText();
   final AudioQueue _audioQueue = AudioQueue();
+  final ChatWebsocket _webSocket = ChatWebsocket();
   MessageProvider? messageProvider;
   SpeakProvider? speakProvider;
-  bool _isListening = false;
+  SocketStateProvider? socketStateProvider;
+  bool _isRecognition = false;
   bool _speechEnabled = false;
   final speechListenOptions = SpeechListenOptions(partialResults: false);
 
   void _onSpeechResult(SpeechRecognitionResult result) {
+    //メッセージ送信時に音声認識をストップ
+    _speechToText.stop();
+
     if (messageProvider == null) {
       throw Exception("_onSpeechResult: messageProvider is null");
     }
+
+    if (socketStateProvider == null) {
+      throw Exception("_onSpeechResult: socketStateProvider is null");
+    }
+
     //送信するメッセージを更新
     messageProvider!.textChangeHandler(result.recognizedWords);
 
     //送信
-    messageProvider!.sendMessageHandler(_sttMessageAcceptedCallback,
+    messageProvider!.sendMessageHandler(_messageAcceptedCallback,
+        socketStateProvider!.getChatModel, socketStateProvider!.getSynthModel,
         messageAcceptFinishCallback: _sttMessageAcceptFinishCallback);
   }
 
@@ -41,11 +57,11 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
   void _onSpeechStatus(String? status) {
     if (status == "listening") {
       setState(() {
-        _isListening = true;
+        _isRecognition = true;
       });
     } else if (status == "notListening") {
       setState(() {
-        _isListening = false;
+        _isRecognition = false;
       });
     }
   }
@@ -63,11 +79,11 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
 
   void _sttMessageAcceptFinishCallback() {
     //音声認識を再開
-    // _startVoiceRecognitionHandler();
+    _startVoiceRecognitionHandler();
   }
 
   void _stopVoiceRecognitionHandler() async {
-    await _speechToText.stop();
+    _speechToText.stop();
     setState(() {});
   }
 
@@ -86,7 +102,7 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
     }
 
     //set character message
-    messageProvider!.messages.add({"text": text, "isUser": false});
+    messageProvider!.setConversationHistory(text, false);
 
     //audio data decode
     Uint8List decodedAudio = base64Decode(base64Data);
@@ -95,78 +111,118 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
     _audioQueue.add(decodedAudio);
   }
 
-  void _sttMessageAcceptedCallback(
-      String base64Data, String text, int newSpeakerId) async {
-    _messageAcceptedCallback(base64Data, text, newSpeakerId);
-
-    //メッセージを受け取ってる間は音声認識をストップ
-    _speechToText.stop();
-  }
-
   @override
   Widget build(BuildContext context) {
+    //watchで再描画
     messageProvider = context.watch<MessageProvider>();
     speakProvider = context.watch<SpeakProvider>();
+    socketStateProvider = context.watch<SocketStateProvider>();
 
-    return BottomAppBar(
-        color: Colors.blueAccent,
-        child: _isListening
-            ? IconButton(
-                tooltip: '対話停止',
-                icon: const Icon(Icons.stop_circle),
-                onPressed: _stopVoiceRecognitionHandler,
-                color: Colors.white,
-                iconSize: 50,
-              )
-            : Row(children: [
-                Flexible(
-                  child: TextField(
-                    controller: messageProvider!.controller,
+    //デバイスの画面サイズを取得
+    final Size deviceSize = MediaQuery.of(context).size;
 
-                    //input text color
-                    style: TextStyle(color: Colors.white),
-
-                    //corsur color
-                    cursorColor: Colors.white,
-                    decoration: InputDecoration(
-                      hintText: "メッセージを入力",
-
-                      //hint text color
-                      hintStyle: TextStyle(color: Colors.white),
-
-                      //border style
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide(
-                          color: Colors.white,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide(
-                          color: Colors.white,
-                        ),
-                      ),
+    return Container(
+      width: deviceSize.width,
+      height: textFieldHeight,
+      alignment: Alignment.center,
+      child: _webSocket.getNowRecieving()
+          //メッセージ送信してから、メッセージ受信完了までプログレスサークル表示
+          ? CircularProgressIndicator(
+              strokeWidth: 7,
+              color: Colors.grey,
+            )
+          : _isRecognition
+              ? IconButton(
+                  alignment: Alignment.bottomCenter,
+                  tooltip: '対話停止',
+                  onPressed: _stopVoiceRecognitionHandler,
+                  icon: CircleAvatar(
+                    radius: stopIconCircleR,
+                    backgroundColor: baseColor,
+                    child: Icon(
+                      size: stopIconSize,
+                      Icons.stop_circle,
+                      color: Colors.white,
                     ),
-                    onChanged: messageProvider!.textChangeHandler,
-                  ),
-                ),
-                messageProvider!.isTextSet
-                    ? IconButton(
-                        tooltip: '送信',
-                        icon: const Icon(Icons.send_rounded),
-                        onPressed: () {
-                          messageProvider!
-                              .sendMessageHandler(_messageAcceptedCallback);
-                        },
-                        color: Colors.white,
-                      )
-                    : IconButton(
-                        tooltip: 'マイク',
-                        icon: const Icon(Icons.mic),
-                        onPressed: _startVoiceRecognitionHandler,
-                        color: Colors.white,
+                  ))
+              : Row(children: [
+                  Expanded(
+                      //テキストボックス
+                      child: Container(
+                    margin: EdgeInsets.fromLTRB(marginX, 0, 0, 0),
+
+                    //テキストボックスの角を丸くする
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+
+                    child: TextField(
+                      controller: messageProvider!.controller,
+
+                      //Enter押したときに送信
+                      onSubmitted: (String? _) {
+                        messageProvider!.sendMessageHandler(
+                            _messageAcceptedCallback,
+                            socketStateProvider!.getChatModel,
+                            socketStateProvider!.getSynthModel);
+                      },
+
+                      //input text color
+                      style: TextStyle(
+                          color: inputFontColor, fontWeight: FontWeight.w600),
+
+                      //corsur color
+                      cursorColor: inputFontColor,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "メッセージを入力...",
+
+                        //入力部分の背景色
+                        filled: true,
+                        fillColor: whiteTransparentColor,
+                        hoverColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+
+                        //hint text color
+                        hintStyle: TextStyle(
+                            color: hintFontColor, fontWeight: FontWeight.w600),
                       ),
-              ]));
+                      onChanged: messageProvider!.textChangeHandler,
+                    ),
+                  )),
+
+                  //テキストボックスの左のアイコン(送信, マイクアイコン)
+                  Container(
+                    margin: EdgeInsets.fromLTRB(marginX, 0, marginX, 0),
+                    child: messageProvider!.isTextSet
+                        ? IconButton(
+                            tooltip: '送信',
+                            icon: CircleAvatar(
+                                radius: iconCircleR,
+                                backgroundColor: baseColor,
+                                child: Icon(
+                                  Icons.send_rounded,
+                                  size: iconSize,
+                                  color: Colors.white,
+                                )),
+                            onPressed: () {
+                              messageProvider!.sendMessageHandler(
+                                  _messageAcceptedCallback,
+                                  socketStateProvider!.getChatModel,
+                                  socketStateProvider!.getSynthModel);
+                            },
+                          )
+                        : IconButton(
+                            tooltip: 'マイク',
+                            icon: CircleAvatar(
+                                radius: iconCircleR,
+                                backgroundColor: baseColor,
+                                child: Icon(Icons.mic,
+                                    size: iconSize, color: Colors.white)),
+                            onPressed: _startVoiceRecognitionHandler,
+                          ),
+                  ),
+                ]),
+    );
   }
 }

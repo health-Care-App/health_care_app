@@ -1,5 +1,7 @@
 import 'package:app/login.dart';
 import 'package:app/survey.dart';
+import 'package:app/google_auth/auth.dart';
+import 'package:app/sign_in/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:app/api/sleep_time/get/fetch.dart';
@@ -42,10 +44,10 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
+    Authentication.signOut(context: context);
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
+      MaterialPageRoute(builder: (context) => SignInScreen()), // LoginSampleに遷移
       (route) => false,
     );
   }
