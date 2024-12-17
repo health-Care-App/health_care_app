@@ -37,7 +37,7 @@ class ChatWebsocket {
   //WebSocket通信を開始
   Future<void> wsStart(
       void Function(String, String, int) messageAcceptedCallback,
-      {void Function()? messageAcceptFinishCallback}) async {
+      void Function() messageAcceptFinishCallback) async {
     //idtoken取得
     final idToken = await Authentication.getIdToken();
 
@@ -67,7 +67,7 @@ class ChatWebsocket {
             (jsonResponse.speakerId == 0)) {
           _setNowRecieving(false);
 
-          messageAcceptFinishCallback;
+          messageAcceptFinishCallback();
 
           //debug log
           print("wsStart: all messages was recieved");

@@ -44,7 +44,6 @@ dependencies:
   web_socket_channel: ^3.0.1
   firebase_auth: ^5.3.3
   shared_preferences: ^2.3.2
-  riverpod: ^2.6.1
   flutter_riverpod: ^2.6.1
   audioplayers: ^6.1.0
   google_sign_in_platform_interface: ^2.4.5
@@ -52,6 +51,7 @@ dependencies:
   provider: ^6.1.2
   cloud_firestore: ^5.5.0
   fl_chart: ^0.69.2
+  flutter_svg: ^2.0.16
 
 dev_dependencies:
   flutter_test:

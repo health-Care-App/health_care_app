@@ -10,7 +10,7 @@ class MessageProvider with ChangeNotifier {
 
   MessageProvider()
       : _sendMessage = "",
-        messages = [],
+        _coversationHistory = [],
         isTextSet = false,
         isWaitFirstMessage = false;
 
@@ -24,12 +24,19 @@ class MessageProvider with ChangeNotifier {
   bool isWaitFirstMessage;
 
   //対話メッセージデータ
-  List<Map<String, dynamic>> messages;
+  final List<Map<String, dynamic>> _coversationHistory;
 
   //getter
   String get getSendMessage => _sendMessage;
+  List<Map<String, dynamic>> get getCoversationHistory => _coversationHistory;
 
-  //messageに変化があった際に呼び出される関数
+  //メッセージをセットする関数
+  void setConversationHistory(String text, bool isUser) {
+    _coversationHistory.add({"text": text, "isUser": isUser});
+    notifyListeners();
+  }
+
+  //textfieldに変化があった際に呼び出される関数
   void textChangeHandler(String newSendMessage) {
     _sendMessage = newSendMessage;
 
@@ -42,28 +49,31 @@ class MessageProvider with ChangeNotifier {
   //message送信を処理する関数
   void sendMessageHandler(
       void Function(String, String, int) messageAcceptedCallback,
+      chatModel,
+      synthModel,
       {void Function()? messageAcceptFinishCallback}) async {
     //入力された文字がない場合はreturn
     if (_sendMessage.isEmpty) {
       return;
     }
 
-    //websocket通信が始まってない場合
+    //websocket通信が始まってない場合は通信開始
     if (ChatWebsocket.isWsStart == false) {
       await _socket.wsStart((String base64Data, String text, int newSpeakerId) {
         messageAcceptedCallback(base64Data, text, newSpeakerId);
         notifyListeners();
-      }, messageAcceptFinishCallback: () {
-        messageAcceptFinishCallback;
+      }, () {
+        if (messageAcceptFinishCallback != null) {
+          messageAcceptFinishCallback();
+        }
         notifyListeners();
       });
     }
 
-    ChatWebsocket.isWsStart = true;
-
+    //サーバーからのメッセージ待ち出ない場合は送信する。
     if (!_socket.getNowRecieving()) {
-      _socket.wsSend(_sendMessage, 0, 0, true);
-      messages.add({"text": _sendMessage, "isUser": true});
+      _socket.wsSend(_sendMessage, chatModel, synthModel, true);
+      _coversationHistory.add({"text": _sendMessage, "isUser": true});
       isWaitFirstMessage = true;
     }
 
