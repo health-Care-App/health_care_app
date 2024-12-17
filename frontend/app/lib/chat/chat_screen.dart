@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../user_info.dart';
+import '../survey.dart';
+import 'package:app/check_recent_data.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -18,6 +20,22 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final User? user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRecentData();
+  }
+
+  Future<void> _checkRecentData() async {
+    final isToday = await isRecentDataToday();
+    if (!isToday) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SurveyScreen()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +53,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 resizeToAvoidBottomInset: false,
                 backgroundColor: Colors.transparent,
                 appBar: AppBar(
-                  //上のバーの高さ
                   toolbarHeight: appBarHeight,
                   elevation: 0,
                   backgroundColor: baseColor,
-                  leadingWidth: 500, //プルダウンが表示できるくらいの余裕を持たせる
+                  leadingWidth: 500,
                   leading: ChatBarSelector(),
                   actions: [
-                    //ユーザーアイコン
                     Container(
                         height: userIconSize,
                         width: userIconSize,
@@ -55,7 +71,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                     builder: (context) => UserInfoScreen()),
                               );
                             },
-                            //ユーザーアイコン取得失敗時にperson icon表示
                             child: user != null
                                 ? ClipOval(
                                     child: Image.network(user!.photoURL!))
