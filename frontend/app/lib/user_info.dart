@@ -17,9 +17,9 @@ class UserInfoScreen extends StatefulWidget {
 class _UserInfoScreenState extends State<UserInfoScreen> {
   final User? user = FirebaseAuth.instance.currentUser;
 
-  List<int> sleepData = List.filled(7, 0);
-  List<int> healthData = List.filled(7, 1);
-  List<String> dates = List.filled(7, "");
+  List<FlSpot> sleepSpots = [];
+  List<FlSpot> healthSpots = [];
+  List<String> dates = [];
 
   @override
   void initState() {
@@ -37,23 +37,29 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       if (response.sleepTimes != null && response.sleepTimes!.isNotEmpty) {
         final recentSleepTimes = response.sleepTimes!.take(7).toList();
         setState(() {
-          sleepData = List<int>.filled(7, 0);
-          dates = List<String>.filled(7, "");
-          for (int i = 0; i < recentSleepTimes.length; i++) {
-            sleepData[6 - i] = recentSleepTimes[i].sleepTime;
-            dates[6 - i] =
-                DateFormat('MM/dd').format(recentSleepTimes[i].dateTime);
-          }
+          sleepSpots = recentSleepTimes
+              .asMap()
+              .entries
+              .map((e) => FlSpot(
+                    e.key.toDouble(),
+                    e.value.sleepTime.toDouble(),
+                  ))
+              .toList();
+          dates = recentSleepTimes
+              .map((e) => DateFormat('MM/dd').format(e.dateTime))
+              .toList();
         });
       } else {
         setState(() {
-          sleepData = List<int>.filled(7, 0);
+          sleepSpots = [];
+          dates = [];
         });
       }
     } catch (e) {
       print("睡眠データの取得中にエラーが発生しました: $e");
       setState(() {
-        sleepData = List<int>.filled(7, 0);
+        sleepSpots = [];
+        dates = [];
       });
     }
   }
@@ -64,20 +70,24 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       if (response.healths != null && response.healths!.isNotEmpty) {
         final recentHealths = response.healths!.take(7).toList();
         setState(() {
-          healthData = List<int>.filled(7, 1);
-          for (int i = 0; i < recentHealths.length; i++) {
-            healthData[6 - i] = recentHealths[i].health;
-          }
+          healthSpots = recentHealths
+              .asMap()
+              .entries
+              .map((e) => FlSpot(
+                    e.key.toDouble(),
+                    e.value.health.toDouble(),
+                  ))
+              .toList();
         });
       } else {
         setState(() {
-          healthData = List<int>.filled(7, 1);
+          healthSpots = [];
         });
       }
     } catch (e) {
       print("体調データの取得中にエラーが発生しました: $e");
       setState(() {
-        healthData = List<int>.filled(7, 1);
+        healthSpots = [];
       });
     }
   }
@@ -129,20 +139,13 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                         },
                       ),
                     ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 1,
                         getTitlesWidget: (value, _) {
                           if (value.toInt() >= 0 &&
-                              value.toInt() < 7 &&
-                              dates[value.toInt()].isNotEmpty) {
+                              value.toInt() < dates.length) {
                             return Text(
                               dates[value.toInt()],
                               style:
@@ -159,13 +162,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   lineBarsData: [
                     LineChartBarData(
                       isCurved: false,
-                      spots: List.generate(
-                        7,
-                        (index) => FlSpot(
-                          index.toDouble(),
-                          sleepData[index].toDouble(),
-                        ),
-                      ),
+                      spots: sleepSpots,
                       barWidth: 4,
                       isStrokeCapRound: true,
                       color: Colors.blue,
@@ -191,21 +188,12 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                         showTitles: true,
                         interval: 1,
                         getTitlesWidget: (value, _) {
-                          if (value == 1 ||
-                              value == 4 ||
-                              value == 7 ||
-                              value == 10) {
+                          if (value == 1 || value == 3 || value == 10) {
                             return Text(value.toInt().toString());
                           }
                           return Text('');
                         },
                       ),
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -213,8 +201,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                         interval: 1,
                         getTitlesWidget: (value, _) {
                           if (value.toInt() >= 0 &&
-                              value.toInt() < 7 &&
-                              dates[value.toInt()].isNotEmpty) {
+                              value.toInt() < dates.length) {
                             return Text(
                               dates[value.toInt()],
                               style:
@@ -231,13 +218,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   lineBarsData: [
                     LineChartBarData(
                       isCurved: false,
-                      spots: List.generate(
-                        7,
-                        (index) => FlSpot(
-                          index.toDouble(),
-                          healthData[index].toDouble(),
-                        ),
-                      ),
+                      spots: healthSpots,
                       barWidth: 4,
                       isStrokeCapRound: true,
                       color: Colors.green,
