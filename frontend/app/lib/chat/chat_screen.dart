@@ -8,8 +8,8 @@ import 'package:app/provider/speak_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import '../user_info.dart';
-import '../survey.dart';
+import 'package:app/user_info.dart';
+// import 'package:app/survey.dart';
 import 'package:app/check_recent_data.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -32,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!isToday) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SurveyScreen()),
+        MaterialPageRoute(builder: (context) => const UserInfoScreen()), // 画面制御
       );
     }
   }

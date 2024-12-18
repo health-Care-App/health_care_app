@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:app/api/sleep_time/post/fetch.dart';
 import 'package:app/api/health/post/fetch.dart';
-import 'chat/chat_screen.dart';
+import 'package:app/chat/chat_screen.dart';
+import 'package:app/color.dart';
 
 class SurveyScreen extends StatefulWidget {
   const SurveyScreen({Key? key}) : super(key: key);
@@ -15,40 +16,34 @@ class _SurveyScreenState extends State<SurveyScreen> {
   String selectedCondition = '5'; // 体調の初期値
   bool isLoading = false; // ローディング状態
 
-  // アンケートデータ送信
   Future<void> submitSurvey() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      final sleepTime = int.parse(selectedSleepTime); // 睡眠時間
-      final health = int.parse(selectedCondition); // 体調
+      final sleepTime = int.parse(selectedSleepTime);
+      final health = int.parse(selectedCondition);
 
-      // 睡眠時間API呼び出し
       final sleepResponse = await postSleepTime(sleepTime);
       if (sleepResponse.message != "ok") {
         throw Exception("睡眠時間データ送信に失敗しました");
       }
 
-      // 体調API呼び出し
       final healthResponse = await postHealth(health);
       if (healthResponse.message != "ok") {
         throw Exception("体調データ送信に失敗しました");
       }
 
-      // 成功メッセージ
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("データ送信に成功しました")),
       );
 
-      // チャット画面に遷移
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const ChatScreen()),
       );
     } catch (e) {
-      // エラーメッセージ
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("エラーが発生しました: $e")),
       );
@@ -59,90 +54,124 @@ class _SurveyScreenState extends State<SurveyScreen> {
     }
   }
 
-  Future<void> _submitSurvey() async {
-    try {
-      int sleepTime = int.parse(selectedSleepTime);
-      int healthCondition = int.parse(selectedCondition);
-
-      // データベースにPOST
-      await postSleepTime(sleepTime);
-      await postHealth(healthCondition);
-
-      // 成功したらホーム画面に遷移
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ChatScreen()),
-      );
-    } catch (e) {
-      // エラー処理
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("送信中にエラーが発生しました: $e")),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("睡眠と体調アンケート")),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 睡眠時間ドロップダウン
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('睡眠時間:'),
-                DropdownButton<String>(
-                  value: selectedSleepTime,
-                  items: List.generate(12, (index) {
-                    final value = (index + 1).toString();
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text('$value 時間'),
-                    );
-                  }),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedSleepTime = value!;
-                    });
-                  },
+      body: Container(
+        width: double.infinity, // 背景を画面幅いっぱいに広げる
+        color: baseColor, // 背景色を水色に設定
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '睡眠時間',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButton<String>(
+                      value: selectedSleepTime,
+                      isExpanded: true,
+                      underline: SizedBox.shrink(),
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      items: List.generate(12, (index) {
+                        final value = (index + 1).toString();
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(
+                            '$value 時間',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedSleepTime = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '体調 (1-10)',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButton<String>(
+                      value: selectedCondition,
+                      isExpanded: true,
+                      underline: SizedBox.shrink(),
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      items: List.generate(10, (index) {
+                        final value = (index + 1).toString();
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(
+                            value,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCondition = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: SizedBox(
+                  width: 200,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor, // ボタンの色をaccentColorに変更
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: isLoading ? null : submitSurvey,
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            '確認する',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // 体調ドロップダウン
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('体調 (1-10):'),
-                DropdownButton<String>(
-                  value: selectedCondition,
-                  items: List.generate(10, (index) {
-                    final value = (index + 1).toString();
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCondition = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: isLoading ? null : submitSurvey,
-              child: isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('送信'),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
