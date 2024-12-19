@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-
 import 'package:app/chat/character_progress.dart';
 import 'package:app/provider/socket_state_provider.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +11,6 @@ class ChatCharacter extends StatefulWidget {
 
   @override
   State<ChatCharacter> createState() => _ChatCharacterState();
-}
-
-Widget imageLoadingWidget(
-    BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-  return CircularProgressIndicator(
-    color: Colors.grey,
-  );
 }
 
 class _ChatCharacterState extends State<ChatCharacter> {
@@ -85,12 +77,14 @@ class _ChatCharacterState extends State<ChatCharacter> {
               builder: (context, socketStateProvider, _) => Image(
                 image: _setImage(speakProvider.getSpeakerId,
                     socketStateProvider.getSynthModel),
-                loadingBuilder: (BuildContext context, Widget child,
-                    ImageChunkEvent? loadingProgress) {
-                  if (loadingProgress == null) {
+                frameBuilder: (BuildContext context, Widget child, int? frame,
+                    bool wasSynchronouslyLoaded) {
+                  if ((frame != null) && (frame > 0)) {
                     return child;
                   }
-                  return CharacterProgress();
+
+                  //画像表示されるまでプログレスサークル表示
+                  return CharacterProgress(text: "画像読み込み中...");
                 },
               ),
             ),

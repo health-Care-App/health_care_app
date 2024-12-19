@@ -27,8 +27,26 @@ class SignInButton extends StatelessWidget {
             //これがないと青い警告が出る
             if (!context.mounted) return;
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) {
+                  return ChatScreen();
+                },
+
+                //画面遷移時のアニメーション
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  // final Offset begin = Offset(1.0, 0.0); // 右から左
+                  final Offset begin = Offset(-1.0, 0.0); // 左から右
+                  final Offset end = Offset.zero;
+                  final Animatable<Offset> tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: Curves.easeInOut));
+                  final Animation<Offset> offsetAnimation =
+                      animation.drive(tween);
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
               ),
             );
           }
