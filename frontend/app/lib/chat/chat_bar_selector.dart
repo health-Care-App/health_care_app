@@ -33,8 +33,8 @@ class _ChatBarSelectorState extends State<ChatBarSelector> {
                         margin: EdgeInsets.all(5),
                         child: SvgPicture.asset(
                           "assets/images/openai-logomark.svg",
-                          width: dropDownIconSize,
-                          height: dropDownIconSize,
+                          width: dropDownAiIconSize,
+                          height: dropDownAiIconSize,
                         ),
                       ),
                       Text('ChatGPT'),
@@ -49,8 +49,8 @@ class _ChatBarSelectorState extends State<ChatBarSelector> {
                         margin: EdgeInsets.all(5),
                         child: SvgPicture.asset(
                           "assets/images/gemini.svg",
-                          width: dropDownIconSize,
-                          height: dropDownIconSize,
+                          width: dropDownAiIconSize,
+                          height: dropDownAiIconSize,
                         ),
                       ),
                       Text('Gemini'),
@@ -77,10 +77,10 @@ class _ChatBarSelectorState extends State<ChatBarSelector> {
                     children: [
                       Container(
                         margin: EdgeInsets.all(5),
-                        child: SvgPicture.asset(
-                          "assets/images/openai-logomark.svg",
-                          width: dropDownIconSize,
-                          height: dropDownIconSize,
+                        child: Image.asset(
+                          "assets/images/zundamonn_icon.webp",
+                          width: dropDownSynthIconSize,
+                          height: dropDownSynthIconSize,
                         ),
                       ),
                       Text('ずんだもん'),
@@ -93,10 +93,10 @@ class _ChatBarSelectorState extends State<ChatBarSelector> {
                     children: [
                       Container(
                         margin: EdgeInsets.all(5),
-                        child: SvgPicture.asset(
-                          "assets/images/gemini.svg",
-                          width: dropDownIconSize,
-                          height: dropDownIconSize,
+                        child: Image.asset(
+                          "assets/images/tsumugi_icon.webp",
+                          width: dropDownSynthIconSize,
+                          height: dropDownSynthIconSize,
                         ),
                       ),
                       Text('春日部つむぎ'),

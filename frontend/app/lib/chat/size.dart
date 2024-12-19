@@ -19,6 +19,9 @@ const double textAreaMobileOffset = 330.0;
 // テキストボックスのパディング
 const double marginX = 20;
 
+// テキストボックスのフォーカス時のボーダーサイズ
+const double focusedTextFieldBorderSize = 2;
+
 //送信・マイクアイコンサイズ
 const double iconSize = 26;
 const double iconCircleR = 22;
@@ -31,5 +34,8 @@ const double stopIconCircleR = 35;
 const double userIconSize = 35;
 const double usrIconMarginSize = 10;
 
-//ドロップダウンに使うアイコンのサイズ
-const dropDownIconSize = 17.0;
+//ドロップダウンに使う生成AIのアイコンのサイズ
+const dropDownAiIconSize = 17.0;
+
+//ドロップダウンに使うキャラクターアイコンのサイズ
+const dropDownSynthIconSize = 25.0;
