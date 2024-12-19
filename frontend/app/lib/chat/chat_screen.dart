@@ -32,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ],
       builder: (context, child) => Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           //上のバーの高さ
           toolbarHeight: appBarHeight,
