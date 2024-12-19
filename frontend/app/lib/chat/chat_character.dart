@@ -14,13 +14,6 @@ class ChatCharacter extends StatefulWidget {
   State<ChatCharacter> createState() => _ChatCharacterState();
 }
 
-Widget imageLoadingWidget(
-    BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-  return CircularProgressIndicator(
-    color: Colors.grey,
-  );
-}
-
 class _ChatCharacterState extends State<ChatCharacter> {
   static final imagesRoot = "assets/images/";
   static final defaultUri = "$imagesRoot/default_upper.gif";
