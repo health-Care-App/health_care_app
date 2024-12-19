@@ -67,6 +67,5 @@ class MessageProvider with ChangeNotifier {
       isWaitFirstMessage = true;
     }
     notifyListeners();
-    print("sendMessageHandler end");
   }
 }
