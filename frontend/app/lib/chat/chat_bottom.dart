@@ -151,7 +151,7 @@ class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
           //メッセージ送信してから、メッセージ受信完了までプログレスサークル表示
           ? CircularProgressIndicator(
               strokeWidth: 7,
-              color: Colors.grey,
+              color: whiteTransparentColor,
             )
           : _isRecognition
               ? IconButton(
