@@ -24,7 +24,7 @@ class _SignInScreenState extends State<SignInScreen> {
           children: [
             Expanded(
               child: Image.asset(
-                "assets/images/logo.png",
+                "assets/images/app_logo.webp",
                 width: 400,
               ),
             ),

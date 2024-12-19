@@ -20,14 +20,14 @@ class _ChatCharacterState extends State<ChatCharacter> {
   static final sadHandUri = "$imagesRoot/sad_upper_hand.gif";
   static final sadUri = "$imagesRoot/sad_upper.gif";
   static final sasayakiUri = "$imagesRoot/sasayaki_upper.gif";
-  static final tsumugiUri = "$imagesRoot/sasayaki_upper.gif"; //仮
+  static final tsumugiUri = "$imagesRoot/tsumugi_default.gif";
 
   //画像をあらかじめ読み込み
   final defaultImage = Image.asset(defaultUri, fit: BoxFit.contain);
   final sadHandImage = Image.asset(sadUri, fit: BoxFit.contain);
   final sadImage = Image.asset(sadHandUri, fit: BoxFit.contain);
   final sasayakiImage = Image.asset(sasayakiUri, fit: BoxFit.contain);
-  final tsumugiImage = Image.asset(tsumugiUri, fit: BoxFit.contain); //仮
+  final tsumugiImage = Image.asset(tsumugiUri, fit: BoxFit.contain);
 
   Image _setImage(int speakerId, int synthModel) {
     if (synthModel == 0) {

@@ -2,6 +2,7 @@ import 'package:app/api/export.dart';
 import 'package:app/chat/color.dart';
 import 'package:app/provider/message_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 class ChatText extends StatefulWidget {
@@ -13,6 +14,7 @@ class ChatText extends StatefulWidget {
 
 class _ChatTextState extends State<ChatText> {
   MessageProvider? messageProvider;
+  final scrollController = ScrollController();
   //<m1>abc</m1><m1>def</m1> -> ["abc", "def"]みたいに変換する関数
   List<String> parseAnswers(String aiMessage) {
     final List<String> parsedMessages = [];
@@ -37,7 +39,7 @@ class _ChatTextState extends State<ChatText> {
       return;
     }
     if (messageProvider == null) {
-      throw ("getMessageHistory: messageProvider is null");
+      throw Exception("getMessageHistory: messageProvider is null");
     }
 
     for (Messages messages in resp.messages!) {
@@ -60,43 +62,53 @@ class _ChatTextState extends State<ChatText> {
   Widget build(BuildContext context) {
     messageProvider = context.watch<MessageProvider>();
 
+    //描画後に一番下までスクロール
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      scrollController.animateTo(
+        //途中でスクロールが止まってしまうので+300で調整
+        scrollController.position.maxScrollExtent + 300,
+        duration: const Duration(seconds: 1),
+        curve: Curves.linear,
+      );
+    });
+
     //デバイスの画面サイズを取得
     final Size deviceSize = MediaQuery.of(context).size;
     return Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: messageProvider!.getCoversationHistory.length,
-                    itemBuilder: (context, index) {
-                      bool isUserMessage = messageProvider!
-                          .getCoversationHistory[index]["isUser"];
-                      return Align(
-                          alignment: isUserMessage
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              //画面横幅の0.7倍までをメッセージの最大幅とする
-                              maxWidth: deviceSize.width * 0.7,
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: isUserMessage
-                                    ? userMessageColor
-                                    : whiteTransparentColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(messageProvider!
-                                  .getCoversationHistory[index]["text"]),
-                            ),
-                          ));
-                    },
-                  ),
-                )
-              ],
-            );
+      children: [
+        Expanded(
+          child: ListView.builder(
+            controller: scrollController,
+            itemCount: messageProvider!.getCoversationHistory.length,
+            itemBuilder: (context, index) {
+              bool isUserMessage =
+                  messageProvider!.getCoversationHistory[index]["isUser"];
+              return Align(
+                  alignment: isUserMessage
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      //画面横幅の0.7倍までをメッセージの最大幅とする
+                      maxWidth: deviceSize.width * 0.7,
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: isUserMessage
+                            ? userMessageColor
+                            : whiteTransparentColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(messageProvider!.getCoversationHistory[index]
+                          ["text"]),
+                    ),
+                  ));
+            },
+          ),
+        )
+      ],
+    );
   }
 }

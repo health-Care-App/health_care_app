@@ -41,7 +41,7 @@ class SignInButton extends StatelessWidget {
             children: const <Widget>[
               //Googleアイコン
               Image(
-                image: AssetImage("assets/images/google_logo.png"),
+                image: AssetImage("assets/images/google_logo.webp"),
                 height: 20.0,
               ),
               //ボタン文字
