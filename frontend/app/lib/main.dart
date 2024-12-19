@@ -30,9 +30,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter AppRun Demo',
+      title: 'mentaAI',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'NotoSansJP',
       ),
       home: SignInScreen(),
     );

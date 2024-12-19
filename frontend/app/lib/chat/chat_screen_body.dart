@@ -28,7 +28,7 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
       Consumer<MessageProvider>(
         builder: (context, messageProvider, _) =>
             messageProvider.isWaitFirstMessage
-                ? CharacterProgress()
+                ? CharacterProgress(text: "考え中...")
                 : SizedBox(), //空要素
       ),
 
