@@ -1,3 +1,4 @@
+import 'package:app/chat/character_progress.dart';
 import 'package:app/chat/chat_bottom.dart';
 import 'package:app/chat/chat_character.dart';
 import 'package:app/chat/chat_text.dart';
@@ -27,13 +28,7 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
       Consumer<MessageProvider>(
         builder: (context, messageProvider, _) =>
             messageProvider.isWaitFirstMessage
-                ? SizedBox(
-                    width: double.infinity,
-                    child: Align(
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(
-                          color: Colors.grey,
-                        )))
+                ? CharacterProgress()
                 : SizedBox(), //空要素
       ),
 
