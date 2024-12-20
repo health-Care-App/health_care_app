@@ -23,16 +23,16 @@ class SignInButton extends StatelessWidget {
           final user = await Authentication.signInWithGoogle(context: context);
 
           if (user != null) {
-            //描画されていない場合は処理を中断
-            //これがないと青い警告が出る
+            //描画されていない場合は処理を中断。これがないと警告が出る
             if (!context.mounted) return;
             Navigator.of(context).pushReplacement(
               PageRouteBuilder(
+                //画面遷移
                 pageBuilder: (context, animation, secondaryAnimation) {
                   return ChatScreen();
                 },
 
-                //画面遷移時のアニメーション
+                //画面遷移時のアニメーション。左から右にスライドする
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                   // final Offset begin = Offset(1.0, 0.0); // 右から左
