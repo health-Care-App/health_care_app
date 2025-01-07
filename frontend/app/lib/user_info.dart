@@ -104,37 +104,50 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String? email = user?.email ?? "メールアドレスがありません";
-
     return Scaffold(
+      backgroundColor: Colors.lightBlue, // 画面全体の背景を水色に設定
       appBar: AppBar(
-        title: Text("ユーザー情報"),
+        title: Text("ユーザー情報", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.lightBlue, // AppBarの背景も水色に設定
+        elevation: 0, // AppBarの影をなくす
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("$email", style: TextStyle(fontSize: 22)),
-            SizedBox(height: 20),
-
             // 睡眠時間グラフ
-            Text("睡眠時間の推移", style: TextStyle(fontSize: 18)),
+            Text(
+              "睡眠時間の推移",
+              style: TextStyle(fontSize: 18, color: Colors.white), // 白文字に変更
+            ),
+            SizedBox(height: 8), // 「睡眠時間の推移」の下にスペースを追加
             Container(
               height: 200,
               padding: EdgeInsets.all(16.0),
-              child: LineChart(
-                LineChartData(
-                  minY: 0,
+              decoration: BoxDecoration(
+                color: Colors.white, // 背景を白に設定
+                borderRadius: BorderRadius.circular(12), // 角を丸める
+              ),
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.start, // データを左詰めに配置
                   maxY: 12,
                   titlesData: FlTitlesData(
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false), // 上部の目盛を非表示
+                    ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 6,
                         getTitlesWidget: (value, _) {
                           if (value == 0 || value == 6 || value == 12) {
-                            return Text(value.toInt().toString());
+                            return Text(
+                              value.toInt().toString(),
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black), // 黒文字
+                            );
                           }
                           return Text('');
                         },
@@ -143,14 +156,13 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        interval: 1,
                         getTitlesWidget: (value, _) {
                           if (value.toInt() >= 0 &&
                               value.toInt() < dates.length) {
                             return Text(
                               dates[value.toInt()],
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.black),
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black), // 黒文字
                             );
                           }
                           return Text('');
@@ -159,54 +171,82 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     ),
                   ),
                   gridData: FlGridData(show: false),
-                  borderData: FlBorderData(show: true),
-                  lineBarsData: [
-                    LineChartBarData(
-                      isCurved: false,
-                      spots: sleepSpots,
-                      barWidth: 4,
-                      isStrokeCapRound: true,
-                      color: Colors.blue,
+                  borderData: FlBorderData(
+                    show: true,
+                    border: const Border.symmetric(
+                      horizontal: BorderSide(color: Colors.grey, width: 1),
                     ),
-                  ],
+                  ),
+                  barGroups: sleepSpots
+                      .asMap()
+                      .entries
+                      .map((e) => BarChartGroupData(
+                            x: e.key,
+                            barRods: [
+                              BarChartRodData(
+                                toY: e.value.y,
+                                color: Colors.blue,
+                                width: 12,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ],
+                          ))
+                      .toList(),
+                  groupsSpace: 30, // 棒グラフ間のスペースを調整
                 ),
               ),
             ),
+
             SizedBox(height: 20),
 
-            // 体調スコアグラフ
-            Text("体調の推移", style: TextStyle(fontSize: 18)),
+// 体調スコアグラフ
+            Text(
+              "体調の推移",
+              style: TextStyle(fontSize: 18, color: Colors.white), // 白文字に変更
+            ),
+            SizedBox(height: 8), // 「体調の推移」の下にスペースを追加
             Container(
               height: 200,
               padding: EdgeInsets.all(16.0),
-              child: LineChart(
-                LineChartData(
-                  minY: 1,
+              decoration: BoxDecoration(
+                color: Colors.white, // 背景を白に設定
+                borderRadius: BorderRadius.circular(12), // 角を丸める
+              ),
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.start, // データを左詰めに配置
                   maxY: 10,
+                  minY: 0,
                   titlesData: FlTitlesData(
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false), // 上部の目盛を非表示
+                    ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 1,
                         getTitlesWidget: (value, _) {
-                          if (value == 1 || value == 3 || value == 10) {
-                            return Text(value.toInt().toString());
+                          if (value == 1 || value == 5 || value == 10) {
+                            return Text(
+                              value.toInt().toString(),
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black), // 黒文字
+                            );
                           }
-                          return Text('');
+                          return const SizedBox.shrink();
                         },
                       ),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        interval: 1,
                         getTitlesWidget: (value, _) {
                           if (value.toInt() >= 0 &&
                               value.toInt() < dates.length) {
                             return Text(
                               dates[value.toInt()],
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.black),
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black), // 黒文字
                             );
                           }
                           return Text('');
@@ -215,19 +255,32 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     ),
                   ),
                   gridData: FlGridData(show: false),
-                  borderData: FlBorderData(show: true),
-                  lineBarsData: [
-                    LineChartBarData(
-                      isCurved: false,
-                      spots: healthSpots,
-                      barWidth: 4,
-                      isStrokeCapRound: true,
-                      color: Colors.green,
+                  borderData: FlBorderData(
+                    show: true,
+                    border: const Border.symmetric(
+                      horizontal: BorderSide(color: Colors.grey, width: 1),
                     ),
-                  ],
+                  ),
+                  barGroups: healthSpots
+                      .asMap()
+                      .entries
+                      .map((e) => BarChartGroupData(
+                            x: e.key,
+                            barRods: [
+                              BarChartRodData(
+                                toY: e.value.y,
+                                color: Colors.green,
+                                width: 12,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ],
+                          ))
+                      .toList(),
+                  groupsSpace: 30, // 棒グラフ間のスペースを調整
                 ),
               ),
             ),
+
             Spacer(),
             Center(
               child: Column(
