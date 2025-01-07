@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:app/api/sleep_time/post/fetch.dart';
 import 'package:app/api/health/post/fetch.dart';
 import 'package:app/chat/chat_screen.dart';
@@ -54,125 +55,146 @@ class _SurveyScreenState extends State<SurveyScreen> {
     }
   }
 
+  String getCurrentDate() {
+    final now = DateTime.now();
+    return DateFormat('MM/dd').format(now);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity, // 背景を画面幅いっぱいに広げる
-        color: baseColor, // 背景色を水色に設定
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
+      body: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.3, // 画面の縦幅の3割
+            width: double.infinity,
+            color: Colors.white,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    '睡眠時間',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    getCurrentDate(),
+                    style: const TextStyle(
+                      fontSize: 36,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: DropdownButton<String>(
-                      value: selectedSleepTime,
-                      isExpanded: true,
-                      underline: SizedBox.shrink(),
-                      dropdownColor: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      items: List.generate(12, (index) {
-                        final value = (index + 1).toString();
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(
-                            '$value 時間',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        );
-                      }),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedSleepTime = value!;
-                        });
-                      },
+                  const Text(
+                    '本日の記録',
+                    style: TextStyle(
+                      fontSize: 32,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '体調 (1-10)',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: DropdownButton<String>(
-                      value: selectedCondition,
-                      isExpanded: true,
-                      underline: SizedBox.shrink(),
-                      dropdownColor: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      items: List.generate(10, (index) {
-                        final value = (index + 1).toString();
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: TextStyle(fontSize: 16),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              width: double.infinity, // 背景を画面幅いっぱいに広げる
+              color: baseColor, // 背景色を水色に設定
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 40.0, vertical: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '睡眠時間',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      }),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedCondition = value!;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Center(
-                child: SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: accentColor, // ボタンの色をaccentColorに変更
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: isLoading ? null : submitSurvey,
-                    child: isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            '確認する',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: DropdownButton<String>(
+                            value: selectedSleepTime,
+                            isExpanded: true,
+                            underline: SizedBox.shrink(),
+                            dropdownColor: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            items: List.generate(12, (index) {
+                              final value = (index + 1).toString();
+                              return DropdownMenuItem(
+                                value: value,
+                                child: Text(
+                                  '$value 時間',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              );
+                            }),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedSleepTime = value!;
+                              });
+                            },
                           ),
-                  ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '体調 (1-10)',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: DropdownButton<String>(
+                            value: selectedCondition,
+                            isExpanded: true,
+                            underline: SizedBox.shrink(),
+                            dropdownColor: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            items: List.generate(10, (index) {
+                              final value = (index + 1).toString();
+                              return DropdownMenuItem(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              );
+                            }),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCondition = value!;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
