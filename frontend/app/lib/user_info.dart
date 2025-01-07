@@ -1,4 +1,4 @@
-import 'package:app/survey.dart';
+import 'package:app/survey/survey.dart';
 import 'package:app/google_auth/auth.dart';
 import 'package:app/sign_in/sign_in_screen.dart';
 import 'package:flutter/material.dart';

@@ -32,7 +32,9 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!isToday) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const UserInfoScreen()), // 画面制御
+        MaterialPageRoute(
+            builder: (context) =>
+                const UserInfoScreen()), // 当日記録をしていなかったら遷移する画面
       );
     }
   }
