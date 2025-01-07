@@ -3,22 +3,17 @@ import 'package:app/chat/audio_queue.dart';
 import 'package:flutter/material.dart';
 
 class MessageProvider with ChangeNotifier {
-  //websocket, サウンドキュー, textコントローラを初期化
+  //websocket, サウンドキューを初期化
   final _socket = ChatWebsocket();
   final audioQueue = AudioQueue();
-  final TextEditingController controller = TextEditingController();
 
   MessageProvider()
       : _sendMessage = "",
         _coversationHistory = [],
-        isTextSet = false,
         isWaitFirstMessage = false;
 
   //送信メッセージ
   String _sendMessage;
-
-  //送信iconかマイクiconかを判断するのに利用
-  bool isTextSet;
 
   //メッセージを送信してから初めてメッセージを受け取るまでtrue
   bool isWaitFirstMessage;
@@ -30,29 +25,24 @@ class MessageProvider with ChangeNotifier {
   String get getSendMessage => _sendMessage;
   List<Map<String, dynamic>> get getCoversationHistory => _coversationHistory;
 
+  set setSendMessage(String newSendMessage) {
+    _sendMessage = newSendMessage;
+  }
+
   //メッセージをセットする関数
   void setConversationHistory(String text, bool isUser) {
     _coversationHistory.add({"text": text, "isUser": isUser});
     notifyListeners();
   }
 
-  //textfieldに変化があった際に呼び出される関数
-  void textChangeHandler(String newSendMessage) {
-    _sendMessage = newSendMessage;
-
-    if (isTextSet != _sendMessage.isNotEmpty) {
-      isTextSet = _sendMessage.isNotEmpty;
-      notifyListeners();
-    }
-  }
-
   //message送信を処理する関数
-  void sendMessageHandler(
+  Future<void> sendMessageHandler(
       void Function(String, String, int) messageAcceptedCallback,
       chatModel,
       synthModel,
       {void Function()? messageAcceptFinishCallback}) async {
     //入力された文字がない場合はreturn
+    _sendMessage = _sendMessage.trim();
     if (_sendMessage.isEmpty) {
       return;
     }
@@ -76,11 +66,6 @@ class MessageProvider with ChangeNotifier {
       _coversationHistory.add({"text": _sendMessage, "isUser": true});
       isWaitFirstMessage = true;
     }
-
-    //textFieldをクリア
-    controller.clear();
-    //iconを変更をさせるため空文字でハンドラを呼び出し
-    textChangeHandler("");
     notifyListeners();
   }
 }

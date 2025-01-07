@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -22,11 +21,7 @@ void main() async {
     }
   }
 
-  runApp(
-    ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -35,9 +30,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter AppRun Demo',
+      title: 'mentaAI',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'NotoSansJP',
       ),
       home: SignInScreen(),
     );

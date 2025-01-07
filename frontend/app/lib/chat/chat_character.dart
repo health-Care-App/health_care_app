@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-
+import 'package:app/chat/character_progress.dart';
 import 'package:app/provider/socket_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,22 +14,19 @@ class ChatCharacter extends StatefulWidget {
 }
 
 class _ChatCharacterState extends State<ChatCharacter> {
-  SpeakProvider? speakProvider;
   static final imagesRoot = "assets/images/";
   static final defaultUri = "$imagesRoot/default_upper.gif";
   static final sadHandUri = "$imagesRoot/sad_upper_hand.gif";
   static final sadUri = "$imagesRoot/sad_upper.gif";
   static final sasayakiUri = "$imagesRoot/sasayaki_upper.gif";
-  static final tsumugiUri = "$imagesRoot/sasayaki_upper.gif"; //仮
+  static final tsumugiUri = "$imagesRoot/tsumugi_default.gif";
+  final defaultImage = AssetImage(defaultUri);
+  final sadHandImage = AssetImage(sadUri);
+  final sadImage = AssetImage(sadHandUri);
+  final sasayakiImage = AssetImage(sasayakiUri);
+  final tsumugiImage = AssetImage(tsumugiUri);
 
-  //画像をあらかじめ読み込み
-  final defaultImage = Image.asset(defaultUri, fit: BoxFit.contain);
-  final sadHandImage = Image.asset(sadUri, fit: BoxFit.contain);
-  final sadImage = Image.asset(sadHandUri, fit: BoxFit.contain);
-  final sasayakiImage = Image.asset(sasayakiUri, fit: BoxFit.contain);
-  final tsumugiImage = Image.asset(tsumugiUri, fit: BoxFit.contain); //仮
-
-  Image _setImage(int speakerId, int synthModel) {
+  AssetImage _setImage(int speakerId, int synthModel) {
     if (synthModel == 0) {
       switch (speakerId) {
         case 1 || 3 || 5:
@@ -50,6 +47,17 @@ class _ChatCharacterState extends State<ChatCharacter> {
     }
   }
 
+  //画像表示をはやくするため、画像をキャッシュ
+  @override
+  void didChangeDependencies() {
+    precacheImage(defaultImage, context);
+    precacheImage(sadHandImage, context);
+    precacheImage(sadImage, context);
+    precacheImage(sasayakiImage, context);
+    precacheImage(tsumugiImage, context);
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     //デバイスの画面サイズを取得
@@ -63,13 +71,24 @@ class _ChatCharacterState extends State<ChatCharacter> {
           alignment: Alignment.bottomCenter,
           //speakerIdの変更が通知された際に再描画
           child: Consumer<SpeakProvider>(
-              builder: (context, speakProvider, _) =>
-                  //ずんだもんと春日部つむぎが切り替わった時に再描画
-                  Consumer<SocketStateProvider>(
-                    builder: (context, socketStateProvider, child) => _setImage(
-                        speakProvider.getSpeakerId,
-                        socketStateProvider.getSynthModel),
-                  )),
+            builder: (context, speakProvider, _) =>
+                //ずんだもんと春日部つむぎが切り替わった時に再描画
+                Consumer<SocketStateProvider>(
+              builder: (context, socketStateProvider, _) => Image(
+                image: _setImage(speakProvider.getSpeakerId,
+                    socketStateProvider.getSynthModel),
+                frameBuilder: (BuildContext context, Widget child, int? frame,
+                    bool wasSynchronouslyLoaded) {
+                  if ((frame != null) && (frame > 0)) {
+                    return child;
+                  }
+
+                  //画像表示されるまでプログレスサークル表示
+                  return CharacterProgress(text: "画像読み込み中...");
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );

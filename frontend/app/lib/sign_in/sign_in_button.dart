@@ -23,12 +23,30 @@ class SignInButton extends StatelessWidget {
           final user = await Authentication.signInWithGoogle(context: context);
 
           if (user != null) {
-            //描画されていない場合は処理を中断
-            //これがないと青い警告が出る
+            //描画されていない場合は処理を中断。これがないと警告が出る
             if (!context.mounted) return;
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(),
+              PageRouteBuilder(
+                //画面遷移
+                pageBuilder: (context, animation, secondaryAnimation) {
+                  return ChatScreen();
+                },
+
+                //画面遷移時のアニメーション。左から右にスライドする
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  // final Offset begin = Offset(1.0, 0.0); // 右から左
+                  final Offset begin = Offset(-1.0, 0.0); // 左から右
+                  final Offset end = Offset.zero;
+                  final Animatable<Offset> tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: Curves.easeInOut));
+                  final Animation<Offset> offsetAnimation =
+                      animation.drive(tween);
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
               ),
             );
           }
@@ -41,7 +59,7 @@ class SignInButton extends StatelessWidget {
             children: const <Widget>[
               //Googleアイコン
               Image(
-                image: AssetImage("assets/images/google_logo.png"),
+                image: AssetImage("assets/images/google_logo.webp"),
                 height: 20.0,
               ),
               //ボタン文字

@@ -40,45 +40,46 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-              create: (BuildContext context) => MessageProvider()),
-          ChangeNotifierProvider(
-              create: (BuildContext context) => SpeakProvider()),
-          ChangeNotifierProvider(
-              create: (BuildContext context) => SocketStateProvider()),
-        ],
-        builder: (context, child) => MaterialApp(
-              home: Scaffold(
-                resizeToAvoidBottomInset: false,
-                backgroundColor: Colors.transparent,
-                appBar: AppBar(
-                  toolbarHeight: appBarHeight,
-                  elevation: 0,
-                  backgroundColor: baseColor,
-                  leadingWidth: 500,
-                  leading: ChatBarSelector(),
-                  actions: [
-                    Container(
-                        height: userIconSize,
-                        width: userIconSize,
-                        margin: EdgeInsets.all(usrIconMarginSize),
-                        child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => UserInfoScreen()),
-                              );
-                            },
-                            child: user != null
-                                ? ClipOval(
-                                    child: Image.network(user!.photoURL!))
-                                : ClipOval(child: Icon(Icons.person))))
-                  ],
-                ),
-                body: ChatScreenBody(),
-              ),
-            ));
+      providers: [
+        ChangeNotifierProvider(
+            create: (BuildContext context) => MessageProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => SpeakProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => SocketStateProvider()),
+      ],
+      builder: (context, child) => Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          //上のバーの高さ
+          toolbarHeight: appBarHeight,
+          elevation: 0,
+          backgroundColor: baseColor,
+          leadingWidth: 500, //プルダウンが表示できるくらいの余裕を持たせる
+          leading: ChatBarSelector(),
+          actions: [
+            //ユーザーアイコン
+            Container(
+                height: userIconSize,
+                width: userIconSize,
+                margin: EdgeInsets.all(usrIconMarginSize),
+                child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UserInfoScreen()),
+                      );
+                    },
+                    //ユーザーアイコン取得失敗時にperson icon表示
+                    child: user != null
+                        ? ClipOval(child: Image.network(user!.photoURL!))
+                        : ClipOval(child: Icon(Icons.person))))
+          ],
+        ),
+        body: ChatScreenBody(),
+      ),
+    );
   }
 }
