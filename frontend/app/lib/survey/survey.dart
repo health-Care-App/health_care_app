@@ -36,10 +36,6 @@ class _SurveyScreenState extends State<SurveyScreen> {
         throw Exception("体調データ送信に失敗しました");
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("データ送信に成功しました")),
-      );
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const ChatScreen()),
@@ -67,16 +63,16 @@ class _SurveyScreenState extends State<SurveyScreen> {
         children: [
           // 上部の白背景部分に画像を追加
           Expanded(
-            flex: 2, // flex値を3から2に変更して高さを縮小
+            flex: 2,
             child: Container(
               width: double.infinity,
               color: Colors.white,
               child: Padding(
-                padding: const EdgeInsets.all(8.0), // 余白を少し減らす
+                padding: const EdgeInsets.all(8.0),
                 child: Image.asset(
                   'assets/images/survey.png', // 画像ファイルのパス
-                  fit: BoxFit.contain, // 画像を適切にリサイズ
-                  alignment: Alignment.center, // 中央に配置
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
                 ),
               ),
             ),
@@ -93,13 +89,13 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   padding: const EdgeInsets.only(left: 40.0, top: 40.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ設定
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         getCurrentDate(),
                         style: const TextStyle(
                           fontSize: 36,
-                          color: Colors.black,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -108,7 +104,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                         '本日の記録',
                         style: TextStyle(
                           fontSize: 32,
-                          color: Colors.black,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -119,10 +115,10 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 40.0, vertical: 24.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start, // 上寄せ配置
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 150), // 「本日の記録」とドロップダウンの間を調整
+                      const SizedBox(height: 150),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -163,7 +159,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16), // 睡眠時間と体調の間を少し狭める
+                      const SizedBox(height: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

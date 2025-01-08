@@ -7,6 +7,7 @@ import 'package:app/api/sleep_time/get/fetch.dart';
 import 'package:app/api/health/get/fetch.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:app/color.dart';
 
 class UserInfoScreen extends StatefulWidget {
   const UserInfoScreen({super.key});
@@ -105,10 +106,10 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue, // 画面全体の背景を水色に設定
+      backgroundColor: Colors.white, // 画面全体の背景を水色に設定
       appBar: AppBar(
-        title: Text("ユーザー情報", style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.lightBlue, // AppBarの背景も水色に設定
+        automaticallyImplyLeading: true,
+        backgroundColor: Colors.white, // AppBarの背景も水色に設定
         elevation: 0, // AppBarの影をなくす
       ),
       body: Padding(
@@ -119,14 +120,18 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
             // 睡眠時間グラフ
             Text(
               "睡眠時間の推移",
-              style: TextStyle(fontSize: 18, color: Colors.white), // 白文字に変更
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(height: 8), // 「睡眠時間の推移」の下にスペースを追加
+            SizedBox(height: 15), // 「睡眠時間の推移」の下にスペースを追加
             Container(
               height: 200,
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: Colors.white, // 背景を白に設定
+                color: graphColor, // 背景を白に設定
                 borderRadius: BorderRadius.circular(12), // 角を丸める
               ),
               child: BarChart(
@@ -137,6 +142,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     topTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: false), // 上部の目盛を非表示
                     ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false), // 右側の目盛を非表示
+                    ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -146,7 +154,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                             return Text(
                               value.toInt().toString(),
                               style: TextStyle(
-                                  fontSize: 12, color: Colors.black), // 黒文字
+                                  fontSize: 12,
+                                  color: const Color.fromARGB(255, 48, 47, 47)),
                             );
                           }
                           return Text('');
@@ -162,7 +171,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                             return Text(
                               dates[value.toInt()],
                               style: TextStyle(
-                                  fontSize: 12, color: Colors.black), // 黒文字
+                                  fontSize: 12,
+                                  color: const Color.fromARGB(255, 48, 47, 47)),
                             );
                           }
                           return Text('');
@@ -174,7 +184,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   borderData: FlBorderData(
                     show: true,
                     border: const Border.symmetric(
-                      horizontal: BorderSide(color: Colors.grey, width: 1),
+                      horizontal: BorderSide(
+                          color: Color.fromARGB(255, 213, 215, 215), width: 1),
                     ),
                   ),
                   barGroups: sleepSpots
@@ -186,30 +197,34 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                               BarChartRodData(
                                 toY: e.value.y,
                                 color: Colors.blue,
-                                width: 12,
-                                borderRadius: BorderRadius.circular(6),
+                                width: 24,
+                                borderRadius: BorderRadius.circular(2),
                               ),
                             ],
                           ))
                       .toList(),
-                  groupsSpace: 30, // 棒グラフ間のスペースを調整
+                  groupsSpace: 24, // 棒グラフ間のスペースを調整
                 ),
               ),
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 80),
 
 // 体調スコアグラフ
             Text(
               "体調の推移",
-              style: TextStyle(fontSize: 18, color: Colors.white), // 白文字に変更
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(height: 8), // 「体調の推移」の下にスペースを追加
+            SizedBox(height: 15), // 「体調の推移」の下にスペースを追加
             Container(
               height: 200,
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: Colors.white, // 背景を白に設定
+                color: graphColor, // 背景を白に設定
                 borderRadius: BorderRadius.circular(12), // 角を丸める
               ),
               child: BarChart(
@@ -221,16 +236,20 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     topTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: false), // 上部の目盛を非表示
                     ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false), // 右側の目盛を非表示
+                    ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 1,
                         getTitlesWidget: (value, _) {
-                          if (value == 1 || value == 5 || value == 10) {
+                          if (value == 0 || value == 5 || value == 10) {
                             return Text(
                               value.toInt().toString(),
                               style: TextStyle(
-                                  fontSize: 12, color: Colors.black), // 黒文字
+                                  fontSize: 12,
+                                  color: const Color.fromARGB(255, 48, 47, 47)),
                             );
                           }
                           return const SizedBox.shrink();
@@ -246,7 +265,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                             return Text(
                               dates[value.toInt()],
                               style: TextStyle(
-                                  fontSize: 12, color: Colors.black), // 黒文字
+                                  fontSize: 12,
+                                  color: const Color.fromARGB(255, 48, 47, 47)),
                             );
                           }
                           return Text('');
@@ -258,7 +278,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   borderData: FlBorderData(
                     show: true,
                     border: const Border.symmetric(
-                      horizontal: BorderSide(color: Colors.grey, width: 1),
+                      horizontal: BorderSide(
+                          color: Color.fromARGB(255, 213, 215, 215), width: 1),
                     ),
                   ),
                   barGroups: healthSpots
@@ -270,13 +291,13 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                               BarChartRodData(
                                 toY: e.value.y,
                                 color: Colors.green,
-                                width: 12,
-                                borderRadius: BorderRadius.circular(6),
+                                width: 24,
+                                borderRadius: BorderRadius.circular(2),
                               ),
                             ],
                           ))
                       .toList(),
-                  groupsSpace: 30, // 棒グラフ間のスペースを調整
+                  groupsSpace: 24, // 棒グラフ間のスペースを調整
                 ),
               ),
             ),
@@ -287,20 +308,24 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () => _logout(context),
-                    child: Text("ログアウト"),
+                    child: Text(
+                      "ログアウト",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 16),
+                      minimumSize: const Size(200, 50), // ボタンの最小サイズを指定
+                      backgroundColor: pinkColor, // 背景色をpinkColorに変更
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SurveyScreen(),
-                        ),
-                      );
-                    },
-                    child: Text("睡眠と体調アンケートに進む"),
-                  ),
                 ],
               ),
             ),
