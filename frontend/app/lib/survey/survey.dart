@@ -1,8 +1,8 @@
+import 'package:app/survey/survey_complete.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:app/api/sleep_time/post/fetch.dart';
 import 'package:app/api/health/post/fetch.dart';
-import 'package:app/chat/chat_screen.dart';
 import 'package:app/color.dart';
 
 class SurveyScreen extends StatefulWidget {
@@ -38,7 +38,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ChatScreen()),
+        MaterialPageRoute(builder: (context) => const SurveyCompleteScreen()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -125,7 +125,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                           const Text(
                             '睡眠時間',
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: surveyTextColor),
                           ),
                           const SizedBox(height: 8),
                           Container(
@@ -166,7 +168,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                           const Text(
                             '体調 (1-10)',
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: surveyTextColor),
                           ),
                           const SizedBox(height: 8),
                           Container(

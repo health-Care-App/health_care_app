@@ -1,4 +1,3 @@
-import 'package:app/survey/survey.dart';
 import 'package:app/google_auth/auth.dart';
 import 'package:app/sign_in/sign_in_screen.dart';
 import 'package:flutter/material.dart';
@@ -308,13 +307,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () => _logout(context),
-                    child: Text(
-                      "ログアウト",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 32, vertical: 16),
@@ -322,6 +314,13 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       backgroundColor: pinkColor, // 背景色をpinkColorに変更
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "ログアウト",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:app/user_info.dart';
-import 'package:app/survey/survey.dart';
+import 'package:app/survey/morning.dart';
 import 'package:app/check_recent_data.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => const SurveyScreen()), // 当日記録をしていなかったら遷移する画面
+            builder: (context) => const MorningScreen()), // 当日記録をしていなかったら遷移する画面
       );
     }
   }
