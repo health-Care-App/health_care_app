@@ -44,7 +44,7 @@ class Authentication {
       ScaffoldMessenger.of(context).showSnackBar(
         customSnackBar(
           text:
-              'サインインに失敗しました。サードパーティーのサインインをブロックしている可能性があります。URLのiマークからサインインの設定を見直してみてください。',
+              'サインインに失敗しました。サードパーティーのサインインをブロックしている可能性があります。',
           textColor: Colors.redAccent,
           backgroundColor: Colors.white,
         ),

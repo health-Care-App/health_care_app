@@ -1,4 +1,4 @@
 /backend/app/tmp
-/.env
 /backend/app/voicevox_core/
 /backend/app/serviceAccountKey.json
+/.env

@@ -28,7 +28,6 @@ class _SignInScreenState extends State<SignInScreen> {
                 width: 400,
               ),
             ),
-
             Container(
               margin: EdgeInsets.fromLTRB(0, 0, 0, 3),
               child: Text(
@@ -57,6 +56,18 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   );
                 },
+              ),
+            ),
+            //voicevoxの利用を明記
+            Container(
+              margin: EdgeInsets.fromLTRB(15, 0, 15, 15),
+              child: Text(
+                'このアプリは音声合成ソフトウェアVOICEVOXを利用しています。',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: textColor,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
           ],
