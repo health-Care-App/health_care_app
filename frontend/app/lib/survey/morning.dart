@@ -9,7 +9,7 @@ class MorningScreen extends StatelessWidget {
   String getCurrentDate() {
     final now = DateTime.now();
     const List<String> japaneseWeekdays = ['日', '月', '火', '水', '木', '金', '土'];
-    final dayOfWeek = japaneseWeekdays[now.weekday % 7]; // 日本語の曜日を取得
+    final dayOfWeek = japaneseWeekdays[now.weekday % 7];
     return DateFormat('MM/dd').format(now) + ' ($dayOfWeek)';
   }
 
@@ -18,7 +18,6 @@ class MorningScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          // 上部の白背景部分に画像を追加
           Expanded(
             flex: 3,
             child: Container(
@@ -40,7 +39,7 @@ class MorningScreen extends StatelessWidget {
               children: [
                 Container(
                   width: double.infinity,
-                  color: baseColor, // 背景色を水色に設定
+                  color: baseColor,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 40.0, top: 40.0),
@@ -50,11 +49,11 @@ class MorningScreen extends StatelessWidget {
                     children: [
                       // 太陽アイコン
                       Image.asset(
-                        'assets/images/survey_sun.png', // 太陽の画像ファイルのパス
-                        width: 50, // 幅を指定
-                        height: 50, // 高さを指定
+                        'assets/images/survey_sun.png',
+                        width: 50,
+                        height: 50,
                       ),
-                      const SizedBox(height: 32), // 太陽とテキストの間に余白を追加
+                      const SizedBox(height: 32),
                       Text(
                         'おはようございます！',
                         style: const TextStyle(
@@ -65,7 +64,7 @@ class MorningScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 32),
                       Text(
-                        getCurrentDate(), // 日付を表示
+                        getCurrentDate(), // 日付
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white,
@@ -85,9 +84,9 @@ class MorningScreen extends StatelessWidget {
                   ),
                 ),
                 Align(
-                  alignment: Alignment.bottomCenter, // ボタンを画面の下中央に配置
+                  alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 64.0), // 下部余白を追加
+                    padding: const EdgeInsets.only(bottom: 64.0),
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -100,8 +99,8 @@ class MorningScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 32, vertical: 16),
-                        minimumSize: const Size(200, 50), // ボタンの最小サイズを指定
-                        backgroundColor: pinkColor, // 背景色をpinkColorに変更
+                        minimumSize: const Size(200, 50),
+                        backgroundColor: pinkColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -109,9 +108,9 @@ class MorningScreen extends StatelessWidget {
                       child: const Text(
                         '記録画面へ',
                         style: TextStyle(
-                          fontSize: 20, // フォントサイズを拡大
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white, // テキストの色を白に設定
+                          color: Colors.white,
                         ),
                       ),
                     ),

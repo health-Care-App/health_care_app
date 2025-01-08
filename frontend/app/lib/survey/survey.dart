@@ -61,7 +61,6 @@ class _SurveyScreenState extends State<SurveyScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // 上部の白背景部分に画像を追加
           Expanded(
             flex: 2,
             child: Container(
@@ -83,7 +82,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               children: [
                 Container(
                   width: double.infinity,
-                  color: baseColor, // 背景色を水色に設定
+                  color: baseColor,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 40.0, top: 40.0),
@@ -208,16 +207,16 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   ),
                 ),
                 Align(
-                  alignment: Alignment.bottomCenter, // ボタンを画面の下中央に配置
+                  alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 64.0), // 下部余白を追加
+                    padding: const EdgeInsets.only(bottom: 64.0),
                     child: ElevatedButton(
                       onPressed: isLoading ? null : submitSurvey,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 32, vertical: 16),
-                        minimumSize: const Size(200, 50), // ボタンの最小サイズを指定
-                        backgroundColor: pinkColor, // 背景色をpinkColorに変更
+                        minimumSize: const Size(200, 50),
+                        backgroundColor: pinkColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -230,9 +229,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                           : const Text(
                               '送信する',
                               style: TextStyle(
-                                fontSize: 20, // フォントサイズを拡大
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white, // テキストの色を白に設定
+                                color: Colors.white,
                               ),
                             ),
                     ),

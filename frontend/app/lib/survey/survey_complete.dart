@@ -10,7 +10,7 @@ class SurveyCompleteScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 各要素を均等に配置
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
               'おつかれさまでした！',
@@ -21,10 +21,10 @@ class SurveyCompleteScreen extends StatelessWidget {
               ),
             ),
             Image.asset(
-              'assets/images/survey_check.png', // チェックマークアイコンのパス
-              width: 200, // アイコンの幅を200に設定
-              height: 200, // アイコンの高さを200に設定
-              fit: BoxFit.contain, // アイコンの比率を維持
+              'assets/images/survey_check.png',
+              width: 200,
+              height: 200,
+              fit: BoxFit.contain,
             ),
             ElevatedButton(
               onPressed: () {
@@ -36,20 +36,20 @@ class SurveyCompleteScreen extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 32, vertical: 16), // ボタンのパディングを設定
-                minimumSize: const Size(200, 50), // ボタンの最小サイズ
-                backgroundColor: Colors.blue, // ボタンの背景色
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                minimumSize: const Size(200, 70),
+                backgroundColor: baseColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12), // ボタンの角丸を設定
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: const Text(
                 'チャット画面へ',
                 style: TextStyle(
-                  fontSize: 18, // フォントサイズを指定
-                  fontWeight: FontWeight.bold, // 太字
-                  color: Colors.white, // テキストの色
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
