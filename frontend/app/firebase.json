@@ -42,5 +42,14 @@
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
-  }
+  },
+  "headers":[
+    {
+      "source": "**",
+      "headers": [{
+        "key": "Acccess-Control-Allow-Origin",
+        "value": "*"
+      }]
+    }
+  ]
 }

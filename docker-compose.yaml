@@ -6,35 +6,52 @@ services:
     env_file: .env
     volumes:
       - ./frontend/app:/app
+      - flutter-sdk:/app/flutter
     ports:
       - 4000:4000
       - 5000:5000
       - 9099:9099
       - 8000:8000
       - 8888:8888
+      - 5900:5900
     tty: true
     stdin_open: true
 
   go:
     container_name: go
-    build: ./backend/
+    build:
+      context: ./backend/
+      dockerfile: ./Dockerfile.dev
     volumes:
       - ./backend/app:/app/
-      - tmp-data:/app/tmp
       - voicevox-core-volume:/app/voicevox_core
     environment:
       FIRESTORE_EMULATOR_HOST: "flutter:8000"
       FIREBASE_AUTH_EMULATOR_HOST: "flutter:9099"
     ports:
       - 8080:8080
-      - 2345:2345
     env_file:
       - .env
     tty: true
     stdin_open: true
-    depends_on:
-      - flutter
+
+# #goの本番環境を模したコンテナ
+#   go-prod:
+#     container_name: go-prod
+#     build:
+#       context: ./backend/
+#       dockerfile: ./Dockerfile.prod
+#     environment:
+#        GOOGLE_APPLICATION_CREDENTIALS: "/app/serviceAccountKey.json"
+#     ports:
+#       - 8080:8080
+#     volumes:
+#       - ./backend/app/serviceAccountKey.json:/app/serviceAccountKey.json
+#     env_file:
+#        - .env
+#     tty: true
+#     stdin_open: true
 
 volumes:
-  tmp-data:
   voicevox-core-volume:
+  flutter-sdk:

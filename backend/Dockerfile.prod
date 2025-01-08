@@ -1,0 +1,16 @@
+FROM golang:1.23.2
+WORKDIR /app/
+
+COPY ./app/go.mod ./app/go.sum ./
+RUN go mod download
+COPY ./app/ /app/
+
+RUN go build -ldflags="-s -w" -trimpath -o /app/run 
+
+FROM buildpack-deps:bookworm-scm
+WORKDIR /app/
+
+COPY --from=0 /app/run /app/
+
+EXPOSE 8080
+CMD [ "/app/run" ]
