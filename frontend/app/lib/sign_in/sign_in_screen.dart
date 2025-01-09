@@ -62,7 +62,7 @@ class _SignInScreenState extends State<SignInScreen> {
             Container(
               margin: EdgeInsets.fromLTRB(15, 0, 15, 15),
               child: Text(
-                'このアプリは音声合成ソフトウェアVOICEVOXを利用しています。',
+                'このアプリは音声合成ソフトウェアVOICEVOX(ずんだもん、春日部つむぎ)を利用しています。',
                 style: TextStyle(
                   fontSize: 13,
                   color: textColor,
