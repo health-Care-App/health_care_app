@@ -19,6 +19,7 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
   Widget build(BuildContext context) {
     //デバイスの画面サイズを取得
     final Size deviceSize = MediaQuery.of(context).size;
+    final bottomSpace = MediaQuery.of(context).viewInsets.bottom;
 
     return Stack(children: [
       //display character image
@@ -50,8 +51,9 @@ class _ChatScreenBodyState extends State<ChatScreenBody> {
       ),
 
       Positioned(
-          top: deviceSize.height - textFieldHeight - appBarHeight,
-          child: ChatBottomAppBar())
+        top: deviceSize.height - textFieldHeight - appBarHeight - bottomSpace,
+        child: ChatBottom(),
+      )
     ]);
   }
 }

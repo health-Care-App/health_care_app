@@ -14,14 +14,14 @@ import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
-class ChatBottomAppBar extends StatefulWidget {
-  const ChatBottomAppBar({super.key});
+class ChatBottom extends StatefulWidget {
+  const ChatBottom({super.key});
 
   @override
-  State<ChatBottomAppBar> createState() => _ChatBottomAppBarState();
+  State<ChatBottom> createState() => _ChatBottomState();
 }
 
-class _ChatBottomAppBarState extends State<ChatBottomAppBar> {
+class _ChatBottomState extends State<ChatBottom> {
   final SpeechToText _speechToText = SpeechToText();
   final AudioQueue _audioQueue = AudioQueue();
   final ChatWebsocket _webSocket = ChatWebsocket();

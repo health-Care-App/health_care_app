@@ -65,9 +65,8 @@ class _ChatTextState extends State<ChatText> {
     //描画後に一番下までスクロール
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollController.animateTo(
-        //途中でスクロールが止まってしまうので+300で調整
-        scrollController.position.maxScrollExtent + 300,
-        duration: const Duration(seconds: 1),
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 5),
         curve: Curves.linear,
       );
     });
