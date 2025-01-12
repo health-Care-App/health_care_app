@@ -165,7 +165,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            '体調 (1-10)',
+                            '体調\n(悪い 1-10 良い)',
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
