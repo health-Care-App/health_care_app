@@ -97,235 +97,257 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
     Authentication.signOut(context: context);
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => SignInScreen()), // LoginSampleに遷移
+      MaterialPageRoute(builder: (context) => SignInScreen()),
       (route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    const double maxWidth = 600;
+
     return Scaffold(
-      backgroundColor: Colors.white, // 画面全体の背景を水色に設定
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        backgroundColor: Colors.white, // AppBarの背景も水色に設定
-        elevation: 0, // AppBarの影をなくす
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        color: Colors.white, // 背景を白に固定
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 睡眠時間グラフ
-            Text(
-              "睡眠時間の推移",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 15), // 「睡眠時間の推移」の下にスペースを追加
-            Container(
-              height: 200,
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: graphColor, // 背景を白に設定
-                borderRadius: BorderRadius.circular(12), // 角を丸める
-              ),
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.start, // データを左詰めに配置
-                  maxY: 12,
-                  titlesData: FlTitlesData(
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false), // 上部の目盛を非表示
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false), // 右側の目盛を非表示
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 6,
-                        getTitlesWidget: (value, _) {
-                          if (value == 0 || value == 6 || value == 12) {
-                            return Text(
-                              value.toInt().toString(),
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: const Color.fromARGB(255, 48, 47, 47)),
-                            );
-                          }
-                          return Text('');
-                        },
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, _) {
-                          if (value.toInt() >= 0 &&
-                              value.toInt() < dates.length) {
-                            return Text(
-                              dates[value.toInt()],
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: const Color.fromARGB(255, 48, 47, 47)),
-                            );
-                          }
-                          return Text('');
-                        },
-                      ),
-                    ),
-                  ),
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: const Border.symmetric(
-                      horizontal: BorderSide(
-                          color: Color.fromARGB(255, 213, 215, 215), width: 1),
-                    ),
-                  ),
-                  barGroups: sleepSpots
-                      .asMap()
-                      .entries
-                      .map((e) => BarChartGroupData(
-                            x: e.key,
-                            barRods: [
-                              BarChartRodData(
-                                toY: e.value.y,
-                                color: Colors.blue,
-                                width: 24,
-                                borderRadius: BorderRadius.circular(2),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: maxWidth),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "睡眠時間の推移",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          Container(
+                            height: 200,
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: graphColor,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: BarChart(
+                              BarChartData(
+                                alignment: BarChartAlignment.start,
+                                maxY: 12,
+                                titlesData: FlTitlesData(
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: 6,
+                                      getTitlesWidget: (value, _) {
+                                        if (value == 0 ||
+                                            value == 6 ||
+                                            value == 12) {
+                                          return Text(
+                                            value.toInt().toString(),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: const Color.fromARGB(
+                                                    255, 48, 47, 47)),
+                                          );
+                                        }
+                                        return Text('');
+                                      },
+                                    ),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (value, _) {
+                                        if (value.toInt() >= 0 &&
+                                            value.toInt() < dates.length) {
+                                          return Text(
+                                            dates[value.toInt()],
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: const Color.fromARGB(
+                                                    255, 48, 47, 47)),
+                                          );
+                                        }
+                                        return Text('');
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                gridData: FlGridData(show: false),
+                                borderData: FlBorderData(
+                                  show: true,
+                                  border: const Border.symmetric(
+                                    horizontal: BorderSide(
+                                        color:
+                                            Color.fromARGB(255, 213, 215, 215),
+                                        width: 1),
+                                  ),
+                                ),
+                                barGroups: sleepSpots
+                                    .asMap()
+                                    .entries
+                                    .map((e) => BarChartGroupData(
+                                          x: e.key,
+                                          barRods: [
+                                            BarChartRodData(
+                                              toY: e.value.y,
+                                              color: Colors.blue,
+                                              width: 24,
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
+                                            ),
+                                          ],
+                                        ))
+                                    .toList(),
+                                groupsSpace: 24,
                               ),
-                            ],
-                          ))
-                      .toList(),
-                  groupsSpace: 24, // 棒グラフ間のスペースを調整
-                ),
-              ),
-            ),
-
-            SizedBox(height: 80),
-
-// 体調スコアグラフ
-            Text(
-              "体調の推移",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 15), // 「体調の推移」の下にスペースを追加
-            Container(
-              height: 200,
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: graphColor, // 背景を白に設定
-                borderRadius: BorderRadius.circular(12), // 角を丸める
-              ),
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.start, // データを左詰めに配置
-                  maxY: 10,
-                  minY: 0,
-                  titlesData: FlTitlesData(
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false), // 上部の目盛を非表示
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false), // 右側の目盛を非表示
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 1,
-                        getTitlesWidget: (value, _) {
-                          if (value == 0 || value == 5 || value == 10) {
-                            return Text(
-                              value.toInt().toString(),
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: const Color.fromARGB(255, 48, 47, 47)),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, _) {
-                          if (value.toInt() >= 0 &&
-                              value.toInt() < dates.length) {
-                            return Text(
-                              dates[value.toInt()],
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: const Color.fromARGB(255, 48, 47, 47)),
-                            );
-                          }
-                          return Text('');
-                        },
-                      ),
-                    ),
-                  ),
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: const Border.symmetric(
-                      horizontal: BorderSide(
-                          color: Color.fromARGB(255, 213, 215, 215), width: 1),
-                    ),
-                  ),
-                  barGroups: healthSpots
-                      .asMap()
-                      .entries
-                      .map((e) => BarChartGroupData(
-                            x: e.key,
-                            barRods: [
-                              BarChartRodData(
-                                toY: e.value.y,
-                                color: Colors.green,
-                                width: 24,
-                                borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          SizedBox(height: 80),
+                          Text(
+                            "体調の推移",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          Container(
+                            height: 200,
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: graphColor,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: BarChart(
+                              BarChartData(
+                                alignment: BarChartAlignment.start,
+                                maxY: 10,
+                                minY: 0,
+                                titlesData: FlTitlesData(
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: 1,
+                                      getTitlesWidget: (value, _) {
+                                        if (value == 0 ||
+                                            value == 5 ||
+                                            value == 10) {
+                                          return Text(
+                                            value.toInt().toString(),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: const Color.fromARGB(
+                                                    255, 48, 47, 47)),
+                                          );
+                                        }
+                                        return const SizedBox.shrink();
+                                      },
+                                    ),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (value, _) {
+                                        if (value.toInt() >= 0 &&
+                                            value.toInt() < dates.length) {
+                                          return Text(
+                                            dates[value.toInt()],
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: const Color.fromARGB(
+                                                    255, 48, 47, 47)),
+                                          );
+                                        }
+                                        return Text('');
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                gridData: FlGridData(show: false),
+                                borderData: FlBorderData(
+                                  show: true,
+                                  border: const Border.symmetric(
+                                    horizontal: BorderSide(
+                                        color:
+                                            Color.fromARGB(255, 213, 215, 215),
+                                        width: 1),
+                                  ),
+                                ),
+                                barGroups: healthSpots
+                                    .asMap()
+                                    .entries
+                                    .map((e) => BarChartGroupData(
+                                          x: e.key,
+                                          barRods: [
+                                            BarChartRodData(
+                                              toY: e.value.y,
+                                              color: Colors.green,
+                                              width: 24,
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
+                                            ),
+                                          ],
+                                        ))
+                                    .toList(),
+                                groupsSpace: 24,
                               ),
-                            ],
-                          ))
-                      .toList(),
-                  groupsSpace: 24, // 棒グラフ間のスペースを調整
-                ),
-              ),
-            ),
-
-            Spacer(),
-            Center(
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: () => _logout(context),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 16),
-                      minimumSize: const Size(200, 50), // ボタンの最小サイズを指定
-                      backgroundColor: pinkColor, // 背景色をpinkColorに変更
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      "ログアウト",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 40),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () => _logout(context),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 32, vertical: 16),
+                                minimumSize: const Size(200, 50),
+                                backgroundColor: pinkColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                "ログアウト",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
-                ],
+                ),
               ),
             ),
           ],
