@@ -114,7 +114,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
         elevation: 0,
       ),
       body: Container(
-        color: Colors.white, // 背景を白に固定
+        color: Colors.white,
         child: Column(
           children: [
             Expanded(

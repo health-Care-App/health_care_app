@@ -17,10 +17,9 @@ class MorningScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     const double scrollThreshold = 550;
-    const double maxWidth = 600; // 最大幅制限
+    const double maxWidth = 600;
 
     if (screenHeight > scrollThreshold) {
-      // 縦幅が十分な場合（以前のコード）
       return Scaffold(
         body: Center(
           child: ConstrainedBox(
@@ -134,7 +133,6 @@ class MorningScreen extends StatelessWidget {
         ),
       );
     } else {
-      // 縦幅が狭い場合（スクロール可能なデザイン）
       return Scaffold(
         body: SingleChildScrollView(
           child: Center(
@@ -143,7 +141,6 @@ class MorningScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 上部画像エリア（高さ固定）
                   Container(
                     width: double.infinity,
                     height: 200,
@@ -157,7 +154,6 @@ class MorningScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // コンテンツエリア
                   Container(
                     width: double.infinity,
                     color: baseColor,
