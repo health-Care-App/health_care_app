@@ -8,7 +8,9 @@ import 'package:app/provider/speak_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import '../user_info.dart';
+import 'package:app/user_info.dart';
+import 'package:app/survey/morning.dart';
+import 'package:app/check_recent_data.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -18,6 +20,23 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final User? user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRecentData();
+  }
+
+  Future<void> _checkRecentData() async {
+    final isToday = await isRecentDataToday();
+    if (!isToday) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const MorningScreen()), // 当日記録をしていなかったら遷移する画面
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
